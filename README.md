@@ -6,5 +6,5 @@ Based upon [my fork](https://github.com/tigattack/VeeamSlackNotifications) of [T
 ## [Instructions.](https://blog.tiga.tech/veeam-b-r-notifications-in-discord/)
 ![Chat Example](https://raw.githubusercontent.com/tigattack/VeeamDiscordNotifications/master/asset/example.png)
 ---
-## [MS Teams fork.](https://github.com/tigattack/VeeamTeamsNotifications)
 ## [Slack fork.](https://github.com/tigattack/VeeamSlackNotifications)
+## [MS Teams fork.](https://github.com/tigattack/VeeamTeamsNotifications)
