@@ -12,3 +12,7 @@ function Start-Logging($path) {
         Write-LogMessage -Tag 'Info' -Message "Transcript is already being logged to $path"
     }
 }
+function Stop-Logging {
+    Write-LogMessage -Tag 'Info' -Message "Stopping transcript logging."
+    Stop-Transcript
+}
