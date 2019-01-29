@@ -1,12 +1,13 @@
+# Pull in variables that were set when the script was started by Veeam
 Param(
 	[String]$JobName,
 	[String]$Id
 )
 
 # Import Functions
-Import-Module "$PSScriptRoot\Helpers"
+Import-Module "$PSScriptRoot\resources\logger.psm1"
 
-# Get the config from our config file
+# Get the config from your config file
 $config = (Get-Content "$PSScriptRoot\config\conf.json") -Join "`n" | ConvertFrom-Json
 
 # Log if enabled in config
@@ -27,76 +28,89 @@ while ($session.IsCompleted -eq $false) {
 	$session = Get-VBRBackupSession | ?{($_.OrigJobName -eq $JobName) -and ($Id -eq $_.Id.ToString())}
 }
 
-# Save same session info
+# Gather session info
 [String]$Status = $session.Result
 $JobName = $session.Name.ToString().Trim()
 $JobType = $session.JobTypeString.Trim()
 [Float]$JobSize = $session.BackupStats.DataSize
 [Float]$TransfSize = $session.BackupStats.BackupSize
+[Float]$Speed = $session.Info.Progress.AvgSpeed
 
-# Report job/data size in B, KB, MB, GB, or TB depending on completed size.
+# Determine whether to report the job and actual data sizes in B, KB, MB, GB, or TB, depending on completed size. Will fallback to B[ytes] if no match.
 ## Job size
-If([Float]$JobSize -lt 1KB) {
-    [String]$JobSizeRound = [Float]$JobSize
-    [String]$JobSizeRound += ' B'
-}
-ElseIf([Float]$JobSize -lt 1MB) {
-    [Float]$JobSize = [Float]$JobSize / 1KB
-    [String]$JobSizeRound = [math]::Round($JobSize,2)
-    [String]$JobSizeRound += ' KB'
-}
-ElseIf([Float]$JobSize -lt 1GB) {
-    [Float]$JobSize = [Float]$JobSize / 1MB
-    [String]$JobSizeRound = [math]::Round($JobSize,2)
-    [String]$JobSizeRound += ' MB'
-}
-ElseIf([Float]$JobSize -lt 1TB) {
-    [Float]$JobSize = [Float]$JobSize / 1GB
-    [String]$JobSizeRound = [math]::Round($JobSize,2)
-    [String]$JobSizeRound += ' GB'
-}
-ElseIf([Float]$JobSize -ge 1TB) {
-    [Float]$JobSize = [Float]$JobSize / 1TB
-    [String]$JobSizeRound = [math]::Round($JobSize,2)
-    [String]$JobSizeRound += ' TB'
-}
-### If no match then report in bytes
-Else{
-    [String]$JobSizeRound = [Float]$JobSize
-    [String]$JobSizeRound += ' B'
+Switch ($JobSize) {
+    ({$PSItem -lt 1KB}) {
+        [String]$JobSizeRound = $JobSize
+        $JobSizeRound += ' B'
+        break
+    }
+    ({$PSItem -lt 1MB}) {
+        $JobSize = $JobSize / 1KB
+        [String]$JobSizeRound = [math]::Round($JobSize,2)
+        $JobSizeRound += ' KB'
+        break
+    }
+    ({$PSItem -lt 1GB}) {
+        $JobSize = $JobSize / 1MB
+        [String]$JobSizeRound = [math]::Round($JobSize,2)
+        $JobSizeRound += ' MB'
+        break
+    }
+    ({$PSItem -lt 1TB}) {
+        $JobSize = $JobSize / 1GB
+        [String]$JobSizeRound = [math]::Round($JobSize,2)
+        $JobSizeRound += ' GB'
+        break
+    }
+    ({$PSItem -ge 1TB}) {
+        $JobSize = $JobSize / 1TB
+        [String]$JobSizeRound = [math]::Round($JobSize,2)
+        $JobSizeRound += ' TB'
+        break
+    }
+    Default {
+    [String]$JobSizeRound = $JobSize
+    $JobSizeRound += ' B'
+    }
 }
 ## Transfer size
-If([Float]$TransfSize -lt 1KB) {
-    [String]$TransfSizeRound = [Float]$TransfSize
-    [String]$TransfSizeRound += ' B'
-}
-ElseIf([Float]$TransfSize -lt 1MB) {
-    [Float]$TransfSize = [Float]$TransfSize / 1KB
-    [String]$TransfSizeRound = [math]::Round($TransfSize,2)
-    [String]$TransfSizeRound += ' KB'
-}
-ElseIf([Float]$TransfSize -lt 1GB) {
-    [Float]$TransfSize = [Float]$TransfSize / 1MB
-    [String]$TransfSizeRound = [math]::Round($TransfSize,2)
-    [String]$TransfSizeRound += ' MB'
-}
-ElseIf([Float]$TransfSize -lt 1TB) {
-    [Float]$TransfSize = [Float]$TransfSize / 1GB
-    [String]$TransfSizeRound = [math]::Round($TransfSize,2)
-    [String]$TransfSizeRound += ' GB'
-}
-ElseIf([Float]$TransfSize -ge 1TB) {
-    [Float]$TransfSize = [Float]$TransfSize / 1TB
-    [String]$TransfSizeRound = [math]::Round($TransfSize,2)
-    [String]$TransfSizeRound += ' TB'
-}
-### If no match then report in bytes
-Else{
-    [String]$TransfSizeRound = [Float]$TransfSize
-    [String]$TransfSizeRound += ' B'
+Switch ($TransfSize) {
+    ({$PSItem -lt 1KB}) {
+        [String]$TransfSizeRound = $TransfSize
+        $TransfSizeRound += ' B'
+        break
+    }
+    ({$PSItem -lt 1MB}) {
+        $TransfSize = $TransfSize / 1KB
+        [String]$TransfSizeRound = [math]::Round($TransfSize,2)
+        $TransfSizeRound += ' KB'
+        break
+    }
+    ({$PSItem -lt 1GB}) {
+        $TransfSize = $TransfSize / 1MB
+        [String]$TransfSizeRound = [math]::Round($TransfSize,2)
+        $TransfSizeRound += ' MB'
+        break
+    }
+    ({$PSItem -lt 1TB}) {
+        $TransfSize = $TransfSize / 1GB
+        [String]$TransfSizeRound = [math]::Round($TransfSize,2)
+        $TransfSizeRound += ' GB'
+        break
+    }
+    ({$PSItem -ge 1TB}) {
+        $TransfSize = $TransfSize / 1TB
+        [String]$TransfSizeRound = [math]::Round($TransfSize,2)
+        $TransfSizeRound += ' TB'
+        break
+    }
+    Default {
+    [String]$TransfSizeRound = $TransfSize
+    $TransfSizeRound += ' B'
+    }
 }
 
-# Job duration
+# Calculate job duration
 $Duration = $session.Info.EndTime - $session.Info.CreationTime
 $TimeSpan = $Duration
 $Duration = '{0:00}h {1:00}m {2:00}s' -f $TimeSpan.Hours, $TimeSpan.Minutes, $TimeSpan.Seconds
@@ -153,7 +167,7 @@ $fieldarray.Add($dedupfield) | Out-Null
 $fieldarray.Add($compressfield) | Out-Null
 $fieldarray.Add($durationfield) | Out-Null
 
-# Embed object with embed and thumbnail vars from above
+# Embed object including field and thumbnail vars from above
 $embedobject = [PSCustomObject]@{
 	title		= $JobName
 	description	= $Status
@@ -172,3 +186,8 @@ $payload = [PSCustomObject]@{
 
 # Send iiiit after converting to JSON
 $request = Invoke-RestMethod -Uri $config.webhook -Body ($payload | ConvertTo-Json -Depth 4) -Method Post -ContentType 'application/json'
+
+# Stop logging.
+if($config.debug_log) {
+	Stop-Logging "$PSScriptRoot\log\debug.log"
+}
