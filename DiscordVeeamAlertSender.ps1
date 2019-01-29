@@ -221,8 +221,18 @@ $embedobject = [PSCustomObject]@{
 $embedarray.Add($embedobject) | Out-Null
 
 # Create payload
-$payload = [PSCustomObject]@{
-	embeds	= $embedarray
+## Mention user if job failed
+If ($config.mention_on_fail -and $Status -eq 'Failed') {
+    $payload = [PSCustomObject]@{
+        content = "<@!$($config.userid)> Job status $Status"
+    	embeds	= $embedarray
+    }
+}
+## Otherwise do not mention user
+Else {
+    $payload = [PSCustomObject]@{
+    	embeds	= $embedarray
+    }
 }
 
 # Send iiiit after converting to JSON
