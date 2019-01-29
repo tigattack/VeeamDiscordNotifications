@@ -110,6 +110,41 @@ Switch ($TransfSize) {
     }
 }
 
+# Determine whether to report the job processing rate in B/s, KB/s, MB/s, or GB/s, depending on the figure. Will fallback to B[ytes] if no match.
+Switch ($Speed) {
+    ({$PSItem -lt 1KB}) {
+        [String]$SpeedRound = $Speed
+        $SpeedRound += ' B/s'
+        break
+    }
+    ({$PSItem -lt 1MB}) {
+        $Speed = $Speed / 1KB
+        [String]$SpeedRound = [math]::Round($Speed,2)
+        $SpeedRound += ' KB/s'
+        break
+    }
+    ({$PSItem -lt 1GB}) {
+        $Speed = $Speed / 1MB
+        [String]$SpeedRound = [math]::Round($Speed,2)
+        $SpeedRound += ' MB/s'
+        break
+    }
+    ({$PSItem -lt 1TB}) {
+        $Speed = $Speed / 1GB
+        [String]$SpeedRound = [math]::Round($Speed,2)
+        $SpeedRound += ' GB/s'
+        break
+    }
+    Default {
+        [String]$SpeedRound = $Speed
+        $SpeedRound += ' B/s'
+    }
+}
+# Write "Unknown" processing speed if 0B/s to avoid confusion.
+If ($SpeedRound -eq '0 B/s') {
+    $SpeedRound = 'Unknown.'
+}
+
 # Calculate job duration
 $Duration = $session.Info.EndTime - $session.Info.CreationTime
 $TimeSpan = $Duration
@@ -159,6 +194,11 @@ $durationfield = [PSCustomObject]@{
     value = $Duration
     inline = 'true'
 }
+$speedfield = [PSCustomObject]@{
+	name = 'Processing rate'
+    value = $SpeedRound
+    inline = 'true'
+}
 
 # Add field objects to the field array
 $fieldarray.Add($backupsizefield) | Out-Null
@@ -166,6 +206,7 @@ $fieldarray.Add($transfsizefield) | Out-Null
 $fieldarray.Add($dedupfield) | Out-Null
 $fieldarray.Add($compressfield) | Out-Null
 $fieldarray.Add($durationfield) | Out-Null
+$fieldarray.Add($speedfield) | Out-Null
 
 # Embed object including field and thumbnail vars from above
 $embedobject = [PSCustomObject]@{
