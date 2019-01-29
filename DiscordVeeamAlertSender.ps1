@@ -15,6 +15,26 @@ if($config.debug_log) {
 	Start-Logging "$PSScriptRoot\log\debug.log"
 }
 
+# Determine if an update is required and notify if so.
+## Get currently downloaded version of this project.
+$currentversion = Get-Content "$PSScriptRoot\resources\version.txt" -Raw
+## Get latest release from GitHub and use that to determine the latest version.
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$latestrelease = Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/latest -Headers @{"Accept"="application/json"} -UseBasicParsing
+## Release IDs are returned in a format of {"id":3622206,"tag_name":"v1.0"} so we need to extract tag_name.
+$latestreleasejson = $latestrelease.Content | ConvertFrom-Json
+$latestversion = $latestreleasejson.tag_name
+## Compare local and latest versions and determine if an update is required, then use that information to build the footer text.
+If ($currentversion -lt $latestversion) {
+    $footeraddition = "You are not up to date, latest is $latestversion."
+}
+Elseif ($currentversion -eq $latestversion) {
+    $footeraddition = "You are running the latest version!"
+}
+Elseif ($currentversion -gt $latestversion) {
+    $footeraddition = "You're running a pre-release version, congrats!"
+}
+
 # Add Veeam snap-in
 Add-PSSnapin VeeamPSSnapin
 
@@ -208,6 +228,12 @@ $fieldarray.Add($compressfield) | Out-Null
 $fieldarray.Add($durationfield) | Out-Null
 $fieldarray.Add($speedfield) | Out-Null
 
+# Build footer object
+$footerobject = [PSCustomObject]@{
+	text = "tigattack's VeeamDiscordNotifications $currentversion. $footeraddition"
+    icon_url = 'https://avatars0.githubusercontent.com/u/10629864'
+}
+
 # Embed object including field and thumbnail vars from above
 $embedobject = [PSCustomObject]@{
 	title		= $JobName
@@ -215,6 +241,7 @@ $embedobject = [PSCustomObject]@{
 	color		= $colour
 	thumbnail	= $thumbobject
     fields		= $fieldarray
+    footer		= $footerobject
 }
 
 # Add embed object to the array created above
