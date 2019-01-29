@@ -15,7 +15,7 @@ if($config.debug_log) {
 	Start-Logging "$PSScriptRoot\log\debug.log"
 }
 
-# Determine if an update is required and notify if so.
+# Determine if an update is required.
 ## Get currently downloaded version of this project.
 $currentversion = Get-Content "$PSScriptRoot\resources\version.txt" -Raw
 ## Get latest release from GitHub and use that to determine the latest version.
@@ -24,15 +24,32 @@ $latestrelease = Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscor
 ## Release IDs are returned in a format of {"id":3622206,"tag_name":"v1.0"} so we need to extract tag_name.
 $latestreleasejson = $latestrelease.Content | ConvertFrom-Json
 $latestversion = $latestreleasejson.tag_name
-## Compare local and latest versions and determine if an update is required, then use that information to build the footer text.
+## Define update phrases and get a random one for the update info.
+$updateolderarray = @(
+    "Jesus mate, you're out of date! Latest is $latestversion, go update.",
+    "Bloody hell you muppet, you need to update! Latest is $latestversion, go update.",
+    "Fuck me sideways, you're out of date! Latest is $latestversion, go update."
+)
+$updatecurrentarray = @(
+    "Nice work mate, you're up to date.",
+    "Good shit buddy, you're up to date.",
+    "Top stuff my dude, you're up to date."
+)
+$updatenewerarray = @(
+    "Wewlad, check you out running a pre-release version, latest is $latestversion!",
+    "Christ m8e, this is mental, you're ahead of release, latest is $latestversion!",
+    "You nutter, you're running a pre-release version! Latest is $latestversion!",
+    "Bloody hell mate, this is unheard of, $currentversion isn't even released yet, latest is $latestversion!"
+)
+## Comparing local and latest versions and determine if an update is required, then use that information to build the footer text.
 If ($currentversion -lt $latestversion) {
-    $footeraddition = "You are not up to date, latest is $latestversion."
+    $footeraddition = (Get-Random -InputObject $updateolderarray -Count 1)
 }
 Elseif ($currentversion -eq $latestversion) {
-    $footeraddition = "You are running the latest version!"
+    $footeraddition = (Get-Random -InputObject $updatecurrentarray -Count 1)
 }
 Elseif ($currentversion -gt $latestversion) {
-    $footeraddition = "You're running a pre-release version, congrats!"
+    $footeraddition = (Get-Random -InputObject $updatenewerarray -Count 1)
 }
 
 # Add Veeam snap-in
