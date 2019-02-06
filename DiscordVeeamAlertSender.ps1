@@ -289,6 +289,8 @@ if($config.debug_log) {
 
 # Trigger update on outdated version
 If ($currentversion -lt $latestversion -and $config.auto_update) {
-    $powershellArguments = "-file $PSScriptRoot\UpdateVeeamDiscordNotification.ps1", "-LatestVersion $latestversion"
+    Move-Item $PSScriptRoot\UpdateVeeamDiscordNotification.ps1 C:\VeeamScripts\UpdateVeeamDiscordNotification.ps1
+    Unblock-File C:\VeeamScripts\UpdateVeeamDiscordNotification.ps1
+    $powershellArguments = "-file C:\VeeamScripts\UpdateVeeamDiscordNotification.ps1", "-LatestVersion $latestversion"
     Start-Process -FilePath "powershell" -Verb runAs -ArgumentList $powershellArguments -WindowStyle hidden
 }
