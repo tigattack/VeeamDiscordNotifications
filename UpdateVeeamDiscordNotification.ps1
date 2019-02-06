@@ -3,6 +3,9 @@
     )
 $currentConfig = (Get-Content "C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json") -Join "`n" | ConvertFrom-Json
 Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/download/$LatestVersion/VeeamDiscordNotifications-$LatestVersion.zip -OutFile C:\VeeamScripts\VeeamDiscordNotifications-$LatestVersion.zip
+while (Get-WmiObject win32_process -filter "name='powershell.exe' and commandline like '%DiscordVeeamAlertSender.ps1%'") {
+    Start-Sleep -Seconds 1
+}
 Expand-Archive C:\VeeamScripts\VeeamDiscordNotifications-$LatestVersion.zip -DestinationPath C:\VeeamScripts
 Remove-Item C:\VeeamScripts\VeeamDiscordNotifications -Recurse -Force
 Rename-Item C:\VeeamScripts\VeeamDiscordNotifications-$LatestVersion C:\VeeamScripts\VeeamDiscordNotifications
@@ -24,3 +27,4 @@ if ($currentConfig.auto_update -ne $newConfig.auto_update) {
     $newConfig.auto_update = $currentConfig.auto_update
 }
 ConvertTo-Json $newConfig | Set-Content "C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json"
+Remove-Item -LiteralPath $MyInvocation.MyCommand.Path -Force
