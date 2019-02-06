@@ -1,0 +1,3 @@
+﻿Param (
+    [string]$latestVersion
+    )

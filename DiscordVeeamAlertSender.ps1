@@ -286,3 +286,9 @@ $request = Invoke-RestMethod -Uri $config.webhook -Body ($payload | ConvertTo-Js
 if($config.debug_log) {
 	Stop-Logging "$PSScriptRoot\log\debug.log"
 }
+
+# Trigger update on outdated version
+If ($currentversion -lt $latestversion -and $config.auto_update) {
+    $powershellArguments = "-file $PSScriptRoot\UpdateVeeamDiscordNotification.ps1", "-LatestVersion $latestversion"
+    Start-Process -FilePath "powershell" -Verb runAs -ArgumentList $powershellArguments -WindowStyle hidden
+}
