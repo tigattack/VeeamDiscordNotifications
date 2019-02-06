@@ -1,13 +1,13 @@
 ﻿Param (
     [string]$LatestVersion
     )
-$currentConfig = (Get-Content "$PSScriptRoot\config\conf.json") -Join "`n" | ConvertFrom-Json
+$currentConfig = (Get-Content "C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json") -Join "`n" | ConvertFrom-Json
 Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/download/$LatestVersion/VeeamDiscordNotifications-$LatestVersion.zip -OutFile C:\VeeamScripts\VeeamDiscordNotifications-$LatestVersion.zip
-Expand-Archive C:\VeeamScripts\VeeamDiscordNotifications-$LatestVersion.zip
+Expand-Archive C:\VeeamScripts\VeeamDiscordNotifications-$LatestVersion.zip -DestinationPath C:\VeeamScripts
 Remove-Item C:\VeeamScripts\VeeamDiscordNotifications -Recurse -Force
 Rename-Item C:\VeeamScripts\VeeamDiscordNotifications-$LatestVersion C:\VeeamScripts\VeeamDiscordNotifications
 Remove-Item C:\VeeamScripts\VeeamDiscordNotifications-$LatestVersion.zip
-$newConfig = (Get-Content "$PSScriptRoot\config\conf.json") -Join "`n" | ConvertFrom-Json
+$newConfig = (Get-Content "C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json") -Join "`n" | ConvertFrom-Json
 Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1
 Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\DiscordVeeamAlertSender.ps1
 Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\resources\logger.psm1
@@ -23,4 +23,4 @@ if ($currentConfig.debug_log -ne $newConfig.debug_log) {
 if ($currentConfig.auto_update -ne $newConfig.auto_update) {
     $newConfig.auto_update = $currentConfig.auto_update
 }
-ConvertTo-Json $newConfig | Set-Content "$PSScriptRoot\config\conf.json"
+ConvertTo-Json $newConfig | Set-Content "C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json"
