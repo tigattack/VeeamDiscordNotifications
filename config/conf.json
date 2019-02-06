@@ -4,5 +4,5 @@
 	"userid": "123456789",
 	"mention_on_fail": false,
 	"debug_log": false,
-    "auto_update": true
+	"auto_update": true
 }
