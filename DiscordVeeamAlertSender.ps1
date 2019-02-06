@@ -282,15 +282,15 @@ Else {
 # Send iiiit after converting to JSON
 $request = Invoke-RestMethod -Uri $config.webhook -Body ($payload | ConvertTo-Json -Depth 4) -Method Post -ContentType 'application/json'
 
-# Stop logging.
-if($config.debug_log) {
-	Stop-Logging "$PSScriptRoot\log\debug.log"
-}
-
 # Trigger update on outdated version
 If ($currentversion -lt $latestversion -and $config.auto_update) {
     Move-Item $PSScriptRoot\UpdateVeeamDiscordNotification.ps1 C:\VeeamScripts\UpdateVeeamDiscordNotification.ps1
     Unblock-File C:\VeeamScripts\UpdateVeeamDiscordNotification.ps1
     $powershellArguments = "-file C:\VeeamScripts\UpdateVeeamDiscordNotification.ps1", "-LatestVersion $latestversion"
     Start-Process -FilePath "powershell" -Verb runAs -ArgumentList $powershellArguments -WindowStyle hidden
+}
+
+# Stop logging.
+if($config.debug_log) {
+	Stop-Logging "$PSScriptRoot\log\debug.log"
 }
