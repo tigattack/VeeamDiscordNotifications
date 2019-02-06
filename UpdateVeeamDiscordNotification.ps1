@@ -12,15 +12,8 @@ Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\DiscordNotificationBootst
 Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\DiscordVeeamAlertSender.ps1
 Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\resources\logger.psm1
 Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\UpdateVeeamDiscordNotification.ps1
-if ($currentConfig.webhook -ne $newConfig.webhook) {
-    $newConfig.webhook = $currentConfig.webhook
-}
-if ($currentConfig.thumbnail -ne $newConfig.thumbnail) {
-    $newConfig.thumbnail = $currentConfig.thumbnail
-}
-if ($currentConfig.userid -ne $newConfig.userid) {
-    $newConfig.userid = $currentConfig.userid
-}
+$newConfig.webhook = $currentConfig.webhook
+$newConfig.userid = $currentConfig.userid
 if ($currentConfig.mention_on_fail -ne $newConfig.mention_on_fail) {
     $newConfig.mention_on_fail = $currentConfig.mention_on_fail
 }
