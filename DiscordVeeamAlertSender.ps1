@@ -17,7 +17,7 @@ if($config.debug_log) {
 
 # Determine if an update is required.
 ## Get currently downloaded version of this project.
-$currentversion = Get-Content "$PSScriptRoot\resources\version.txt" -Raw
+$currentversion = Get-Content "$PSScriptRoot\resources\version.txt"
 ## Get latest release from GitHub and use that to determine the latest version.
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $latestrelease = Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/latest -Headers @{"Accept"="application/json"} -UseBasicParsing
@@ -284,9 +284,9 @@ $request = Invoke-RestMethod -Uri $config.webhook -Body ($payload | ConvertTo-Js
 
 # Trigger update on outdated version
 If ($currentversion -lt $latestversion -and $config.auto_update) {
-    Move-Item $PSScriptRoot\UpdateVeeamDiscordNotification.ps1 C:\VeeamScripts\UpdateVeeamDiscordNotification.ps1
-    Unblock-File C:\VeeamScripts\UpdateVeeamDiscordNotification.ps1
-    $powershellArguments = "-file C:\VeeamScripts\UpdateVeeamDiscordNotification.ps1", "-LatestVersion $latestversion"
+    Copy-Item $PSScriptRoot\UpdateVeeamDiscordNotification.ps1 $PSScriptRoot\..\UpdateVeeamDiscordNotification.ps1
+    Unblock-File $PSScriptRoot\..\UpdateVeeamDiscordNotification.ps1
+    $powershellArguments = "-file $PSScriptRoot\..\UpdateVeeamDiscordNotification.ps1", "-LatestVersion $latestversion"
     Start-Process -FilePath "powershell" -Verb runAs -ArgumentList $powershellArguments -WindowStyle hidden
 }
 
