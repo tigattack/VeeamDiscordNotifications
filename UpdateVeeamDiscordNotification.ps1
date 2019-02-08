@@ -33,7 +33,7 @@ $notification = {
     $fieldarray.Add($resultfield) | Out-Null
     # Embed object including field and thumbnail vars from above
     $embedobject = [PSCustomObject]@{
-        title		= $JobName
+        title		= 'Update'
         color		= '1267393'
         thumbnail	= $thumbobject
         fields		= $fieldarray
