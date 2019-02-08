@@ -53,7 +53,7 @@ $oldversion = Get-Content "$PSScriptRoot\VeeamDiscordNotifications\resources\ver
 # Import functions
 Import-Module "$PSScriptRoot\VeeamDiscordNotifications\resources\logger.psm1"
 # Start logging
-Start-Logging "$PSScriptRoot\VeeamDiscordNotifications\log\update.log"
+Start-Logging "$PSScriptRoot\update.log"
 
 # Pull current config to variable
 $currentConfig = (Get-Content "$PSScriptRoot\VeeamDiscordNotifications\config\conf.json") -Join "`n" | ConvertFrom-Json
@@ -68,6 +68,7 @@ while (Get-WmiObject win32_process -filter "name='powershell.exe' and commandlin
     }
 }
 # Pull latest version of script from GitHub
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/download/$LatestVersion/VeeamDiscordNotifications-$LatestVersion.zip -OutFile $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip
 # Expand downloaded ZIP
 Expand-Archive $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -DestinationPath $PSScriptRoot
@@ -119,4 +120,6 @@ Remove-Item "$PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip"
 Remove-Item -LiteralPath $MyInvocation.MyCommand.Path -Force
 
 # Stop logging
-Stop-Logging "$PSScriptRoot\VeeamDiscordNotifications\log\update.log"
+Stop-Logging "$PSScriptRoot\update.log"
+# Copy item
+Move-Item "$PSScriptRoot\update.log" "$PSScriptRoot\VeeamDiscordNotifications\log\update.log"
