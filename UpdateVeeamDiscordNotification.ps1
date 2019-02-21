@@ -51,6 +51,31 @@ function notification {
     # Send iiit
     Invoke-RestMethod -Uri $currentconfig.webhook -Body ($payload | ConvertTo-Json -Depth 4) -Method Post -ContentType 'application/json'
 }
+# Success function
+function success {
+    $result = 'Success!'
+    Remove-Item –Path $PSScriptRoot\VeeamDiscordNotifications-old –Recurse -Force
+    Write-Output 'Successfully updated.'
+    Invoke-Expression notification
+    # Stop logging
+    Stop-Logging "$PSScriptRoot\update.log"
+    # Move log file
+    Move-Item "$PSScriptRoot\update.log" "$PSScriptRoot\VeeamDiscordNotifications\log\update.log"
+    Exit-PSSession
+}
+# Failure function
+function fail {
+    $result = 'Failure!'
+    Remove-Item –Path $PSScriptRoot\VeeamDiscordNotifications –Recurse -Force
+    Rename-Item $PSScriptRoot\VeeamDiscordNotifications-old $PSScriptRoot\VeeamDiscordNotifications
+    Write-Output 'Update failed, reverted to previous version.'
+    Invoke-Expression notification
+    # Stop logging
+    Stop-Logging "$PSScriptRoot\update.log"
+    # Move log file
+    Move-Item "$PSScriptRoot\update.log" "$PSScriptRoot\VeeamDiscordNotifications\log\update.log"
+    Exit-PSSession
+}
 
 # Get currently downloaded version
 Try {
@@ -60,6 +85,7 @@ Try {
 Catch {
     $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
     Write-Output "$errorvar"
+    Invoke-Expression fail
 }
 
 # Import functions
@@ -75,6 +101,7 @@ Try {
 Catch {
     $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
     Write-Output "$errorvar"
+    Invoke-Expression fail
 }
 
 # Wait until the alert sender has finished running, or quit this if it's still running after 60s. It should never take that long.
@@ -96,6 +123,7 @@ Try {
 Catch {
     $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
     Write-Output "$errorvar"
+    Invoke-Expression fail
 }
 
 # Expand downloaded ZIP
@@ -106,6 +134,7 @@ Try {
 Catch {
     $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
     Write-Output "$errorvar"
+    Invoke-Expression fail
 }
 
 # Rename old version to make room for the new version
@@ -116,6 +145,7 @@ Try {
 Catch {
     $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
     Write-Output "$errorvar"
+    Invoke-Expression fail
 }
 
 # Rename extracted update
@@ -126,6 +156,7 @@ Try {
 Catch {
     $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
     Write-Output "$errorvar"
+    Invoke-Expression fail
 }
 
 # Pull configuration from new conf file
@@ -136,6 +167,7 @@ Try {
 Catch {
     $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
     Write-Output "$errorvar"
+    Invoke-Expression fail
 }
 
 # Unblock script files
@@ -163,6 +195,7 @@ Try {
 Catch {
     $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
     Write-Output "$errorvar"
+    Invoke-Expression fail
 }
 
 # Get newly downloaded version
@@ -173,21 +206,15 @@ Try {
 Catch {
     $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
     Write-Output "$errorvar"
+    Invoke-Expression fail
 }
 
 # Send notification
 If ($newversion -eq $LatestVersion) {
-    $result = 'Success!'
-    Remove-Item –Path $PSScriptRoot\VeeamDiscordNotifications-old –Recurse -Force
-    Write-Output 'Successfully updated.'
-    Invoke-Command -ScriptBlock $notification
+    Invoke-Expression success
 }
 Else {
-    $result = 'Failure!'
-    Remove-Item –Path $PSScriptRoot\VeeamDiscordNotifications –Recurse -Force
-    Rename-Item $PSScriptRoot\VeeamDiscordNotifications-old $PSScriptRoot\VeeamDiscordNotifications
-    Write-Output 'Update failed, reverted to previous version.'
-    Invoke-Command -ScriptBlock $notification
+    Invoke-Expression fail
 }
 
 # Clean up.
