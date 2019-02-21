@@ -170,7 +170,7 @@ Catch {
 
 # Pull configuration from new conf file
 Try {
-	Write-Output 'Rename extracted update.'
+	Write-Output 'Pull configuration from new conf file.'
 	$newConfig = (Get-Content "$PSScriptRoot\VeeamDiscordNotifications\config\conf.json") -Join "`n" | ConvertFrom-Json
 }
 Catch {
