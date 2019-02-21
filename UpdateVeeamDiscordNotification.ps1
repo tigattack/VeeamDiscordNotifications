@@ -6,8 +6,8 @@ Param (
 # Set error action preference.
 $ErrorActionPreference = 'Stop'
 
-# Notification script block
-$notification = {
+# Notification function
+function notification {
     # Create embed and fields array
     [System.Collections.ArrayList]$embedarray = @()
     [System.Collections.ArrayList]$fieldarray = @()
@@ -196,5 +196,5 @@ Remove-Item -LiteralPath $MyInvocation.MyCommand.Path -Force
 
 # Stop logging
 Stop-Logging "$PSScriptRoot\update.log"
-# Copy item
+# Move log file
 Move-Item "$PSScriptRoot\update.log" "$PSScriptRoot\VeeamDiscordNotifications\log\update.log"
