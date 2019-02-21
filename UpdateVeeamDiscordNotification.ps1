@@ -2,6 +2,10 @@
 Param (
     [string]$LatestVersion
 )
+
+# Set error action preference.
+$ErrorActionPreference = 'Stop'
+
 # Notification script block
 $notification = {
     # Create embed and fields array
@@ -49,14 +53,29 @@ $notification = {
 }
 
 # Get currently downloaded version
-$oldversion = Get-Content "$PSScriptRoot\VeeamDiscordNotifications\resources\version.txt"
+Try {
+    Write-Output 'Getting currently downloaded version of the script.'
+    $oldversion = Get-Content "$PSScriptRoot\VeeamDiscordNotifications\resources\version.txt"
+}
+Catch {
+    $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+    Write-Output "$errorvar"
+}
+
 # Import functions
 Import-Module "$PSScriptRoot\VeeamDiscordNotifications\resources\logger.psm1"
 # Start logging
 Start-Logging "$PSScriptRoot\update.log"
 
 # Pull current config to variable
-$currentConfig = (Get-Content "$PSScriptRoot\VeeamDiscordNotifications\config\conf.json") -Join "`n" | ConvertFrom-Json
+Try {
+	Write-Output 'Pull current config to variable.'
+	$currentConfig = (Get-Content "$PSScriptRoot\VeeamDiscordNotifications\config\conf.json") -Join "`n" | ConvertFrom-Json
+}
+Catch {
+    $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+    Write-Output "$errorvar"
+}
 
 # Wait until the alert sender has finished running, or quit this if it's still running after 60s. It should never take that long.
 while (Get-WmiObject win32_process -filter "name='powershell.exe' and commandline like '%DiscordVeeamAlertSender.ps1%'") {
@@ -67,38 +86,94 @@ while (Get-WmiObject win32_process -filter "name='powershell.exe' and commandlin
         exit
     }
 }
+
 # Pull latest version of script from GitHub
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/download/$LatestVersion/VeeamDiscordNotifications-$LatestVersion.zip -OutFile $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip
+Try {
+	Write-Output 'Pull latest version of script from GitHub.'
+	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/download/$LatestVersion/VeeamDiscordNotifications-$LatestVersion.zip -OutFile $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip
+}
+Catch {
+    $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+    Write-Output "$errorvar"
+}
+
 # Expand downloaded ZIP
-Expand-Archive $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -DestinationPath $PSScriptRoot
+Try {
+	Write-Output 'Expand downloaded ZIP.'
+	Expand-Archive $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -DestinationPath $PSScriptRoot
+}
+Catch {
+    $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+    Write-Output "$errorvar"
+}
+
 # Rename old version to make room for the new version
-Rename-Item $PSScriptRoot\VeeamDiscordNotifications $PSScriptRoot\VeeamDiscordNotifications-old
+Try {
+	Write-Output 'Rename old version to make room for the new version.'
+	Rename-Item $PSScriptRoot\VeeamDiscordNotifications $PSScriptRoot\VeeamDiscordNotifications-old
+}
+Catch {
+    $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+    Write-Output "$errorvar"
+}
+
 # Rename extracted update
-Rename-Item $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion $PSScriptRoot\VeeamDiscordNotifications
+Try {
+	Write-Output 'Rename extracted update.'
+	Rename-Item $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion $PSScriptRoot\VeeamDiscordNotifications
+}
+Catch {
+    $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+    Write-Output "$errorvar"
+}
+
 # Pull configuration from new conf file
-$newConfig = (Get-Content "$PSScriptRoot\VeeamDiscordNotifications\config\conf.json") -Join "`n" | ConvertFrom-Json
+Try {
+	Write-Output 'Rename extracted update.'
+	$newConfig = (Get-Content "$PSScriptRoot\VeeamDiscordNotifications\config\conf.json") -Join "`n" | ConvertFrom-Json
+}
+Catch {
+    $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+    Write-Output "$errorvar"
+}
+
 # Unblock script files
-Unblock-File $PSScriptRoot\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1
-Unblock-File $PSScriptRoot\VeeamDiscordNotifications\DiscordVeeamAlertSender.ps1
-Unblock-File $PSScriptRoot\VeeamDiscordNotifications\resources\logger.psm1
-Unblock-File $PSScriptRoot\VeeamDiscordNotifications\UpdateVeeamDiscordNotification.ps1
-# Set conf.json as it was before
-$newConfig.webhook = $currentConfig.webhook
-$newConfig.userid = $currentConfig.userid
-if ($currentConfig.mention_on_fail -ne $newConfig.mention_on_fail) {
-    $newConfig.mention_on_fail = $currentConfig.mention_on_fail
+Unblock-File $PSScriptRoot\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1 -ErrorAction Continue
+Unblock-File $PSScriptRoot\VeeamDiscordNotifications\DiscordVeeamAlertSender.ps1 -ErrorAction Continue
+Unblock-File $PSScriptRoot\VeeamDiscordNotifications\resources\logger.psm1 -ErrorAction Continue
+Unblock-File $PSScriptRoot\VeeamDiscordNotifications\UpdateVeeamDiscordNotification.ps1 -ErrorAction Continue
+
+# Populate conf.json with previous configuration
+Try {
+	Write-Output 'Populate conf.json with previous configuration.'
+	$newConfig.webhook = $currentConfig.webhook
+    $newConfig.userid = $currentConfig.userid
+    if ($currentConfig.mention_on_fail -ne $newConfig.mention_on_fail) {
+        $newConfig.mention_on_fail = $currentConfig.mention_on_fail
+    }
+    if ($currentConfig.debug_log -ne $newConfig.debug_log) {
+        $newConfig.debug_log = $currentConfig.debug_log
+    }
+    if ($currentConfig.auto_update -ne $newConfig.auto_update) {
+        $newConfig.auto_update = $currentConfig.auto_update
+    }
+    ConvertTo-Json $newConfig | Set-Content "$PSScriptRoot\VeeamDiscordNotifications\config\conf.json"
 }
-if ($currentConfig.debug_log -ne $newConfig.debug_log) {
-    $newConfig.debug_log = $currentConfig.debug_log
+Catch {
+    $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+    Write-Output "$errorvar"
 }
-if ($currentConfig.auto_update -ne $newConfig.auto_update) {
-    $newConfig.auto_update = $currentConfig.auto_update
-}
-ConvertTo-Json $newConfig | Set-Content "$PSScriptRoot\VeeamDiscordNotifications\config\conf.json"
 
 # Get newly downloaded version
-$newversion = Get-Content "$PSScriptRoot\VeeamDiscordNotifications\resources\version.txt"
+Try {
+	Write-Output 'Get newly downloaded version.'
+	$newversion = Get-Content "$PSScriptRoot\VeeamDiscordNotifications\resources\version.txt"
+}
+Catch {
+    $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+    Write-Output "$errorvar"
+}
 
 # Send notification
 If ($newversion -eq $LatestVersion) {
