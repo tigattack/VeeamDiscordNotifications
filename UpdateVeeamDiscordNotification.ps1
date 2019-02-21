@@ -66,11 +66,6 @@ function success {
     Remove-Item –Path $PSScriptRoot\VeeamDiscordNotifications-old –Recurse -Force
     Write-Output 'Successfully updated.'
     Invoke-Expression notification
-    # Stop logging
-    Stop-Logging "$PSScriptRoot\update.log"
-    # Move log file
-    Move-Item "$PSScriptRoot\update.log" "$PSScriptRoot\VeeamDiscordNotifications\log\update.log"
-    Exit-PSSession
 }
 # Failure function
 function fail {
@@ -79,11 +74,6 @@ function fail {
     Rename-Item $PSScriptRoot\VeeamDiscordNotifications-old $PSScriptRoot\VeeamDiscordNotifications
     Write-Output 'Update failed, reverted to previous version.'
     Invoke-Expression notification
-    # Stop logging
-    Stop-Logging "$PSScriptRoot\update.log"
-    # Move log file
-    Move-Item "$PSScriptRoot\update.log" "$PSScriptRoot\VeeamDiscordNotifications\log\update.log"
-    Exit-PSSession
 }
 
 # Get currently downloaded version
