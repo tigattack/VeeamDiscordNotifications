@@ -35,6 +35,15 @@ function notification {
     $fieldarray.Add($oldversionfield) | Out-Null
     $fieldarray.Add($newversionfield) | Out-Null
     $fieldarray.Add($resultfield) | Out-Null
+    # Send error if exist
+    If ($errorvar -ne $null) {
+        $errorfield = [PSCustomObject]@{
+	        name = 'Update Error'
+            value = $errorvar
+            inline = 'false'
+        }
+        $fieldarray.Add($errorfield) | Out-Null
+    }
     # Embed object including field and thumbnail vars from above
     $embedobject = [PSCustomObject]@{
         title		= 'Update'
