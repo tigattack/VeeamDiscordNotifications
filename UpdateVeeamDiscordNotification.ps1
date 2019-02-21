@@ -180,6 +180,7 @@ Catch {
 }
 
 # Unblock script files
+Write-Output 'Unblock script files.'
 Unblock-File $PSScriptRoot\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1 -ErrorAction Continue
 Unblock-File $PSScriptRoot\VeeamDiscordNotifications\DiscordVeeamAlertSender.ps1 -ErrorAction Continue
 Unblock-File $PSScriptRoot\VeeamDiscordNotifications\resources\logger.psm1 -ErrorAction Continue
