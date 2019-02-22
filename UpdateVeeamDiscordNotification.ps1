@@ -3,11 +3,18 @@ Param (
     [string]$LatestVersion
 )
 
+# Import functions
+Import-Module "$PSScriptRoot\VeeamDiscordNotifications\resources\logger.psm1"
+# Start logging
+Start-Logging "$PSScriptRoot\update.log"
+
 # Set error action preference.
+Write-Output 'Set error action preference.'
 $ErrorActionPreference = 'Stop'
 
 # Notification function
 function notification {
+    Write-Output 'Building notification.'
     # Create embed and fields array
     [System.Collections.ArrayList]$embedarray = @()
     [System.Collections.ArrayList]$fieldarray = @()
@@ -57,22 +64,23 @@ function notification {
     $payload = [PSCustomObject]@{
     	embeds	= $embedarray
     }
+    Write-Output 'Sending notification.'
     # Send iiit
-    Invoke-RestMethod -Uri $currentconfig.webhook -Body ($payload | ConvertTo-Json -Depth 4) -Method Post -ContentType 'application/json'
+    Invoke-RestMethod -Uri $currentconfig.webhook -Body ($payload | ConvertTo-Json -Depth 4) -Method Post -ContentType 'application/json' -ErrorAction Continue
 }
 # Success function
 function success {
+    Write-Output 'Successfully updated.'
     $result = 'Success!'
     Remove-Item –Path $PSScriptRoot\VeeamDiscordNotifications-old –Recurse -Force
-    Write-Output 'Successfully updated.'
     Invoke-Expression notification
 }
 # Failure function
 function fail {
+    Write-Output 'Update failed, reverting to previous version.'
     $result = 'Failure!'
     Remove-Item –Path $PSScriptRoot\VeeamDiscordNotifications –Recurse -Force
     Rename-Item $PSScriptRoot\VeeamDiscordNotifications-old $PSScriptRoot\VeeamDiscordNotifications
-    Write-Output 'Update failed, reverted to previous version.'
     Invoke-Expression notification
 }
 
@@ -86,11 +94,6 @@ Catch {
     Write-Output "$errorvar"
     Invoke-Expression fail
 }
-
-# Import functions
-Import-Module "$PSScriptRoot\VeeamDiscordNotifications\resources\logger.psm1"
-# Start logging
-Start-Logging "$PSScriptRoot\update.log"
 
 # Pull current config to variable
 Try {
@@ -218,10 +221,15 @@ Else {
 }
 
 # Clean up.
+Write-Output 'Remove downloaded ZIP.'
 Remove-Item "$PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip"
+Write-Output 'Remove UpdateVeeamDiscordNotification.ps1.'
 Remove-Item -LiteralPath $MyInvocation.MyCommand.Path -Force
 
 # Stop logging
+Write-Output 'Stop logging.'
 Stop-Logging "$PSScriptRoot\update.log"
 # Move log file
+Write-Output 'Move log file.'
 Move-Item "$PSScriptRoot\update.log" "$PSScriptRoot\VeeamDiscordNotifications\log\update.log"
+Write-Output 'Exiting.'
