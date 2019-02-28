@@ -13,7 +13,7 @@ Write-Output 'Set error action preference.'
 $ErrorActionPreference = 'Stop'
 
 # Notification function
-function notification {
+function Update-Notification {
     Write-Output 'Building notification.'
     # Create embed and fields array
     [System.Collections.ArrayList]$embedarray = @()
@@ -69,20 +69,65 @@ function notification {
     Invoke-RestMethod -Uri $currentconfig.webhook -Body ($payload | ConvertTo-Json -Depth 4) -Method Post -ContentType 'application/json' -ErrorAction Continue
 }
 # Success function
-function success {
+function Update-Success {
     Write-Output 'Successfully updated.'
     $result = 'Success!'
     Remove-Item –Path $PSScriptRoot\VeeamDiscordNotifications-old –Recurse -Force
-    Invoke-Expression notification
+    Invoke-Expression Update-Notification
 }
 # Failure function
-function fail {
-    Write-Output 'Update failed, reverting to previous version.'
+function Update-Fail {
     $result = 'Failure!'
+    Switch ($fail) {
+        download {
+            Write-Output 'Failed to download update.'
+        }
+        unzip {
+            Write-Output 'Failed to unzip update. Cleaning up and reverting.'
+            Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -Force
+        }
+        rename_old {
+            Write-Output 'Failed to rename old version. Cleaning up and reverting.'
+            Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -Force
+            Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion -Recurse -Force
+        }
+        rename_new {
+            Write-Output 'Failed to rename new version. Cleaning up and reverting.'
+            Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -Force
+            Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion -Recurse -Force
+        	Rename-Item $PSScriptRoot\VeeamDiscordNotifications-old $PSScriptRoot\VeeamDiscordNotifications
+        }
+        after_rename_new {
+            Write-Output 'Failed after renaming new version. Cleaning up and reverting.'
+            Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -Force
+            Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications -Recurse -Force
+        	Rename-Item $PSScriptRoot\VeeamDiscordNotifications-old $PSScriptRoot\VeeamDiscordNotifications
+        }
+    }
+    Write-Output 'Update failed. Previous version restored.'
     Remove-Item –Path $PSScriptRoot\VeeamDiscordNotifications –Recurse -Force
     Rename-Item $PSScriptRoot\VeeamDiscordNotifications-old $PSScriptRoot\VeeamDiscordNotifications
-    Invoke-Expression notification
+    Invoke-Expression Update-Notification
 }
+# End of script function
+function End-Script {
+    # Clean up.
+    Write-Output 'Remove downloaded ZIP if it''s still there.'
+    If (Test-Path "$PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip") {
+        Remove-Item "$PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip"
+    }
+    Write-Output 'Remove UpdateVeeamDiscordNotification.ps1.'
+    Remove-Item -LiteralPath $MyInvocation.MyCommand.Path -Force
+    
+    # Stop logging
+    Write-Output 'Stop logging.'
+    Stop-Logging "$PSScriptRoot\update.log"
+    # Move log file
+    Write-Output 'Move log file.'
+    Move-Item "$PSScriptRoot\update.log" "$PSScriptRoot\VeeamDiscordNotifications\log\update.log"
+    Write-Output 'Exiting.'
+}
+
 
 # Get currently downloaded version
 Try {
@@ -92,7 +137,7 @@ Try {
 Catch {
     $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
     Write-Output "$errorvar"
-    Invoke-Expression fail
+    Invoke-Expression Update-Fail
 }
 
 # Pull current config to variable
@@ -103,7 +148,7 @@ Try {
 Catch {
     $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
     Write-Output "$errorvar"
-    Invoke-Expression fail
+    Invoke-Expression Update-Fail
 }
 
 # Wait until the alert sender has finished running, or quit this if it's still running after 60s. It should never take that long.
@@ -112,8 +157,8 @@ while (Get-WmiObject win32_process -filter "name='powershell.exe' and commandlin
     Start-Sleep -Seconds 1
     If ($timer -eq '60') {
         Write-Output 'Timeout reached. Updater quitting as DiscordVeeamAlertSender.ps1 is still running after 60 seconds.'
-        exit
     }
+    Invoke-Expression Update-Fail
 }
 
 # Pull latest version of script from GitHub
@@ -125,7 +170,8 @@ Try {
 Catch {
     $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
     Write-Output "$errorvar"
-    Invoke-Expression fail
+    $fail = 'download'
+    Invoke-Expression Update-Fail
 }
 
 # Expand downloaded ZIP
@@ -136,7 +182,8 @@ Try {
 Catch {
     $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
     Write-Output "$errorvar"
-    Invoke-Expression fail
+    $fail = 'unzip'
+    Invoke-Expression Update-Fail
 }
 
 # Rename old version to make room for the new version
@@ -147,7 +194,8 @@ Try {
 Catch {
     $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
     Write-Output "$errorvar"
-    Invoke-Expression fail
+    $fail = 'rename_old'
+    Invoke-Expression Update-Fail
 }
 
 # Rename extracted update
@@ -158,7 +206,8 @@ Try {
 Catch {
     $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
     Write-Output "$errorvar"
-    Invoke-Expression fail
+    $fail = 'rename_new'
+    Invoke-Expression Update-Fail
 }
 
 # Pull configuration from new conf file
@@ -169,7 +218,8 @@ Try {
 Catch {
     $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
     Write-Output "$errorvar"
-    Invoke-Expression fail
+    $fail = 'after_rename_new'
+    Invoke-Expression Update-Fail
 }
 
 # Unblock script files
@@ -198,7 +248,8 @@ Try {
 Catch {
     $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
     Write-Output "$errorvar"
-    Invoke-Expression fail
+    $fail = 'after_rename_new'
+    Invoke-Expression Update-Fail
 }
 
 # Get newly downloaded version
@@ -209,27 +260,14 @@ Try {
 Catch {
     $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
     Write-Output "$errorvar"
-    Invoke-Expression fail
+    $fail = 'after_rename_new'
+    Invoke-Expression Update-Fail
 }
 
 # Send notification
 If ($newversion -eq $LatestVersion) {
-    Invoke-Expression success
+    Invoke-Expression Update-Success
 }
 Else {
-    Invoke-Expression fail
+    Invoke-Expression Update-Fail
 }
-
-# Clean up.
-Write-Output 'Remove downloaded ZIP.'
-Remove-Item "$PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip"
-Write-Output 'Remove UpdateVeeamDiscordNotification.ps1.'
-Remove-Item -LiteralPath $MyInvocation.MyCommand.Path -Force
-
-# Stop logging
-Write-Output 'Stop logging.'
-Stop-Logging "$PSScriptRoot\update.log"
-# Move log file
-Write-Output 'Move log file.'
-Move-Item "$PSScriptRoot\update.log" "$PSScriptRoot\VeeamDiscordNotifications\log\update.log"
-Write-Output 'Exiting.'
