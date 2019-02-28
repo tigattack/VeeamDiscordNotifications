@@ -74,6 +74,7 @@ function Update-Success {
     $result = 'Success!'
     Remove-Item –Path $PSScriptRoot\VeeamDiscordNotifications-old –Recurse -Force
     Invoke-Expression Update-Notification
+    Invoke-Expression End-Script
 }
 # Failure function
 function Update-Fail {
@@ -108,6 +109,7 @@ function Update-Fail {
     Remove-Item –Path $PSScriptRoot\VeeamDiscordNotifications –Recurse -Force
     Rename-Item $PSScriptRoot\VeeamDiscordNotifications-old $PSScriptRoot\VeeamDiscordNotifications
     Invoke-Expression Update-Notification
+    Invoke-Expression End-Script
 }
 # End of script function
 function End-Script {
