@@ -89,12 +89,12 @@ function Update-Success {
 
     # Copy logs directory from copy of previously installed version to new install
     Write-Output 'Copying logs from old version to new version.'
-    Copy-Item -Path $PSScriptRoot\VeeamDiscordNotifications-old\log -Destination $PSScriptRoot\VeeamDiscordNotifications\ -Recurse
+    Copy-Item -Path $PSScriptRoot\VeeamDiscordNotifications-old\log -Destination $PSScriptRoot\VeeamDiscordNotifications\ -Recurse -Force
 
     # Remove copy of previously installed version
+    Write-Output 'Removing old version.'
     Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-old -Recurse -Force
 
-    Write-Output "Update result: $result"
     Invoke-Expression Update-Notification
     Invoke-Expression End-Script
 }
@@ -134,14 +134,13 @@ function Update-Fail {
         	Rename-Item $PSScriptRoot\VeeamDiscordNotifications-old $PSScriptRoot\VeeamDiscordNotifications
         }
     }
-    Write-Output "Update result: $result"
     Invoke-Expression Update-Notification
     Invoke-Expression End-Script
 }
 # End of script function
 function End-Script {
     # Clean up.
-    Write-Output 'Remove downloaded ZIP if it''s still there.'
+    Write-Output 'Remove downloaded ZIP.'
     If (Test-Path "$PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip") {
         Remove-Item "$PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip"
     }
@@ -154,6 +153,8 @@ function End-Script {
     # Move log file
     Write-Output 'Move log file to log directory in VeeamDiscordNotifications.'
     Move-Item $logfile "$PSScriptRoot\VeeamDiscordNotifications\log\"
+    # Report result and exit script
+    Write-Output "Update result: $result"
     Write-Output 'Exiting.'
     Exit
 }
@@ -216,7 +217,7 @@ Catch {
     Invoke-Expression Update-Fail
 }
 
-# Rename old version to make room for the new version
+# Rename old version to keep as a backup while the update is in progress.
 Try {
 	Write-Output 'Rename old version to make room for the new version.'
 	Rename-Item $PSScriptRoot\VeeamDiscordNotifications $PSScriptRoot\VeeamDiscordNotifications-old
