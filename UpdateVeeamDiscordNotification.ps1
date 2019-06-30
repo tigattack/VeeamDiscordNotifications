@@ -5,8 +5,13 @@ Param (
 
 # Import functions
 Import-Module "$PSScriptRoot\VeeamDiscordNotifications\resources\logger.psm1"
-# Start logging
-Start-Logging "$PSScriptRoot\update.log"
+
+# Logging
+## Set log file name
+$date = (Get-Date -UFormat %Y-%m-%d)
+$logfile = "$PSScriptRoot\update_$date.log"
+## Start logging to file
+Start-Logging $logfile
 
 # Set error action preference.
 Write-Output 'Set error action preference.'
@@ -141,10 +146,10 @@ function End-Script {
     
     # Stop logging
     Write-Output 'Stop logging.'
-    Stop-Logging "$PSScriptRoot\update.log"
+    Stop-Logging $logfile
     # Move log file
-    Write-Output 'Move log file.'
-    Move-Item "$PSScriptRoot\update.log" "$PSScriptRoot\VeeamDiscordNotifications\log\update.log"
+    Write-Output 'Move log file to log directory in VeeamDiscordNotifications.'
+    Move-Item $logfile "$PSScriptRoot\VeeamDiscordNotifications\log\"
     Write-Output 'Exiting.'
     Exit
 }
