@@ -17,13 +17,16 @@ if($config.debug_log) {
 
 # Determine if an update is required.
 ## Get currently downloaded version of this project.
-$currentversion = Get-Content "$PSScriptRoot\resources\version.txt"
+$currentversion = Get-Content "$PSScriptRoot\resources\version.txt" -Raw
+
 ## Get latest release from GitHub and use that to determine the latest version.
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $latestrelease = Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/latest -Headers @{"Accept"="application/json"} -UseBasicParsing
+
 ## Release IDs are returned in a format of {"id":3622206,"tag_name":"v1.0"} so we need to extract tag_name.
 $latestreleasejson = $latestrelease.Content | ConvertFrom-Json
 $latestversion = $latestreleasejson.tag_name
+
 ## Define update phrases and get a random one for the update info.
 $updateolderarray = @(
     "Jesus mate, you're out of date! Latest is $latestversion, go update.",
@@ -41,6 +44,7 @@ $updatenewerarray = @(
     "You nutter, you're running a pre-release version! Latest is $latestversion!",
     "Bloody hell mate, this is unheard of, $currentversion isn't even released yet, latest is $latestversion!"
 )
+
 ## Comparing local and latest versions and determine if an update is required, then use that information to build the footer text.
 If ($currentversion -lt $latestversion) {
     $footeraddition = (Get-Random -InputObject $updateolderarray -Count 1)
