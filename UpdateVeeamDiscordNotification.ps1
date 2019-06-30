@@ -87,6 +87,10 @@ function Update-Success {
     # Set result var for notification and script output
     $result = 'Success!'
 
+    # Copy logs directory from copy of previously installed version to new install
+    Write-Output 'Copying logs from old version to new version.'
+    Copy-Item -Path $PSScriptRoot\VeeamDiscordNotifications-old\log -Destination $PSScriptRoot\VeeamDiscordNotifications\ -Recurse
+
     # Remove copy of previously installed version
     Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-old -Recurse -Force
 
