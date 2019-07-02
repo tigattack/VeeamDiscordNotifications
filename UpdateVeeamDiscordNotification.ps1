@@ -75,7 +75,9 @@ function Update-Notification {
         Invoke-RestMethod -Uri $currentconfig.webhook -Body ($payload | ConvertTo-Json -Depth 4) -Method Post -ContentType 'application/json'
     }
     Catch {
-        Write-Output 'Update notification failed to send to Discord.'
+        $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+        Write-Warning 'Update notification failed to send to Discord.'
+        Write-Output "$errorvar"
     }
 }
 # Success function
@@ -163,7 +165,7 @@ function End-Script {
 # Get currently downloaded version
 Try {
     Write-Output 'Getting currently downloaded version of the script.'
-    $oldversion = Get-Content "$PSScriptRoot\VeeamDiscordNotifications\resources\version.txt"
+    [String]$oldversion = Get-Content "$PSScriptRoot\VeeamDiscordNotifications\resources\version.txt" -Raw
 }
 Catch {
     $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
@@ -286,7 +288,7 @@ Catch {
 # Get newly downloaded version
 Try {
 	Write-Output 'Get newly downloaded version.'
-	$newversion = Get-Content "$PSScriptRoot\VeeamDiscordNotifications\resources\version.txt"
+	[String]$newversion = Get-Content "$PSScriptRoot\VeeamDiscordNotifications\resources\version.txt" -Raw
 }
 Catch {
     $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
