@@ -27,22 +27,27 @@ $latestrelease = Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscor
 $latestreleasejson = $latestrelease.Content | ConvertFrom-Json
 $latestversion = $latestreleasejson.tag_name
 
-## Define update phrases and get a random one for the update info.
+## Define version announcement phrases and get a random one for the version info in the footer of the report.
 $updateolderarray = @(
-	"Jesus mate, you're out of date! Latest is $latestversion, go update.",
-	"Bloody hell you muppet, you need to update! Latest is $latestversion, go update.",
-	"Fuck me sideways, you're out of date! Latest is $latestversion, go update."
+    "Jesus mate, you're out of date! Latest is $latestversion. Check your update logs.",
+    "Bloody hell you muppet, you need to update! Latest is $latestversion. Check your update logs.",
+    "Fuck me sideways, you're out of date! Latest is $latestversion. Check your update logs.",
+    "Shitting heck lad, you need to update! Latest is $latestversion. Check your update logs.",
+    "Christ almighty, you're out of date! Latest is $latestversion. Check your update logs."
 )
 $updatecurrentarray = @(
-	"Nice work mate, you're up to date.",
-	"Good shit buddy, you're up to date.",
-	"Top stuff my dude, you're up to date."
+    "Nice work mate, you're up to date.",
+    "Good shit buddy, you're up to date.",
+    "Top stuff my dude, you're running the latest version.",
+    "Good job fam, you're all up to date.",
+    "Lovely stuff mate, you're running the latest version."
 )
 $updatenewerarray = @(
-	"Wewlad, check you out running a pre-release version, latest is $latestversion!",
-	"Christ m8e, this is mental, you're ahead of release, latest is $latestversion!",
-	"You nutter, you're running a pre-release version! Latest is $latestversion!",
-	"Bloody hell mate, this is unheard of, $currentversion isn't even released yet, latest is $latestversion!"
+    "Wewlad, check you out running a pre-release version, latest is $latestversion!",
+    "Christ m8e, this is mental, you're ahead of release, latest is $latestversion!",
+    "You nutter, you're running a pre-release version! Latest is $latestversion!",
+    "Bloody hell mate, this is unheard of, $currentversion isn't even released yet, latest is $latestversion!"
+    "Fuuuckin hell, $currentversion hasn't even been released! Latest is $latestrelease."
 )
 
 ## Comparing local and latest versions and determine if an update is required, then use that information to build the footer text.
