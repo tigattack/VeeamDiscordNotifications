@@ -9,9 +9,9 @@ Import-Module "$PSScriptRoot\VeeamDiscordNotifications\resources\logger.psm1"
 # Logging
 ## Set log file name
 $date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ":", "." })
-$logfile = "$PSScriptRoot\update_$date.log"
+$logFile = "$PSScriptRoot\update_$date.log"
 ## Start logging to file
-Start-Logging $logfile
+Start-Logging $logFile
 
 # Set error action preference.
 Write-Output 'Set error action preference.'
@@ -21,65 +21,66 @@ $ErrorActionPreference = 'Stop'
 function Update-Notification {
     Write-Output 'Building notification.'
     # Create embed and fields array
-    [System.Collections.ArrayList]$embedarray = @()
-    [System.Collections.ArrayList]$fieldarray = @()
+    [System.Collections.ArrayList]$embedArray = @()
+    [System.Collections.ArrayList]$fieldArray = @()
     # Thumbnail object
-    $thumbobject = [PSCustomObject]@{
-	    url = $currentconfig.thumbnail
+    $thumbObject = [PSCustomObject]@{
+	    url = $currentConfig.thumbnail
     }
     # Field objects
-    $resultfield = [PSCustomObject]@{
+    $resultField = [PSCustomObject]@{
 	    name = 'Update Result'
         value = $result
         inline = 'false'
     }
-    $newversionfield = [PSCustomObject]@{
+    $newVersionField = [PSCustomObject]@{
 	    name = 'New version'
-        value = $newversion
+        value = $newVersion
         inline = 'false'
     }
-    $oldversionfield = [PSCustomObject]@{
+    $oldVersionField = [PSCustomObject]@{
 	    name = 'Old version'
-        value = $oldversion
+        value = $oldVersion
         inline = 'false'
     }
     # Add field objects to the field array
-    $fieldarray.Add($oldversionfield) | Out-Null
-    $fieldarray.Add($newversionfield) | Out-Null
-    $fieldarray.Add($resultfield) | Out-Null
+    $fieldArray.Add($oldVersionField) | Out-Null
+    $fieldArray.Add($newVersionField) | Out-Null
+    $fieldArray.Add($resultField) | Out-Null
     # Send error if exist
-    If ($errorvar -ne $null) {
-        $errorfield = [PSCustomObject]@{
+    If ($errorVar -ne $null) {
+        $errorField = [PSCustomObject]@{
 	        name = 'Update Error'
-            value = $errorvar
+            value = $errorVar
             inline = 'false'
         }
-        $fieldarray.Add($errorfield) | Out-Null
+        $fieldArray.Add($errorField) | Out-Null
     }
     # Embed object including field and thumbnail vars from above
-    $embedobject = [PSCustomObject]@{
+    $embedObject = [PSCustomObject]@{
         title		= 'Update'
         color		= '1267393'
-        thumbnail	= $thumbobject
-        fields		= $fieldarray
+        thumbnail	= $thumbObject
+        fields		= $fieldArray
     }
     # Add embed object to the array created above
-    $embedarray.Add($embedobject) | Out-Null
+    $embedArray.Add($embedObject) | Out-Null
     # Build payload
     $payload = [PSCustomObject]@{
-    	embeds	= $embedarray
+    	embeds	= $embedArray
     }
     Write-Output 'Sending notification.'
     # Send iiit
     Try {
-        Invoke-RestMethod -Uri $currentconfig.webhook -Body ($payload | ConvertTo-Json -Depth 4) -Method Post -ContentType 'application/json'
+        Invoke-RestMethod -Uri $currentConfig.webhook -Body ($payload | ConvertTo-Json -Depth 4) -Method Post -ContentType 'application/json'
     }
     Catch {
-        $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+        $errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
         Write-Warning 'Update notification failed to send to Discord.'
-        Write-Output "$errorvar"
+        Write-Output "$errorVar"
     }
 }
+
 # Success function
 function Update-Success {
     # Set error action preference so that errors while ending the script don't end the script prematurely.
@@ -96,10 +97,12 @@ function Update-Success {
     # Remove copy of previously installed version
     Write-Output 'Removing old version.'
     Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-old -Recurse -Force
-
+    
+    # Trigger the Update-Notification function and then End-Script function.
     Invoke-Expression Update-Notification
     Invoke-Expression End-Script
 }
+
 # Failure function
 function Update-Fail {
     # Set error action preference so that errors while ending the script don't end the script prematurely.
@@ -136,9 +139,12 @@ function Update-Fail {
         	Rename-Item $PSScriptRoot\VeeamDiscordNotifications-old $PSScriptRoot\VeeamDiscordNotifications
         }
     }
+
+    # Trigger the Update-Notification function and then End-Script function.
     Invoke-Expression Update-Notification
     Invoke-Expression End-Script
 }
+
 # End of script function
 function End-Script {
     # Clean up.
@@ -151,26 +157,16 @@ function End-Script {
     
     # Stop logging
     Write-Output 'Stop logging.'
-    Stop-Logging $logfile
+    Stop-Logging $logFile
+
     # Move log file
     Write-Output 'Move log file to log directory in VeeamDiscordNotifications.'
-    Move-Item $logfile "$PSScriptRoot\VeeamDiscordNotifications\log\"
+    Move-Item $logFile "$PSScriptRoot\VeeamDiscordNotifications\log\"
+
     # Report result and exit script
     Write-Output "Update result: $result"
     Write-Output 'Exiting.'
     Exit
-}
-
-
-# Get currently downloaded version
-Try {
-    Write-Output 'Getting currently downloaded version of the script.'
-    [String]$oldversion = Get-Content "$PSScriptRoot\VeeamDiscordNotifications\resources\version.txt" -Raw
-}
-Catch {
-    $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
-    Write-Output "$errorvar"
-    Invoke-Expression Update-Fail
 }
 
 # Pull current config to variable
@@ -179,8 +175,19 @@ Try {
 	$currentConfig = (Get-Content "$PSScriptRoot\VeeamDiscordNotifications\config\conf.json") -Join "`n" | ConvertFrom-Json
 }
 Catch {
-    $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
-    Write-Output "$errorvar"
+    $errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+    Write-Output "$errorVar"
+    Invoke-Expression Update-Fail
+}
+
+# Get currently downloaded version
+Try {
+    Write-Output 'Getting currently downloaded version of the script.'
+    [String]$oldVersion = Get-Content "$PSScriptRoot\VeeamDiscordNotifications\resources\version.txt" -Raw
+}
+Catch {
+    $errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+    Write-Output "$errorVar"
     Invoke-Expression Update-Fail
 }
 
@@ -201,8 +208,8 @@ Try {
     Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/download/$LatestVersion/VeeamDiscordNotifications-$LatestVersion.zip -OutFile $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip
 }
 Catch {
-    $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
-    Write-Output "$errorvar"
+    $errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+    Write-Output "$errorVar"
     $fail = 'download'
     Invoke-Expression Update-Fail
 }
@@ -213,8 +220,8 @@ Try {
 	Expand-Archive $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -DestinationPath $PSScriptRoot
 }
 Catch {
-    $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
-    Write-Output "$errorvar"
+    $errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+    Write-Output "$errorVar"
     $fail = 'unzip'
     Invoke-Expression Update-Fail
 }
@@ -225,8 +232,8 @@ Try {
 	Rename-Item $PSScriptRoot\VeeamDiscordNotifications $PSScriptRoot\VeeamDiscordNotifications-old
 }
 Catch {
-    $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
-    Write-Output "$errorvar"
+    $errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+    Write-Output "$errorVar"
     $fail = 'rename_old'
     Invoke-Expression Update-Fail
 }
@@ -237,8 +244,8 @@ Try {
 	Rename-Item $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion $PSScriptRoot\VeeamDiscordNotifications
 }
 Catch {
-    $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
-    Write-Output "$errorvar"
+    $errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+    Write-Output "$errorVar"
     $fail = 'rename_new'
     Invoke-Expression Update-Fail
 }
@@ -249,8 +256,8 @@ Try {
 	$newConfig = (Get-Content "$PSScriptRoot\VeeamDiscordNotifications\config\conf.json") -Join "`n" | ConvertFrom-Json
 }
 Catch {
-    $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
-    Write-Output "$errorvar"
+    $errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+    Write-Output "$errorVar"
     $fail = 'after_rename_new'
     Invoke-Expression Update-Fail
 }
@@ -279,8 +286,8 @@ Try {
     ConvertTo-Json $newConfig | Set-Content "$PSScriptRoot\VeeamDiscordNotifications\config\conf.json"
 }
 Catch {
-    $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
-    Write-Output "$errorvar"
+    $errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+    Write-Output "$errorVar"
     $fail = 'after_rename_new'
     Invoke-Expression Update-Fail
 }
@@ -288,17 +295,17 @@ Catch {
 # Get newly downloaded version
 Try {
 	Write-Output 'Get newly downloaded version.'
-	[String]$newversion = Get-Content "$PSScriptRoot\VeeamDiscordNotifications\resources\version.txt" -Raw
+	[String]$newVersion = Get-Content "$PSScriptRoot\VeeamDiscordNotifications\resources\version.txt" -Raw
 }
 Catch {
-    $errorvar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
-    Write-Output "$errorvar"
+    $errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+    Write-Output "$errorVar"
     $fail = 'after_rename_new'
     Invoke-Expression Update-Fail
 }
 
 # Send notification
-If ($newversion -eq $LatestVersion) {
+If ($newVersion -eq $LatestVersion) {
     Invoke-Expression Update-Success
 }
 Else {
