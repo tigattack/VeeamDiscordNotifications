@@ -115,25 +115,25 @@ function Update-Fail {
     # Take action based on the stage at which the error occured
     Switch ($fail) {
         download {
-            Write-Output 'Failed to download update.'
+            Write-Warning 'Failed to download update.'
         }
         unzip {
-            Write-Output 'Failed to unzip update. Cleaning up and reverting.'
+            Write-Warning 'Failed to unzip update. Cleaning up and reverting.'
             Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -Force
         }
         rename_old {
-            Write-Output 'Failed to rename old version. Cleaning up and reverting.'
+            Write-Warning 'Failed to rename old version. Cleaning up and reverting.'
             Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -Force
             Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion -Recurse -Force
         }
         rename_new {
-            Write-Output 'Failed to rename new version. Cleaning up and reverting.'
+            Write-Warning 'Failed to rename new version. Cleaning up and reverting.'
             Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -Force
             Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion -Recurse -Force
         	Rename-Item $PSScriptRoot\VeeamDiscordNotifications-old $PSScriptRoot\VeeamDiscordNotifications
         }
         after_rename_new {
-            Write-Output 'Failed after renaming new version. Cleaning up and reverting.'
+            Write-Warning 'Failed after renaming new version. Cleaning up and reverting.'
             Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -Force
             Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications -Recurse -Force
         	Rename-Item $PSScriptRoot\VeeamDiscordNotifications-old $PSScriptRoot\VeeamDiscordNotifications
