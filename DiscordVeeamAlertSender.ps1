@@ -194,7 +194,10 @@ If ($SpeedRound -eq '0 B/s') {
 # Calculate job duration
 $Duration = $session.Info.EndTime - $session.Info.CreationTime
 $TimeSpan = $Duration
-$Duration = '{0:00}h {1:00}m {2:00}s' -f $TimeSpan.Hours, $TimeSpan.Minutes, $TimeSpan.Seconds
+If ($TimeSpan.Days -ge '1') {
+        $Duration = $TimeSpan.Days+'d '
+}
+$Duration += '{0}h {1}m {2}s' -f $TimeSpan.Hours, $TimeSpan.Minutes, $TimeSpan.Seconds
 
 # Decide embed colour from session status
 switch ($Status) {
