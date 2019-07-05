@@ -13,19 +13,19 @@ if($config.debug_log) {
 Add-PSSnapin VeeamPSSnapin
 
 # Get the Veeam job from parent process.
-$parentpid = (Get-WmiObject Win32_Process -Filter "processid='$pid'").parentprocessid.ToString()
-$parentcmd = (Get-WmiObject Win32_Process -Filter "processid='$parentpid'").CommandLine
-$job = Get-VBRJob | ?{$parentcmd -like "*"+$_.Id.ToString()+"*"}
+$parentPID = (Get-WmiObject Win32_Process -Filter "processid='$pid'").parentprocessid.ToString()
+$parentCmd = (Get-WmiObject Win32_Process -Filter "processid='$parentPID'").CommandLine
+$job = Get-VBRJob | ?{$parentCmd -like "*"+$_.Id.ToString()+"*"}
 
 # Get the Veeam session.
-$session = Get-VBRBackupSession | ?{($_.OrigJobName -eq $job.Name) -and ($parentcmd -like "*"+$_.Id.ToString()+"*")}
+$session = Get-VBRBackupSession | ?{($_.OrigJobName -eq $job.Name) -and ($parentCmd -like "*"+$_.Id.ToString()+"*")}
 
 # Store the job's name and ID.
-$Id = '"' + $session.Id.ToString().ToString().Trim() + '"'
-$JobName = '"' + $session.OrigJobName.ToString().Trim() + '"'
+$id = '"' + $session.Id.ToString().ToString().Trim() + '"'
+$jobName = '"' + $session.OrigJobName.ToString().Trim() + '"'
 
 # Build argument string for the alert sender.
-$powershellArguments = "-file $PSScriptRoot\DiscordVeeamAlertSender.ps1", "-JobName $JobName", "-Id $Id"
+$powershellArguments = "-file $PSScriptRoot\DiscordVeeamAlertSender.ps1", "-JobName $jobName", "-Id $id"
 
 # Start a new new script in a new process with some of the information gathered here.
 # This allows Veeam to finish the current session so that we can gather information from the completed job.
