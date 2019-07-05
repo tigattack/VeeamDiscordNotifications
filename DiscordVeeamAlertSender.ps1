@@ -192,12 +192,13 @@ If ($speedRound -eq '0 B/s') {
 }
 
 # Calculate job duration
-$duration = $session.Info.EndTime - $session.Info.CreationTime
-$timeSpan = $duration
-If ($timeSpan.Days -ge '1') {
-        $duration = $timeSpan.Days+'d '
+$TimeSpan = $session.Info.EndTime - $session.Info.CreationTime
+If ($TimeSpan.Days -ge '1') {
+        $Duration = '{0}d {1}h {2}m {3}s' -f $TimeSpan.Days, $TimeSpan.Hours, $TimeSpan.Minutes, $TimeSpan.Seconds
 }
-$duration += '{0}h {1}m {2}s' -f $timeSpan.Hours, $timeSpan.Minutes, $timeSpan.Seconds
+Else {
+    $Duration = '{0}h {1}m {2}s' -f $TimeSpan.Hours, $TimeSpan.Minutes, $TimeSpan.Seconds
+}
 
 # Switch on the session status
 switch ($status) {
