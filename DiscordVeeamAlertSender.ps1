@@ -47,7 +47,7 @@ $updateNewerArray = @(
     "Christ m8e, this is mental, you're ahead of release, latest is $latestVersion!",
     "You nutter, you're running a pre-release version! Latest is $latestVersion!",
     "Bloody hell mate, this is unheard of, $currentVersion isn't even released yet, latest is $latestVersion!"
-    "Fuuuckin hell, $currentVersion hasn't even been released! Latest is $latestRelease."
+    "Fuuuckin hell, $currentVersion hasn't even been released! Latest is $latestVersion."
 )
 
 ## Comparing local and latest versions and determine if an update is required, then use that information to build the footer text.
