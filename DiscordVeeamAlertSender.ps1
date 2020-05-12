@@ -11,8 +11,12 @@ Import-Module "$PSScriptRoot\resources\logger.psm1"
 $config = (Get-Content "$PSScriptRoot\config\conf.json") -Join "`n" | ConvertFrom-Json
 
 # Log if enabled in config
-if ($config.debug_log) {
-	Start-Logging "$PSScriptRoot\log\debug.log"
+if($config.debug_log) {
+    ## Set log file name
+    $date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ":", "." })
+    $logFile = "$PSScriptRoot\log\Log_$jobName-$date.log"
+    ## Start logging to file
+    Start-Logging $logFile
 }
 
 # Determine if an update is required.
@@ -309,6 +313,6 @@ If ($currentVersion -lt $latestVersion -and $config.auto_update) {
 }
 
 # Stop logging.
-if ($config.debug_log) {
-	Stop-Logging "$PSScriptRoot\log\debug.log"
+if($config.debug_log) {
+	Stop-Logging $logFile
 }

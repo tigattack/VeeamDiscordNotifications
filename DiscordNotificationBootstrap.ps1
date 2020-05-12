@@ -4,9 +4,13 @@ Import-Module "$PSScriptRoot\resources\logger.psm1"
 # Get the config from our config file.
 $config = (Get-Content "$PSScriptRoot\config\conf.json") -Join "`n" | ConvertFrom-Json
 
-# Log if enabled in config.
+# Start logging if logging is enabled in config
 if($config.debug_log) {
-	Start-Logging "$PSScriptRoot\log\debug.log"
+    ## Set log file name
+    $date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ":", "." })
+    $logFile = "$PSScriptRoot\log\Log_Bootstrap-$date.log"
+    ## Start logging to file
+    Start-Logging $logFile
 }
 
 # Import Veeam module.
@@ -33,5 +37,5 @@ Start-Process -FilePath "powershell" -Verb runAs -ArgumentList $powershellArgume
 
 # Stop logging.
 if($config.debug_log) {
-	Stop-Logging "$PSScriptRoot\log\debug.log"
+	Stop-Logging $logFile
 }
