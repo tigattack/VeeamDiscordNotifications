@@ -15,10 +15,10 @@ Add-PSSnapin VeeamPSSnapin
 # Get the Veeam job from parent process.
 $parentPID = (Get-WmiObject Win32_Process -Filter "processid='$pid'").parentprocessid.ToString()
 $parentCmd = (Get-WmiObject Win32_Process -Filter "processid='$parentPID'").CommandLine
-$job = Get-VBRJob | ?{$parentCmd -like "*"+$_.Id.ToString()+"*"}
+$job = Get-VBRJob | Where-Object{$parentCmd -like "*"+$_.Id.ToString()+"*"}
 
 # Get the Veeam session.
-$session = Get-VBRBackupSession | ?{($_.OrigJobName -eq $job.Name) -and ($parentCmd -like "*"+$_.Id.ToString()+"*")}
+$session = Get-VBRBackupSession | Where-Object{($_.OrigJobName -eq $job.Name) -and ($parentCmd -like "*"+$_.Id.ToString()+"*")}
 
 # Store the job's name and ID.
 $id = '"' + $session.Id.ToString().ToString().Trim() + '"'
