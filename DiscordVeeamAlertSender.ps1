@@ -69,7 +69,7 @@ $session = Get-VBRBackupSession | Where-Object{($_.OrigjobName -eq $jobName) -an
 
 # Wait for the session to finish up
 while ($session.IsCompleted -eq $false) {
-	Write-LogMessage 'Info' 'Session not finished Sleeping...'
+	Write-LogMessage -Tag 'Info' -Message 'Session not finished. Sleeping...'
 	Start-Sleep -m 200
 	$session = Get-VBRBackupSession | Where-Object{($_.OrigjobName -eq $jobName) -and ($id -eq $_.Id.ToString())}
 }
