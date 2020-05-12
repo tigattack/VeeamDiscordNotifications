@@ -48,7 +48,7 @@ function Update-Notification {
     $fieldArray.Add($newVersionField) | Out-Null
     $fieldArray.Add($resultField) | Out-Null
     # Send error if exist
-    If ($errorVar -ne $null) {
+    If ($null -ne $errorVar) {
         $errorField = [PSCustomObject]@{
 	        name = 'Update Error'
             value = $errorVar
@@ -86,7 +86,7 @@ function Update-Success {
     # Set error action preference so that errors while ending the script don't end the script prematurely.
     Write-Output 'Set error action preference.'
     $ErrorActionPreference = 'Continue'
-    
+
     # Set result var for notification and script output
     $result = 'Success!'
 
@@ -97,7 +97,7 @@ function Update-Success {
     # Remove copy of previously installed version
     Write-Output 'Removing old version.'
     Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-old -Recurse -Force
-    
+
     # Trigger the Update-Notification function and then End-Script function.
     Invoke-Expression Update-Notification
     Invoke-Expression End-Script
@@ -108,7 +108,7 @@ function Update-Fail {
     # Set error action preference so that errors while ending the script don't end the script prematurely.
     Write-Output 'Set error action preference.'
     $ErrorActionPreference = 'Continue'
-    
+
     # Set result var for notification and script output
     $result = 'Failure!'
 
@@ -154,7 +154,7 @@ function End-Script {
     }
     Write-Output 'Remove UpdateVeeamDiscordNotification.ps1.'
     Remove-Item -LiteralPath $PSCommandPath -Force
-    
+
     # Stop logging
     Write-Output 'Stop logging.'
     Stop-Logging $logFile
