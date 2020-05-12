@@ -65,13 +65,13 @@ Elseif ($currentVersion -gt $latestVersion) {
 Import-Module Veeam.Backup.PowerShell
 
 # Get the session
-$session = Get-VBRBackupSession | ?{($_.OrigjobName -eq $jobName) -and ($id -eq $_.Id.ToString())}
+$session = Get-VBRBackupSession | Where-Object{($_.OrigjobName -eq $jobName) -and ($id -eq $_.Id.ToString())}
 
 # Wait for the session to finish up
 while ($session.IsCompleted -eq $false) {
 	Write-LogMessage 'Info' 'Session not finished Sleeping...'
 	Start-Sleep -m 200
-	$session = Get-VBRBackupSession | ?{($_.OrigjobName -eq $jobName) -and ($id -eq $_.Id.ToString())}
+	$session = Get-VBRBackupSession | Where-Object{($_.OrigjobName -eq $jobName) -and ($id -eq $_.Id.ToString())}
 }
 
 # Gather session info
