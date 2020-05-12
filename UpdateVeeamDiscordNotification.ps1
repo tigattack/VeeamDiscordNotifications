@@ -146,7 +146,7 @@ function Update-Fail {
 }
 
 # End of script function
-function End-Script {
+function Stop-Script {
     # Clean up.
     Write-Output 'Remove downloaded ZIP.'
     If (Test-Path "$PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip") {
