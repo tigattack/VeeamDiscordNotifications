@@ -28,9 +28,7 @@ $currentVersion = Get-Content "$PSScriptRoot\resources\version.txt" -Raw
 $latestRelease = Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/latest -Headers @{"Accept"="application/json"} -UseBasicParsing
 
 ## Release IDs are returned in a format of {"id":3622206,"tag_name":"v1.0"} so we need to extract tag_name.
-$latestReleaseJson = $latestRelease.Content | ConvertFrom-Json
-$latestVersion = $latestReleaseJson.tag_name
-
+$latestVersion = ConvertFrom-Json $latestRelease.Content | ForEach-Object {$_.tag_name}
 ## Define version announcement phrases and get a random one for the version info in the footer of the report.
 $updateOlderArray = @(
     "Jesus mate, you're out of date! Latest is $latestVersion. Check your update logs.",
