@@ -1,16 +1,16 @@
-# Pull in variables that were set when the script was started by Veeam
+# Pull in variables from the DiscordNotificationBootstrap script
 Param(
 	[String]$jobName,
 	[String]$id
 )
 
-# Import Functions
+# Import functions
 Import-Module "$PSScriptRoot\resources\logger.psm1"
 
-# Get the config from your config file
+# Get config from your config file
 $config = (Get-Content "$PSScriptRoot\config\conf.json") -Join "`n" | ConvertFrom-Json
 
-# Log if enabled in config
+# Start logging if logging is enabled in config
 if($config.debug_log) {
     ## Set log file name
     $date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ":", "." })
@@ -19,17 +19,17 @@ if($config.debug_log) {
     Start-Logging $logFile
 }
 
-# Determine if an update is required.
+# Determine if an update is required
 ## Get currently downloaded version of this project.
 $currentVersion = Get-Content "$PSScriptRoot\resources\version.txt" -Raw
 
 ## Get latest release from GitHub and use that to determine the latest version.
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $latestRelease = Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/latest -Headers @{"Accept"="application/json"} -UseBasicParsing
-
-## Release IDs are returned in a format of {"id":3622206,"tag_name":"v1.0"} so we need to extract tag_name.
+## Release IDs are returned in a format of {"id":3622206,"tag_name":"v1.0"}, so we need to extract tag_name.
 $latestVersion = ConvertFrom-Json $latestRelease.Content | ForEach-Object {$_.tag_name}
-## Define version announcement phrases and get a random one for the version info in the footer of the report.
+
+## Define version announcement phrases.
 $updateOlderArray = @(
     "Jesus mate, you're out of date! Latest is $latestVersion. Check your update logs.",
     "Bloody hell you muppet, you need to update! Latest is $latestVersion. Check your update logs.",
@@ -53,6 +53,7 @@ $updateNewerArray = @(
 )
 
 ## Comparing local and latest versions and determine if an update is required, then use that information to build the footer text.
+## Picks a phrase at random from the list above for the version statement in the footer of the backup report.
 If ($currentVersion -lt $latestVersion) {
     $footerAddition = (Get-Random -InputObject $updateOlderArray -Count 1)
 }
@@ -63,20 +64,20 @@ Elseif ($currentVersion -gt $latestVersion) {
     $footerAddition = (Get-Random -InputObject $updateNewerArray -Count 1)
 }
 
-# Add Veeam snap-in
+# Add Veeam snap-in.
 Add-PSSnapin VeeamPSSnapin
 
-# Get the session
+# Get the backup session information.
 $session = Get-VBRBackupSession | Where-Object{($_.OrigjobName -eq $jobName) -and ($id -eq $_.Id.ToString())}
 
-# Wait for the session to finish up
-while ($session.IsCompleted -eq $false) {
+# Wait for the backup session to finish.
+While ($session.IsCompleted -eq $false) {
 	Write-LogMessage -Tag 'Info' -Message 'Session not finished. Sleeping...'
 	Start-Sleep -m 200
 	$session = Get-VBRBackupSession | Where-Object{($_.OrigjobName -eq $jobName) -and ($id -eq $_.Id.ToString())}
 }
 
-# Gather session info
+# Gather backup session info.
 [String]$status = $session.Result
 $jobName = $session.Name.ToString().Trim()
 $JobType = $session.JobTypeString.Trim()
@@ -84,8 +85,8 @@ $JobType = $session.JobTypeString.Trim()
 [Float]$transferSize = $session.BackupStats.BackupSize
 [Float]$speed = $session.Info.Progress.AvgSpeed
 
-# Determine whether to report the job and actual data sizes in B, KB, MB, GB, or TB, depending on completed size. Will fallback to B[ytes] if no match.
-## Job size
+# Determine whether to report the job and actual data sizes in B, KB, MB, GB, or TB, depending on completed size. Will fall back to B[ytes] if no match.
+## Switch for job size.
 Switch ($jobSize) {
     ({$PSItem -lt 1KB}) {
         [String]$jobSizeRound = $jobSize
@@ -121,7 +122,7 @@ Switch ($jobSize) {
     $jobSizeRound += ' B'
     }
 }
-## Transfer size
+## Switch for transfer size.
 Switch ($transferSize) {
     ({$PSItem -lt 1KB}) {
         [String]$transferSizeRound = $transferSize
@@ -158,7 +159,8 @@ Switch ($transferSize) {
     }
 }
 
-# Determine whether to report the job processing rate in B/s, KB/s, MB/s, or GB/s, depending on the figure. Will fallback to B[ytes] if no match.
+# Determine whether to report the job processing speed in B/s, KB/s, MB/s, or GB/s, depending on the figure. Will fallback to B[ytes] if no match.
+# Switch for speed.
 Switch ($speed) {
     ({$PSItem -lt 1KB}) {
         [String]$speedRound = $speed
@@ -193,7 +195,7 @@ If ($speedRound -eq '0 B/s') {
     $speedRound = 'Unknown.'
 }
 
-# Calculate job duration
+# Calculate job duration.
 $TimeSpan = $session.Info.EndTime - $session.Info.CreationTime
 If ($TimeSpan.Days -ge '1') {
         $Duration = '{0}d {1}h {2}m {3}s' -f $TimeSpan.Days, $TimeSpan.Hours, $TimeSpan.Minutes, $TimeSpan.Seconds
@@ -202,8 +204,8 @@ Else {
     $Duration = '{0}h {1}m {2}s' -f $TimeSpan.Hours, $TimeSpan.Minutes, $TimeSpan.Seconds
 }
 
-# Switch on the session status
-switch ($status) {
+# Switch for the session status to decide the embed colour.
+Switch ($status) {
     None {$colour = '16777215'}
     Warning {$colour = '16776960'}
     Success {$colour = '65280'}
@@ -211,16 +213,16 @@ switch ($status) {
     Default {$colour = '16777215'}
 }
 
-# Create embed and fields array
+# Create embed and field arrays.
 [System.Collections.ArrayList]$embedArray = @()
 [System.Collections.ArrayList]$fieldArray = @()
 
-# Thumbnail object
+# Create thumbnail object.
 $thumbObject = [PSCustomObject]@{
 	url = $config.thumbnail
 }
 
-# Field objects
+# Create field objects.
 $backupSizeField = [PSCustomObject]@{
 	name = 'Backup size'
     value = [String]$jobSizeRound
@@ -252,7 +254,7 @@ $speedField = [PSCustomObject]@{
     inline = 'true'
 }
 
-# Add field objects to the field array
+# Add field objects to the field array.
 $fieldArray.Add($backupSizeField) | Out-Null
 $fieldArray.Add($transferSizeField) | Out-Null
 $fieldArray.Add($dedupField) | Out-Null
@@ -260,13 +262,13 @@ $fieldArray.Add($compressField) | Out-Null
 $fieldArray.Add($durationField) | Out-Null
 $fieldArray.Add($speedField) | Out-Null
 
-# Build footer object
+# Build footer object.
 $footerObject = [PSCustomObject]@{
 	text = "tigattack's VeeamDiscordNotifications $currentVersion. $footerAddition"
     icon_url = 'https://avatars0.githubusercontent.com/u/10629864'
 }
 
-# Embed object including field and thumbnail vars from above
+# Build embed object.
 $embedObject = [PSCustomObject]@{
 	title		= $jobName
 	description	= $status
@@ -276,28 +278,28 @@ $embedObject = [PSCustomObject]@{
     footer		= $footerObject
 }
 
-# Add embed object to the array created above
+# Add embed object to the embed array.
 $embedArray.Add($embedObject) | Out-Null
 
 # Create payload
-## Mention user if job failed
+## Mention user on job failure if configured to do so.
 If ($config.mention_on_fail -and $status -eq 'Failed') {
     $payload = [PSCustomObject]@{
         content = "<@!$($config.userid)> Job status $status"
     	embeds	= $embedArray
     }
 }
-## Otherwise do not mention user
+## Otherwise do not mention user.
 Else {
     $payload = [PSCustomObject]@{
     	embeds	= $embedArray
     }
 }
 
-# Send iiiit after converting to JSON
+# Send iiiit.
 $request = Invoke-RestMethod -Uri $config.webhook -Body ($payload | ConvertTo-Json -Depth 4) -Method Post -ContentType 'application/json'
 
-# Trigger update on outdated version
+# Trigger update if there's a newer version available.
 If ($currentVersion -lt $latestVersion -and $config.auto_update) {
     Copy-Item $PSScriptRoot\UpdateVeeamDiscordNotification.ps1 $PSScriptRoot\..\UpdateVeeamDiscordNotification.ps1
     Unblock-File $PSScriptRoot\..\UpdateVeeamDiscordNotification.ps1
