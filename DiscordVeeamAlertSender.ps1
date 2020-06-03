@@ -6,6 +6,7 @@ Param(
 
 # Import functions
 Import-Module "$PSScriptRoot\resources\logger.psm1"
+Import-Module "$PSScriptRoot\resources\ConvertTo-ByteUnits.psm1"
 
 # Get config from your config file
 $config = Get-Content -Raw "$PSScriptRoot\config\conf.json" | ConvertFrom-Json
@@ -87,111 +88,12 @@ $JobType = $session.JobTypeString.Trim()
 $jobEndTime = $session.Info.EndTime
 $jobStartTime = $session.Info.CreationTime
 
-# Determine whether to report the job and actual data sizes in B, KB, MB, GB, or TB, depending on completed size. Will fall back to B[ytes] if no match.
-## Switch for job size.
-Switch ($jobSize) {
-    ({$PSItem -lt 1KB}) {
-        [String]$jobSizeRound = $jobSize
-        $jobSizeRound += ' B'
-        break
-    }
-    ({$PSItem -lt 1MB}) {
-        $jobSize = $jobSize / 1KB
-        [String]$jobSizeRound = [math]::Round($jobSize,2)
-        $jobSizeRound += ' KB'
-        break
-    }
-    ({$PSItem -lt 1GB}) {
-        $jobSize = $jobSize / 1MB
-        [String]$jobSizeRound = [math]::Round($jobSize,2)
-        $jobSizeRound += ' MB'
-        break
-    }
-    ({$PSItem -lt 1TB}) {
-        $jobSize = $jobSize / 1GB
-        [String]$jobSizeRound = [math]::Round($jobSize,2)
-        $jobSizeRound += ' GB'
-        break
-    }
-    ({$PSItem -ge 1TB}) {
-        $jobSize = $jobSize / 1TB
-        [String]$jobSizeRound = [math]::Round($jobSize,2)
-        $jobSizeRound += ' TB'
-        break
-    }
-    Default {
-    [String]$jobSizeRound = $jobSize
-    $jobSizeRound += ' B'
-    }
-}
-## Switch for transfer size.
-Switch ($transferSize) {
-    ({$PSItem -lt 1KB}) {
-        [String]$transferSizeRound = $transferSize
-        $transferSizeRound += ' B'
-        break
-    }
-    ({$PSItem -lt 1MB}) {
-        $transferSize = $transferSize / 1KB
-        [String]$transferSizeRound = [math]::Round($transferSize,2)
-        $transferSizeRound += ' KB'
-        break
-    }
-    ({$PSItem -lt 1GB}) {
-        $transferSize = $transferSize / 1MB
-        [String]$transferSizeRound = [math]::Round($transferSize,2)
-        $transferSizeRound += ' MB'
-        break
-    }
-    ({$PSItem -lt 1TB}) {
-        $transferSize = $transferSize / 1GB
-        [String]$transferSizeRound = [math]::Round($transferSize,2)
-        $transferSizeRound += ' GB'
-        break
-    }
-    ({$PSItem -ge 1TB}) {
-        $transferSize = $transferSize / 1TB
-        [String]$transferSizeRound = [math]::Round($transferSize,2)
-        $transferSizeRound += ' TB'
-        break
-    }
-    Default {
-    [String]$transferSizeRound = $transferSize
-    $transferSizeRound += ' B'
-    }
-}
+# Convert bytes to rounded units.
+$jobSizeRound = ConvertTo-ByteUnits -InputObject $jobSize
+$transferSizeRound = ConvertTo-ByteUnits -InputObject $transferSize
+## Convert speed in B/s to rounded units and append '/s'
+$speedRound = (ConvertTo-ByteUnits -InputObject $speed) + '/s'
 
-# Determine whether to report the job processing speed in B/s, KB/s, MB/s, or GB/s, depending on the figure. Will fallback to B[ytes] if no match.
-# Switch for speed.
-Switch ($speed) {
-    ({$PSItem -lt 1KB}) {
-        [String]$speedRound = $speed
-        $speedRound += ' B/s'
-        break
-    }
-    ({$PSItem -lt 1MB}) {
-        $speed = $speed / 1KB
-        [String]$speedRound = [math]::Round($speed,2)
-        $speedRound += ' KB/s'
-        break
-    }
-    ({$PSItem -lt 1GB}) {
-        $speed = $speed / 1MB
-        [String]$speedRound = [math]::Round($speed,2)
-        $speedRound += ' MB/s'
-        break
-    }
-    ({$PSItem -lt 1TB}) {
-        $speed = $speed / 1GB
-        [String]$speedRound = [math]::Round($speed,2)
-        $speedRound += ' GB/s'
-        break
-    }
-    Default {
-        [String]$speedRound = $speed
-        $speedRound += ' B/s'
-    }
-}
 # Write "Unknown" processing speed if 0B/s to avoid confusion.
 If ($speedRound -eq '0 B/s') {
     $speedRound = 'Unknown.'
