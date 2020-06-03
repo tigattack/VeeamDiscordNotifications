@@ -8,7 +8,7 @@ Param(
 Import-Module "$PSScriptRoot\resources\logger.psm1"
 
 # Get config from your config file
-$config = (Get-Content "$PSScriptRoot\config\conf.json") -Join "`n" | ConvertFrom-Json
+$config = Get-Content -Raw "$PSScriptRoot\config\conf.json" | ConvertFrom-Json
 
 # Start logging if logging is enabled in config
 if($config.debug_log) {
