@@ -141,45 +141,45 @@ $thumbObject = [PSCustomObject]@{
 # Create field objects and add to fieldArray.
 $fieldArray = @(
     [PSCustomObject]@{
-	name = 'Backup size'
-    value = [String]$jobSizeRound
-    inline = 'true'
+	    name = 'Backup size'
+        value = [String]$jobSizeRound
+        inline = 'true'
     },
     [PSCustomObject]@{
-	name = 'Transferred Data'
-    value = [String]$transferSizeRound
-    inline = 'true'
-}
+        name = 'Transferred Data'
+        value = [String]$transferSizeRound
+        inline = 'true'
+    }
     [PSCustomObject]@{
-	name = 'Dedup Ratio'
-    value = [String]$session.BackupStats.DedupRatio
-    inline = 'true'
-}
+        name = 'Dedup Ratio'
+        value = [String]$session.BackupStats.DedupRatio
+        inline = 'false'
+    }
     [PSCustomObject]@{
-	name = 'Compression Ratio'
-    value = [String]$session.BackupStats.CompressRatio
-    inline = 'true'
-}
+        name = 'Compression Ratio'
+        value = [String]$session.BackupStats.CompressRatio
+        inline = 'false'
+    }
+    [PSCustomObject]@{
+        name = 'Processing rate'
+        value = $speedRound
+        inline = 'false'
+    }
     [PSCustomObject]@{
         name = 'Job Duration'
         value = $durationFormatted
         inline = 'true'
     }
     [PSCustomObject]@{
-        name = 'Processing rate'
-        value = $speedRound
-    inline = 'true'
-}
-    [PSCustomObject]@{
-	name = 'Time Started'
+        name = 'Time Started'
         value = '{0}:{1}:{2}' -f $jobStartTime.Hour, $jobStartTime.Minute, $jobStartTime.Second
-    inline = 'true'
-}
+        inline = 'true'
+    }
     [PSCustomObject]@{
-	name = 'Time Completed'
+        name = 'Time Completed'
         value = '{0}:{1}:{2}' -f $jobEndTime.Hour, $jobEndTime.Minute, $jobEndTime.Second
-    inline = 'true'
-}
+        inline = 'true'
+    }
 )
 
 # Build footer object.
@@ -191,13 +191,13 @@ $footerObject = [PSCustomObject]@{
 # Build embed object.
 $embedArray = @(
     [PSCustomObject]@{
-	title		= $jobName
-	description	= $status
-	color		= $colour
-	thumbnail	= $thumbObject
-    fields		= $fieldArray
-    footer		= $footerObject
-}
+        title		= $jobName
+        description	= $status
+        color		= $colour
+        thumbnail	= $thumbObject
+        fields		= $fieldArray
+        footer		= $footerObject
+    }
 )
 
 # Create payload
