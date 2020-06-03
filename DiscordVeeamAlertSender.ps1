@@ -195,13 +195,29 @@ If ($speedRound -eq '0 B/s') {
     $speedRound = 'Unknown.'
 }
 
-# Calculate job duration.
-$TimeSpan = $session.Info.EndTime - $session.Info.CreationTime
-If ($TimeSpan.Days -ge '1') {
-        $Duration = '{0}d {1}h {2}m {3}s' -f $TimeSpan.Days, $TimeSpan.Hours, $TimeSpan.Minutes, $TimeSpan.Seconds
+# Calculate difference between job start and end time.
+$duration = $session.Info.EndTime - $session.Info.CreationTime
+# Switch for job duration.
+Switch ($duration) {
+    ($_.Days -ge '1') {
+        $durationFormatted = '{0}d {1}h {2}m {3}s' -f $TimeSpan.Days, $TimeSpan.Hours, $TimeSpan.Minutes, $TimeSpan.Seconds
+        break
+    }
+    ($_.Hours -ge '1') {
+        $durationFormatted = '{0}h {1}m {2}s' -f $TimeSpan.Hours, $TimeSpan.Minutes, $TimeSpan.Seconds
+        break
+    }
+    ($_.Minutes -ge '1') {
+        $durationFormatted = '{0}m {1}s' -f $TimeSpan.Minutes, $TimeSpan.Seconds
+        break
+    }
+    ($_.Seconds -ge '1') {
+        $durationFormatted = '{0}s' -f $TimeSpan.Seconds
+        break
+    }
+    Default {
+        $durationFormatted = '{0}d {1}h {2}m {3}s' -f $TimeSpan.Days, $TimeSpan.Hours, $TimeSpan.Minutes, $TimeSpan.Seconds
 }
-Else {
-    $Duration = '{0}h {1}m {2}s' -f $TimeSpan.Hours, $TimeSpan.Minutes, $TimeSpan.Seconds
 }
 
 # Switch for the session status to decide the embed colour.
@@ -245,7 +261,7 @@ $compressField = [PSCustomObject]@{
 }
 $durationField = [PSCustomObject]@{
 	name = 'Job Duration'
-    value = $duration
+    value = $durationFormatted
     inline = 'true'
 }
 $speedField = [PSCustomObject]@{
