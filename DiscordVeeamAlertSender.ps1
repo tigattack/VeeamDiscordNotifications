@@ -101,6 +101,38 @@ If ($speedRound -eq '0 B/s') {
 
 # Calculate difference between job start and end time.
 $duration = $jobEndTime - $jobStartTime
+
+# $jobEndTime and $jobStartTime are readonly. Create writeable object using their values so we can modify them.
+$jobTimes = [PSCustomObject]@{
+	StartHour = $jobStartTime.Hour
+    StartMinute = $jobStartTime.Minute
+    StartSecond = $jobStartTime.Second
+	EndHour = $jobEndTime.Hour
+	EndMinute = $jobEndTime.Minute
+	EndSecond = $jobEndTime.Second
+}
+# Change times from 0 to 00 if applicable
+Switch ($jobTimes) {
+	{$_.StartHour -eq '0'} {
+		$jobTimes.StartHour = '00'
+	}
+	{$_.StartMinute -eq '0'} {
+		$jobTimes.StartMinute = '00'
+	}
+	{$_.StartSecond -eq '0'} {
+		$jobTimes.StartSecond = '00'
+	}
+	{$_.EndHour -eq '0'} {
+		$jobTimes.EndHour = '00'
+	}
+	{$_.EndMinute -eq '0'} {
+		$jobTimes.EndMinute = '00'
+	}
+	{$_.EndSecond -eq '0'} {
+		$jobTimes.EndSecond = '00'
+	}
+}
+
 # Switch for job duration.
 Switch ($duration) {
     {$_.Days -ge '1'} {
@@ -172,12 +204,12 @@ $fieldArray = @(
     }
     [PSCustomObject]@{
         name = 'Time Started'
-        value = '{0}:{1}:{2}' -f $jobStartTime.Hour, $jobStartTime.Minute, $jobStartTime.Second
+        value = '{0}:{1}:{2}' -f $jobTimes.StartHour, $jobTimes.StartMinute, $jobTimes.StartSecond
         inline = 'true'
     }
     [PSCustomObject]@{
         name = 'Time Completed'
-        value = '{0}:{1}:{2}' -f $jobEndTime.Hour, $jobEndTime.Minute, $jobEndTime.Second
+        value = '{0}:{1}:{2}' -f $jobTimes.EndHour, $jobTimes.EndMinute, $jobTimes.EndSecond
         inline = 'true'
     }
 )
