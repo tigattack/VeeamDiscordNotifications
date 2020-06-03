@@ -133,66 +133,54 @@ Switch ($status) {
     Default {$colour = '16777215'}
 }
 
-# Create embed and field arrays.
-[System.Collections.ArrayList]$embedArray = @()
-[System.Collections.ArrayList]$fieldArray = @()
-
 # Create thumbnail object.
 $thumbObject = [PSCustomObject]@{
 	url = $config.thumbnail
 }
 
-# Create field objects.
-$backupSizeField = [PSCustomObject]@{
+# Create field objects and add to fieldArray.
+$fieldArray = @(
+    [PSCustomObject]@{
 	name = 'Backup size'
     value = [String]$jobSizeRound
     inline = 'true'
-}
-$transferSizeField = [PSCustomObject]@{
+    },
+    [PSCustomObject]@{
 	name = 'Transferred Data'
     value = [String]$transferSizeRound
     inline = 'true'
 }
-$dedupField = [PSCustomObject]@{
+    [PSCustomObject]@{
 	name = 'Dedup Ratio'
     value = [String]$session.BackupStats.DedupRatio
     inline = 'true'
 }
-$compressField = [PSCustomObject]@{
+    [PSCustomObject]@{
 	name = 'Compression Ratio'
     value = [String]$session.BackupStats.CompressRatio
     inline = 'true'
 }
-$durationField = [PSCustomObject]@{
-	name = 'Job Duration'
-    value = $durationFormatted
+    [PSCustomObject]@{
+        name = 'Job Duration'
+        value = $durationFormatted
+        inline = 'true'
+    }
+    [PSCustomObject]@{
+        name = 'Processing rate'
+        value = $speedRound
     inline = 'true'
 }
-$speedField = [PSCustomObject]@{
-	name = 'Processing rate'
-    value = $speedRound
-    inline = 'true'
-}
-$startTimeField = [PSCustomObject]@{
+    [PSCustomObject]@{
 	name = 'Time Started'
-    value = $jobStartTime
+        value = '{0}:{1}:{2}' -f $jobStartTime.Hour, $jobStartTime.Minute, $jobStartTime.Second
     inline = 'true'
 }
-$endTimeField = [PSCustomObject]@{
+    [PSCustomObject]@{
 	name = 'Time Completed'
-    value = $jobEndTime
+        value = '{0}:{1}:{2}' -f $jobEndTime.Hour, $jobEndTime.Minute, $jobEndTime.Second
     inline = 'true'
 }
-
-# Add field objects to the field array.
-$fieldArray.Add($backupSizeField) | Out-Null
-$fieldArray.Add($transferSizeField) | Out-Null
-$fieldArray.Add($dedupField) | Out-Null
-$fieldArray.Add($compressField) | Out-Null
-$fieldArray.Add($durationField) | Out-Null
-$fieldArray.Add($speedField) | Out-Null
-$fieldArray.Add($startTimeField) | Out-Null
-$fieldArray.Add($endTimeField) | Out-Null
+)
 
 # Build footer object.
 $footerObject = [PSCustomObject]@{
@@ -201,7 +189,8 @@ $footerObject = [PSCustomObject]@{
 }
 
 # Build embed object.
-$embedObject = [PSCustomObject]@{
+$embedArray = @(
+    [PSCustomObject]@{
 	title		= $jobName
 	description	= $status
 	color		= $colour
@@ -209,9 +198,7 @@ $embedObject = [PSCustomObject]@{
     fields		= $fieldArray
     footer		= $footerObject
 }
-
-# Add embed object to the embed array.
-$embedArray.Add($embedObject) | Out-Null
+)
 
 # Decide whether to mention user
 If (($config.mention_on_fail -and $Status -eq 'Failed') -or ($config.mention_on_warning -and $Status -eq 'Warning')) {
