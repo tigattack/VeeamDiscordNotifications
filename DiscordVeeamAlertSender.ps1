@@ -141,7 +141,7 @@ $thumbObject = [PSCustomObject]@{
 # Create field objects and add to fieldArray.
 $fieldArray = @(
     [PSCustomObject]@{
-	    name = 'Backup size'
+	    name = 'Backup Size'
         value = [String]$jobSizeRound
         inline = 'true'
     },
@@ -161,7 +161,7 @@ $fieldArray = @(
         inline = 'false'
     }
     [PSCustomObject]@{
-        name = 'Processing rate'
+        name = 'Processing Rate'
         value = $speedRound
         inline = 'false'
     }
