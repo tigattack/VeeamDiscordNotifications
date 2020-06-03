@@ -103,24 +103,24 @@ If ($speedRound -eq '0 B/s') {
 $duration = $jobEndTime - $jobStartTime
 # Switch for job duration.
 Switch ($duration) {
-    ($_.Days -ge '1') {
-        $durationFormatted = '{0}d {1}h {2}m {3}s' -f $TimeSpan.Days, $TimeSpan.Hours, $TimeSpan.Minutes, $TimeSpan.Seconds
+    {$_.Days -ge '1'} {
+        $durationFormatted = '{0}d {1}h {2}m {3}s' -f $_.Days, $_.Hours, $_.Minutes, $_.Seconds
         break
     }
-    ($_.Hours -ge '1') {
-        $durationFormatted = '{0}h {1}m {2}s' -f $TimeSpan.Hours, $TimeSpan.Minutes, $TimeSpan.Seconds
+    {$_.Hours -ge '1'} {
+        $durationFormatted = '{0}h {1}m {2}s' -f $_.Hours, $_.Minutes, $_.Seconds
         break
     }
-    ($_.Minutes -ge '1') {
-        $durationFormatted = '{0}m {1}s' -f $TimeSpan.Minutes, $TimeSpan.Seconds
+    {$_.Minutes -ge '1'} {
+        $durationFormatted = '{0}m {1}s' -f $_.Minutes, $_.Seconds
         break
     }
-    ($_.Seconds -ge '1') {
-        $durationFormatted = '{0}s' -f $TimeSpan.Seconds
+    {$_.Seconds -ge '1'} {
+        $durationFormatted = '{0}s' -f $_.Seconds
         break
     }
     Default {
-        $durationFormatted = '{0}d {1}h {2}m {3}s' -f $TimeSpan.Days, $TimeSpan.Hours, $TimeSpan.Minutes, $TimeSpan.Seconds
+        $durationFormatted = '{0}d {1}h {2}m {3}s' -f $_.Days, $_.Hours, $_.Minutes, $_.Seconds
     }
 }
 
