@@ -84,6 +84,8 @@ $JobType = $session.JobTypeString.Trim()
 [Float]$jobSize = $session.BackupStats.DataSize
 [Float]$transferSize = $session.BackupStats.BackupSize
 [Float]$speed = $session.Info.Progress.AvgSpeed
+$jobEndTime = $session.Info.EndTime
+$jobStartTime = $session.Info.CreationTime
 
 # Determine whether to report the job and actual data sizes in B, KB, MB, GB, or TB, depending on completed size. Will fall back to B[ytes] if no match.
 ## Switch for job size.
@@ -196,7 +198,7 @@ If ($speedRound -eq '0 B/s') {
 }
 
 # Calculate difference between job start and end time.
-$duration = $session.Info.EndTime - $session.Info.CreationTime
+$duration = $jobEndTime - $jobStartTime
 # Switch for job duration.
 Switch ($duration) {
     ($_.Days -ge '1') {
@@ -217,7 +219,7 @@ Switch ($duration) {
     }
     Default {
         $durationFormatted = '{0}d {1}h {2}m {3}s' -f $TimeSpan.Days, $TimeSpan.Hours, $TimeSpan.Minutes, $TimeSpan.Seconds
-}
+    }
 }
 
 # Switch for the session status to decide the embed colour.
@@ -269,6 +271,16 @@ $speedField = [PSCustomObject]@{
     value = $speedRound
     inline = 'true'
 }
+$startTimeField = [PSCustomObject]@{
+	name = 'Time Started'
+    value = $jobStartTime
+    inline = 'true'
+}
+$endTimeField = [PSCustomObject]@{
+	name = 'Time Completed'
+    value = $jobEndTime
+    inline = 'true'
+}
 
 # Add field objects to the field array.
 $fieldArray.Add($backupSizeField) | Out-Null
@@ -277,6 +289,8 @@ $fieldArray.Add($dedupField) | Out-Null
 $fieldArray.Add($compressField) | Out-Null
 $fieldArray.Add($durationField) | Out-Null
 $fieldArray.Add($speedField) | Out-Null
+$fieldArray.Add($startTimeField) | Out-Null
+$fieldArray.Add($endTimeField) | Out-Null
 
 # Build footer object.
 $footerObject = [PSCustomObject]@{
