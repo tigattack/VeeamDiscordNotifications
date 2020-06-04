@@ -6,11 +6,11 @@ $config = (Get-Content "$PSScriptRoot\config\conf.json") -Join "`n" | ConvertFro
 
 # Start logging if logging is enabled in config.
 if($config.debug_log) {
-    ## Set log file name
-    $date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ":", "." })
-    $logFile = "$PSScriptRoot\log\Log_Bootstrap-$date.log"
-    ## Start logging to file
-    Start-Logging $logFile
+	## Set log file name
+	$date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ":", "." })
+	$logFile = "$PSScriptRoot\log\Log_Bootstrap-$date.log"
+	## Start logging to file
+	Start-Logging $logFile
 }
 
 # Import Veeam module.
