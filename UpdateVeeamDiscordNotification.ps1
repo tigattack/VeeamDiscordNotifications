@@ -88,7 +88,7 @@ function Update-Success {
 	$ErrorActionPreference = 'Continue'
 
 	# Set result var for notification and script output
-	$result = 'Success!'
+	$script:result = 'Success!'
 
 	# Copy logs directory from copy of previously installed version to new install
 	Write-Output 'Copying logs from old version to new version.'
@@ -110,7 +110,7 @@ function Update-Fail {
 	$ErrorActionPreference = 'Continue'
 
 	# Set result var for notification and script output
-	$result = 'Failure!'
+	$script:result = 'Failure!'
 
 	# Take action based on the stage at which the error occured
 	Switch ($fail) {
