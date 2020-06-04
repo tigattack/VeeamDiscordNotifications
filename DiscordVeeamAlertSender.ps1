@@ -255,6 +255,12 @@ Else {
 # Send iiiit.
 $request = Invoke-RestMethod -Uri $config.webhook -Body ($payload | ConvertTo-Json -Depth 4) -Method Post -ContentType 'application/json'
 
+# Write error if message fails to send to Discord.
+If ($request.Length -gt '0') {
+	Write-LogMessage -Tag 'Error' -Message 'Failed to send message to Discord. Response below.'
+	Write-LogMessage -Tag 'Error' -Message "$request"
+}
+
 # Trigger update if there's a newer version available.
 If ($currentVersion -lt $latestVersion -and $config.auto_update) {
 	Copy-Item $PSScriptRoot\UpdateVeeamDiscordNotification.ps1 $PSScriptRoot\..\UpdateVeeamDiscordNotification.ps1
