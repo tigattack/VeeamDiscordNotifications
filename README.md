@@ -33,7 +33,7 @@ Configuration is set in ./config/conf.json
 ## [MS Teams fork.](https://github.com/tigattack/VeeamTeamsNotifications)
 
 ## Credits
-[MelonSmasher](https://github.com/MelonSmasher)//[TheSageColleges](https://github.com/TheSageColleges) for the [original project](https://github.com/TheSageColleges/VeeamSlackNotifications) on which this is based.
+[MelonSmasher](https://github.com/MelonSmasher)//[TheSageColleges](https://github.com/TheSageColleges) for [the project](TheSageColleges/VeeamSlackNotifications) on which this is based.
 
 [dannyt66](https://github.com/dannyt66) for various things - Assistance with silly little issues, the odd bugfix here and there, and the inspiration and first works on the `UpdateVeeamDiscordNotifications.ps1` script.
 
