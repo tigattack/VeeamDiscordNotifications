@@ -16,7 +16,7 @@ if($config.debug_log) {
 # Add Veeam snap-in.
 Add-PSSnapin VeeamPSSnapin
 
-# Get the Veeam job from parent process.
+# Get the command line used to start the Veeam session.
 $parentPID = (Get-WmiObject Win32_Process -Filter "processid='$pid'").parentprocessid.ToString()
 $parentCmd = (Get-WmiObject Win32_Process -Filter "processid='$parentPID'").CommandLine
 $job = Get-VBRJob | Where-Object{$parentCmd -like "*"+$_.Id.ToString()+"*"}
@@ -32,7 +32,7 @@ $jobName = '"' + $session.OrigJobName.ToString().Trim() + '"'
 $powershellArguments = "-file $PSScriptRoot\DiscordVeeamAlertSender.ps1", "-JobName $jobName", "-Id $id"
 
 # Start a new new script in a new process with some of the information gathered here.
-# This allows Veeam to finish the current session so that we can gather information from the completed job.
+# This allows Veeam to finish the current session faster and allows us gather information from the completed job.
 Start-Process -FilePath "powershell" -Verb runAs -ArgumentList $powershellArguments -WindowStyle hidden
 
 # Stop logging.
