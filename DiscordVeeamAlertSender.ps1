@@ -1,12 +1,14 @@
 # Pull in variables from the DiscordNotificationBootstrap script
 Param(
 	[String]$jobName,
-	[String]$id
+	[String]$id,
+	[String]$jobType
 )
 
 # Import functions
 Import-Module "$PSScriptRoot\resources\logger.psm1"
 Import-Module "$PSScriptRoot\resources\ConvertTo-ByteUnits.psm1"
+Import-Module "$PSScriptRoot\resources\Get-VBRSessionInfo.psm1"
 
 # Get config from your config file
 $config = Get-Content -Raw "$PSScriptRoot\config\conf.json" | ConvertFrom-Json
@@ -69,22 +71,19 @@ Elseif ($currentVersion -gt $latestVersion) {
 Add-PSSnapin VeeamPSSnapin
 
 # Get the backup session information.
-$session = Get-VBRBackupSession | Where-Object{($_.OrigjobName -eq $jobName) -and ($id -eq $_.Id.ToString())}
+$session = Get-VBRSessionInfo -SessionID $id -JobType $jobType
 
 # Wait for the backup session to finish.
 While ($session.IsCompleted -eq $false) {
 	Write-LogMessage -Tag 'Info' -Message 'Session not finished. Sleeping...'
 	Start-Sleep -m 200
-	$session = Get-VBRBackupSession | Where-Object{($_.OrigjobName -eq $jobName) -and ($id -eq $_.Id.ToString())}
+	Get-VBRSessionInfo -SessionID $id -JobType $jobType
 }
 
-# Gather backup session info.
+# Gather generic session info
 [String]$status = $session.Result
-$jobName = $session.Name.ToString().Trim()
-$JobType = $session.JobTypeString.Trim()
-[Float]$jobSize = $session.BackupStats.DataSize
-[Float]$transferSize = $session.BackupStats.BackupSize
-[Float]$speed = $session.Info.Progress.AvgSpeed
+$jobEndTime = $session.Info.EndTime
+$jobStartTime = $session.Info.CreationTime
 $jobEndTime = $session.Info.EndTime
 $jobStartTime = $session.Info.CreationTime
 
