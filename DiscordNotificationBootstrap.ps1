@@ -1,5 +1,6 @@
 # Import Functions.
 Import-Module "$PSScriptRoot\resources\logger.psm1"
+Import-Module "$PSScriptRoot\resources\Get-VBRSessionInfo.psm1"
 
 # Get the config from our config file.
 $config = (Get-Content "$PSScriptRoot\config\conf.json") -Join "`n" | ConvertFrom-Json
@@ -19,17 +20,28 @@ Add-PSSnapin VeeamPSSnapin
 # Get the command line used to start the Veeam session.
 $parentPID = (Get-WmiObject Win32_Process -Filter "processid='$pid'").parentprocessid.ToString()
 $parentCmd = (Get-WmiObject Win32_Process -Filter "processid='$parentPID'").CommandLine
-$job = Get-VBRJob | Where-Object{$parentCmd -like "*"+$_.Id.ToString()+"*"}
 
-# Get the Veeam session.
-$session = Get-VBRBackupSession | Where-Object{($_.OrigJobName -eq $job.Name) -and ($parentCmd -like "*"+$_.Id.ToString()+"*")}
+# Get the Veeam job and session IDs
+$jobId = ([regex]::Matches($parentCmd, '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')).Value[0]
+$sessionId = ([regex]::Matches($parentCmd, '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')).Value[1]
+# Get the Veeam job details and hide warnings to mute the warning regarding depreciation of the use of this cmdlet to get Agent job details. At time of writing, there is no alternative.
+$job = Get-VBRJob -WarningAction SilentlyContinue | Where-Object {$_.Id.Guid -eq $jobId}
 
-# Store the job's name and ID.
-$id = '"' + $session.Id.ToString().ToString().Trim() + '"'
-$jobName = '"' + $session.OrigJobName.ToString().Trim() + '"'
+# Get the job time
+Switch ($job.JobType) {
+	{$_ -eq 'Backup'} {
+		$jobType = 'VM'
+	}
+	{$_ -eq 'EpAgentBackup'} {
+		$jobType = 'Agent'
+	}
+}
+
+# Get the session information and name.
+Get-VBRSessionInfo -SessionID $sessionId -JobType $jobType
 
 # Build argument string for the alert sender.
-$powershellArguments = "-file $PSScriptRoot\DiscordVeeamAlertSender.ps1", "-JobName $jobName", "-Id $id"
+$powershellArguments = "-file $PSScriptRoot\DiscordVeeamAlertSender.ps1", "-JobName $jobName", "-Id $sessionId", "-JobType $jobType"
 
 # Start a new new script in a new process with some of the information gathered here.
 # This allows Veeam to finish the current session faster and allows us gather information from the completed job.
