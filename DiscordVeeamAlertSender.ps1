@@ -74,7 +74,7 @@ Add-PSSnapin VeeamPSSnapin
 $session = Get-VBRSessionInfo -SessionID $id -JobType $jobType
 
 # Wait for the backup session to finish.
-While ($session.IsCompleted -eq $false) {
+While ($session.State -ne 'Stopped') {
 	Write-LogMessage -Tag 'Info' -Message 'Session not finished. Sleeping...'
 	Start-Sleep -m 200
 	Get-VBRSessionInfo -SessionID $id -JobType $jobType
@@ -84,18 +84,53 @@ While ($session.IsCompleted -eq $false) {
 [String]$status = $session.Result
 $jobEndTime = $session.Info.EndTime
 $jobStartTime = $session.Info.CreationTime
-$jobEndTime = $session.Info.EndTime
-$jobStartTime = $session.Info.CreationTime
 
-# Convert bytes to rounded units.
-$jobSizeRound = ConvertTo-ByteUnits -InputObject $jobSize
-$transferSizeRound = ConvertTo-ByteUnits -InputObject $transferSize
-## Convert speed in B/s to rounded units and append '/s'
-$speedRound = (ConvertTo-ByteUnits -InputObject $speed) + '/s'
+if ($jobType -eq 'VM') {
+	# Gatherr session info for VM backup.
+	[String]$status = $session.Result
+	[Float]$jobSize = $session.BackupStats.DataSize
+	[Float]$transferSize = $session.BackupStats.BackupSize
+	[Float]$speed = $session.Info.Progress.AvgSpeed
 
-# Write "Unknown" processing speed if 0B/s to avoid confusion.
-If ($speedRound -eq '0 B/s') {
-	$speedRound = 'Unknown.'
+	# Convert bytes to rounded units.
+	$jobSizeRound = ConvertTo-ByteUnits -InputObject $jobSize
+	$transferSizeRound = ConvertTo-ByteUnits -InputObject $transferSize
+	## Convert speed from B/s to rounded units and append '/s'
+	$speedRound = (ConvertTo-ByteUnits -InputObject $speed) + '/s'
+
+	# Write "Unknown" processing speed if 0B/s to avoid confusion.
+	If ($speedRound -eq '0 B/s') {
+		$speedRound = 'Unknown.'
+	}
+
+	# Create field objects and add to fieldArray.
+	$fieldArray = @(
+		[PSCustomObject]@{
+			name = 'Backup Size'
+			value = [String]$jobSizeRound
+			inline = 'true'
+		},
+		[PSCustomObject]@{
+			name = 'Transferred Data'
+			value = [String]$transferSizeRound
+			inline = 'true'
+		}
+		[PSCustomObject]@{
+			name = 'Dedup Ratio'
+			value = [String]$session.BackupStats.DedupRatio
+			inline = 'false'
+		}
+		[PSCustomObject]@{
+			name = 'Compression Ratio'
+			value = [String]$session.BackupStats.CompressRatio
+			inline = 'false'
+		}
+		[PSCustomObject]@{
+			name = 'Processing Rate'
+			value = $speedRound
+			inline = 'false'
+		}
+	)
 }
 
 # Calculate difference between job start and end time.
@@ -134,47 +169,7 @@ Switch ($duration) {
 	}
 }
 
-# Switch for the session status to decide the embed colour.
-Switch ($status) {
-	None {$colour = '16777215'}
-	Warning {$colour = '16776960'}
-	Success {$colour = '65280'}
-	Failed {$colour = '16711680'}
-	Default {$colour = '16777215'}
-}
-
-# Create thumbnail object.
-$thumbObject = [PSCustomObject]@{
-	url = $config.thumbnail
-}
-
-# Create field objects and add to fieldArray.
-$fieldArray = @(
-	[PSCustomObject]@{
-		name = 'Backup Size'
-		value = [String]$jobSizeRound
-		inline = 'true'
-	},
-	[PSCustomObject]@{
-		name = 'Transferred Data'
-		value = [String]$transferSizeRound
-		inline = 'true'
-	}
-	[PSCustomObject]@{
-		name = 'Dedup Ratio'
-		value = [String]$session.BackupStats.DedupRatio
-		inline = 'false'
-	}
-	[PSCustomObject]@{
-		name = 'Compression Ratio'
-		value = [String]$session.BackupStats.CompressRatio
-		inline = 'false'
-	}
-	[PSCustomObject]@{
-		name = 'Processing Rate'
-		value = $speedRound
-		inline = 'false'
-	}
+$fieldArray += @(
 	[PSCustomObject]@{
 		name = 'Job Duration'
 		value = $durationFormatted
@@ -191,6 +186,30 @@ $fieldArray = @(
 		inline = 'true'
 	}
 )
+
+If ($jobType -eq 'Agent') {
+	$fieldArray += @(
+		[PSCustomObject]@{
+			name = 'Notice'
+			value = "Veeam's PowerShell snappin provides very little information about agent backups, so unfortunately this is all that can be provided for the time being."
+			inline = 'false'
+		}
+	)
+}
+
+# Switch for the session status to decide the embed colour.
+Switch ($status) {
+	None {$colour = '16777215'}
+	Warning {$colour = '16776960'}
+	Success {$colour = '65280'}
+	Failed {$colour = '16711680'}
+	Default {$colour = '16777215'}
+}
+
+# Create thumbnail object.
+$thumbObject = [PSCustomObject]@{
+	url = $config.thumbnail
+}
 
 # Build footer object.
 $footerObject = [PSCustomObject]@{
