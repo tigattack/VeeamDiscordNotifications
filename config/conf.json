@@ -1,5 +1,5 @@
 {
-	"webhook": "https://discordapp.com/.......................",
+	"webhook": "DiscordUserHook",
 	"thumbnail": "https://raw.githubusercontent.com/tigattack/VeeamDiscordNotifications/master/asset/thumb01.png",
 	"userid": "123456789",
 	"mention_on_fail": false,
