@@ -1,38 +1,33 @@
 
 
 #CheckUser has webhook url ready
-$userprompt = Read-Host -Prompt 'Confimation that you have your webhook URL ready? Y/N'
+$userprompt = Read-Host -Prompt "Confimation that you have your webhook URL ready? Y/N"
 if ($userprompt -ne 'Y') {
-    write-host'Please create your discord channel and generate your webhook before continuing'
+    write-host"Please create your discord channel and generate your webhook before continuing"
     exit
 }
-    #Clean Up Download
-Write-Host'Cleaning up download, please wait'
-try {
+    #Create Directory structure
+    New-Item C:\VeeamScripts -Type directory
+    $downloadlocation = Read-Host -Prompt "Please Type the full path of your download location including Drive letter"
+    Expand-Archive $downloadlocation -DestinationPath C:\VeeamScripts
     Rename-Item C:\VeeamScripts\VeeamDiscordNotifications-v1.5 C:\VeeamScripts\VeeamDiscordNotifications
-    Remove-Item C:\VeeamScripts\VeeamDiscordNotifications-v1.5.zip
-}
-catch {
-    write-host'Unable to remove download, please check permissions and try again'
-    exit
-}
 
 #Assign webhook url to variable
-$webhookurl = Read-Host -Prompt 'Please paste your Webhook URL now'
+$webhookurl = Read-Host -Prompt "Please paste your Webhook URL now"
 
 #Read Config File & Write the user webhook
-$Config = (Get-Content "$PSScriptRoot\VeeamDiscordNotifications\config\conf.json") -Join "`n" | ConvertFrom-Json
+$Config = (Get-Content C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json) | ConvertFrom-Json
 $Config.webhook = $webhookurl
 #Write Config
-ConvertTo-Json $Config | Set-Content "$PSScriptRoot\VeeamDiscordNotifications\config\conf.json"
+ConvertTo-Json $Config | Set-Content C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json
  # Unblock script files
-Unblock-File $PSScriptRoot\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1
-Unblock-File $PSScriptRoot\VeeamDiscordNotifications\DiscordVeeamAlertSender.ps1
-Unblock-File $PSScriptRoot\VeeamDiscordNotifications\resources\logger.psm1
-Unblock-File $PSScriptRoot\VeeamDiscordNotifications\UpdateVeeamDiscordNotification.ps1  
+ Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1
+ Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\DiscordVeeamAlertSender.ps1
+ Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\resources\logger.psm1
 
 
 #Display the command for Veeam
 
-Write-Host'Sucsess, copy the following command into Advanced Settings of Each Job you which to have reported.' 
-Write-Host'Powershell.exe -File C:\VeeamScripts\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1'
+Write-Host "Sucsess, copy the following command into Advanced Settings of Each Job you which to have reported."
+Write-Host "Powershell.exe -File C:\VeeamScripts\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1"
+
