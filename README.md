@@ -1,7 +1,15 @@
-# Veeam Backup and Restore Notifications for Discord
-Sends notifications from Veeam Backup & Restore to Discord.
+# Veeam Backup & Replication Notifications for Discord
+Sends notifications from Veeam Backup & Replication to Discord.
 
 Based upon [my fork](https://github.com/tigattack/VeeamSlackNotifications) of [TheSageColleges' original project](https://github.com/TheSageColleges/VeeamSlackNotifications).
+
+### Looking for volunteers.
+
+If you enjoy this project and would like to help out, please do so. If you're interested in helping out, contact me on Discord - `tigatack#7987`
+
+As much as I love this project, my free time is all but nonexistent and work is needed to add functionality for different types of jobs than just VM backups and to bring this project in-line with recent changes in Veeam Backup & Replication (VBR) and VBR's PowerShell module.
+
+This is work that I will inevitably get to at some point, but I'd hate to see people left in the lurch with this and would love to have it done sooner rather than later.
 
 ## [Setup instructions](https://blog.tiga.tech/veeam-b-r-notifications-in-discord/)
 
