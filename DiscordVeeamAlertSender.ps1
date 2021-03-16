@@ -264,15 +264,20 @@ $embedobject = [PSCustomObject]@{
 # Add embed object to the array created above
 $embedarray.Add($embedobject) | Out-Null
 
+# Decide whether to mention user
+If (($config.mention_on_fail -and $Status -eq 'Failed') -or ($config.mention_on_warning -and $Status -eq 'Warning')) {
+    $mention = $true
+}
+
 # Create payload
-## Mention user if job failed
-If ($config.mention_on_fail -and $Status -eq 'Failed') {
+## Job report with mention
+If ($mention -eq $true) {
     $payload = [PSCustomObject]@{
-        content = "<@!$($config.userid)> Job status $Status"
+        content = "<@!$($config.userid)> $JobName - $Status"
     	embeds	= $embedarray
     }
 }
-## Otherwise do not mention user
+## Job report without mention
 Else {
     $payload = [PSCustomObject]@{
     	embeds	= $embedarray
