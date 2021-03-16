@@ -187,7 +187,7 @@ $Duration = $session.Info.EndTime - $session.Info.CreationTime
 $TimeSpan = $Duration
 $Duration = '{0:00}h {1:00}m {2:00}s' -f $TimeSpan.Hours, $TimeSpan.Minutes, $TimeSpan.Seconds
 
-# Switch on the session status
+# Decide embed colour from session status
 switch ($Status) {
     None {$colour = '16777215'}
     Warning {$colour = '16776960'}
