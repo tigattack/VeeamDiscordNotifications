@@ -1,6 +1,6 @@
 # This function logs messages with a type tag
 function Write-LogMessage($tag, $message) {
-	Write-Host "[$tag] $message"
+	Write-Output "[$tag] $message"
 }
 
 # This function handles Logging
