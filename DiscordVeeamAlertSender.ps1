@@ -250,5 +250,5 @@ If ($currentVersion -lt $latestVersion -and $config.auto_update) {
 
 # Stop logging.
 if($config.debug_log) {
-	Stop-Logging $logFile
+	Stop-Logging
 }

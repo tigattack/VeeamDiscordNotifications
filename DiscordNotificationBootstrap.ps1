@@ -37,5 +37,5 @@ Start-Process -FilePath "powershell" -Verb runAs -ArgumentList $powershellArgume
 
 # Stop logging.
 if($config.debug_log) {
-	Stop-Logging $logFile
+	Stop-Logging
 }
