@@ -220,7 +220,7 @@ Catch {
 }
 
 # Wait until the alert sender has finished running, or quit this if it's still running after 60s. It should never take that long.
-while (Get-WmiObject win32_process -filter "name='powershell.exe' and commandline like '%DiscordVeeamAlertSender.ps1%'") {
+while (Get-CimInstance win32_process -filter "name='powershell.exe' and commandline like '%DiscordVeeamAlertSender.ps1%'") {
 	$timer++
 	Start-Sleep -Seconds 1
 	If ($timer -eq '60') {
