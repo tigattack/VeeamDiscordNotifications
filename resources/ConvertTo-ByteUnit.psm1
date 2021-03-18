@@ -1,4 +1,4 @@
-function ConvertTo-ByteUnits
+function ConvertTo-ByteUnit
 	{
 	[CmdletBinding()]
 	Param (
