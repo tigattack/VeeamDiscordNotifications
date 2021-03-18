@@ -17,8 +17,8 @@ if($config.debug_log) {
 Import-Module Veeam.Backup.PowerShell
 
 # Get the command line used to start the Veeam session.
-$parentPID = (Get-WmiObject Win32_Process -Filter "processid='$pid'").parentprocessid.ToString()
-$parentCmd = (Get-WmiObject Win32_Process -Filter "processid='$parentPID'").CommandLine
+$parentPID = (Get-CimInstance Win32_Process -Filter "processid='$pid'").parentprocessid.ToString()
+$parentCmd = (Get-CimInstance Win32_Process -Filter "processid='$parentPID'").CommandLine
 $job = Get-VBRJob | Where-Object{$parentCmd -like "*"+$_.Id.ToString()+"*"}
 
 # Get the Veeam session.
