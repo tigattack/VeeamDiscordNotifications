@@ -22,7 +22,7 @@ jobs:
             $errors   = $issues.Where({$_.Severity -eq 'Error'})
             $warnings = $issues.Where({$_.Severity -eq 'Warning'})
             if ($errors) {
-                Write-Error "There were $($errors.Count) errors and $($warnings.Count) warnings total." -ErrorAction Stop
+                Write-Error "There were $($errors.Count) errors and $($warnings.Count) warnings total." -ErrorAction Stop | Format-Table -AutoSize
             } else {
-                Write-Output "There were $($errors.Count) errors and $($warnings.Count) warnings total."
+                Write-Output "There were $($errors.Count) errors and $($warnings.Count) warnings total." | Format-Table -AutoSize
             }
