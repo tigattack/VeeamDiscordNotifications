@@ -1,4 +1,3 @@
----
 name: CI
 on:
   push:
@@ -6,7 +5,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  lint:
+ PSScriptAnalyzer-lint:
     name: Run PSScriptAnalyzer
     runs-on: ubuntu-latest
     steps:
@@ -19,16 +18,11 @@ jobs:
     - name: Lint with PSScriptAnalyzer
       shell: pwsh
       run: |
-            Invoke-ScriptAnalyzer -Path * -Recurse -Outvariable issues | Out-Null
-            $errors   = $issues.Where({$_.Severity -eq 'Error' -or $_.Severity -eq 'ParseError'})
+            Invoke-ScriptAnalyzer -Path * -Recurse -Outvariable issues
+            $errors   = $issues.Where({$_.Severity -eq 'Error'})
             $warnings = $issues.Where({$_.Severity -eq 'Warning'})
-            $infos = $issues.Where({$_.Severity -eq 'Information'})
-            Foreach ($i in $errors) {
-              Write-Output "::error file=$($i.ScriptName),line=$($i.Line),col=$($i.Column)::$($i.RuleName) - $($i.Message)"
-            }
-            Foreach ($i in $warnings) {
-              Write-Output "::warning file=$($i.ScriptName),line=$($i.Line),col=$($i.Column)::$($i.RuleName) - $($i.Message)"
-            }
-            Foreach ($i in $infos) {
-              Write-Output "There were $($errors.Count) errors, $($warnings.Count) warnings, and $($infos.Count) infos in total." | Format-Table -AutoSize
+            if ($errors) {
+                Write-Error "There were $($errors.Count) errors and $($warnings.Count) warnings total." -ErrorAction Stop | Format-Table -AutoSize
+            } else {
+                Write-Output "There were $($errors.Count) errors and $($warnings.Count) warnings total." | Format-Table -AutoSize
             }
