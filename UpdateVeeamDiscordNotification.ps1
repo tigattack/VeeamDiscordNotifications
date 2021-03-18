@@ -19,154 +19,182 @@ $ErrorActionPreference = 'Stop'
 
 # Notification function
 function Update-Notification {
-	Write-Output 'Building notification.'
-	# Create embed and fields array
-	[System.Collections.ArrayList]$embedArray = @()
-	[System.Collections.ArrayList]$fieldArray = @()
-	# Thumbnail object
-	$thumbObject = [PSCustomObject]@{
-		url = $currentConfig.thumbnail
-	}
-	# Field objects
-	$resultField = [PSCustomObject]@{
-		name = 'Update Result'
-		value = $result
-		inline = 'false'
-	}
-	$newVersionField = [PSCustomObject]@{
-		name = 'New version'
-		value = $newVersion
-		inline = 'false'
-	}
-	$oldVersionField = [PSCustomObject]@{
-		name = 'Old version'
-		value = $oldVersion
-		inline = 'false'
-	}
-	# Add field objects to the field array
-	$fieldArray.Add($oldVersionField) | Out-Null
-	$fieldArray.Add($newVersionField) | Out-Null
-	$fieldArray.Add($resultField) | Out-Null
-	# Send error if exist
-	If ($null -ne $errorVar) {
-		$errorField = [PSCustomObject]@{
-			name = 'Update Error'
-			value = $errorVar
+	[CmdletBinding(
+		SupportsShouldProcess,
+		ConfirmImpact = 'Low'
+	)]
+	Param ()
+	If ($PSCmdlet.ShouldProcess('Discord', 'Send update notification')) {
+		Write-Output 'Building notification.'
+		# Create embed and fields array
+		[System.Collections.ArrayList]$embedArray = @()
+		[System.Collections.ArrayList]$fieldArray = @()
+		# Thumbnail object
+		$thumbObject = [PSCustomObject]@{
+			url = $currentConfig.thumbnail
+		}
+		# Field objects
+		$resultField = [PSCustomObject]@{
+			name = 'Update Result'
+			value = $result
 			inline = 'false'
 		}
-		$fieldArray.Add($errorField) | Out-Null
-	}
-	# Embed object including field and thumbnail vars from above
-	$embedObject = [PSCustomObject]@{
-		title		= 'Update'
-		color		= '1267393'
-		thumbnail	= $thumbObject
-		fields		= $fieldArray
-	}
-	# Add embed object to the array created above
-	$embedArray.Add($embedObject) | Out-Null
-	# Build payload
-	$payload = [PSCustomObject]@{
-		embeds	= $embedArray
-	}
-	Write-Output 'Sending notification.'
-	# Send iiit
-	Try {
-		Invoke-RestMethod -Uri $currentConfig.webhook -Body ($payload | ConvertTo-Json -Depth 4) -Method Post -ContentType 'application/json'
-	}
-	Catch {
-		$errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
-		Write-Warning 'Update notification failed to send to Discord.'
-		Write-Output "$errorVar"
+		$newVersionField = [PSCustomObject]@{
+			name = 'New version'
+			value = $newVersion
+			inline = 'false'
+		}
+		$oldVersionField = [PSCustomObject]@{
+			name = 'Old version'
+			value = $oldVersion
+			inline = 'false'
+		}
+		# Add field objects to the field array
+		$fieldArray.Add($oldVersionField) | Out-Null
+		$fieldArray.Add($newVersionField) | Out-Null
+		$fieldArray.Add($resultField) | Out-Null
+		# Send error if exist
+		If ($null -ne $errorVar) {
+			$errorField = [PSCustomObject]@{
+				name = 'Update Error'
+				value = $errorVar
+				inline = 'false'
+			}
+			$fieldArray.Add($errorField) | Out-Null
+		}
+		# Embed object including field and thumbnail vars from above
+		$embedObject = [PSCustomObject]@{
+			title		= 'Update'
+			color		= '1267393'
+			thumbnail	= $thumbObject
+			fields		= $fieldArray
+		}
+		# Add embed object to the array created above
+		$embedArray.Add($embedObject) | Out-Null
+		# Build payload
+		$payload = [PSCustomObject]@{
+			embeds	= $embedArray
+		}
+		Write-Output 'Sending notification.'
+		# Send iiit
+		Try {
+			Invoke-RestMethod -Uri $currentConfig.webhook -Body ($payload | ConvertTo-Json -Depth 4) -Method Post -ContentType 'application/json'
+		}
+		Catch {
+			$errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+			Write-Warning 'Update notification failed to send to Discord.'
+			Write-Output "$errorVar"
+		}
 	}
 }
 
 # Success function
 function Update-Success {
-	# Set error action preference so that errors while ending the script don't end the script prematurely.
-	Write-Output 'Set error action preference.'
-	$ErrorActionPreference = 'Continue'
+	[CmdletBinding(
+		SupportsShouldProcess,
+		ConfirmImpact = 'Low'
+	)]
+	Param ()
+	If ($PSCmdlet.ShouldProcess('Updater', 'Update success process')) {
+		# Set error action preference so that errors while ending the script don't end the script prematurely.
+		Write-Output 'Set error action preference.'
+		$ErrorActionPreference = 'Continue'
 
-	# Set result var for notification and script output
-	$script:result = 'Success!'
+		# Set result var for notification and script output
+		$script:result = 'Success!'
 
-	# Copy logs directory from copy of previously installed version to new install
-	Write-Output 'Copying logs from old version to new version.'
-	Copy-Item -Path $PSScriptRoot\VeeamDiscordNotifications-old\log -Destination $PSScriptRoot\VeeamDiscordNotifications\ -Recurse -Force
+		# Copy logs directory from copy of previously installed version to new install
+		Write-Output 'Copying logs from old version to new version.'
+		Copy-Item -Path $PSScriptRoot\VeeamDiscordNotifications-old\log -Destination $PSScriptRoot\VeeamDiscordNotifications\ -Recurse -Force
 
-	# Remove copy of previously installed version
-	Write-Output 'Removing old version.'
-	Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-old -Recurse -Force
+		# Remove copy of previously installed version
+		Write-Output 'Removing old version.'
+		Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-old -Recurse -Force
 
-	# Trigger the Update-Notification function and then End-Script function.
-	Invoke-Expression Update-Notification
-	Invoke-Expression End-Script
+		# Trigger the Update-Notification function and then End-Script function.
+		Update-Notification
+		End-Script
+	}
 }
 
 # Failure function
 function Update-Fail {
-	# Set error action preference so that errors while ending the script don't end the script prematurely.
-	Write-Output 'Set error action preference.'
-	$ErrorActionPreference = 'Continue'
+	[CmdletBinding(
+		SupportsShouldProcess,
+		ConfirmImpact = 'Low'
+	)]
+	Param ()
+	If ($PSCmdlet.ShouldProcess('Updater', 'Update failure process')) {
+		# Set error action preference so that errors while ending the script don't end the script prematurely.
+		Write-Output 'Set error action preference.'
+		$ErrorActionPreference = 'Continue'
 
-	# Set result var for notification and script output
-	$script:result = 'Failure!'
+		# Set result var for notification and script output
+		$script:result = 'Failure!'
 
-	# Take action based on the stage at which the error occured
-	Switch ($fail) {
-		download {
-			Write-Warning 'Failed to download update.'
+		# Take action based on the stage at which the error occured
+		Switch ($fail) {
+			download {
+				Write-Warning 'Failed to download update.'
+			}
+			unzip {
+				Write-Warning 'Failed to unzip update. Cleaning up and reverting.'
+				Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -Force
+			}
+			rename_old {
+				Write-Warning 'Failed to rename old version. Cleaning up and reverting.'
+				Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -Force
+				Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion -Recurse -Force
+			}
+			rename_new {
+				Write-Warning 'Failed to rename new version. Cleaning up and reverting.'
+				Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -Force
+				Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion -Recurse -Force
+				Rename-Item $PSScriptRoot\VeeamDiscordNotifications-old $PSScriptRoot\VeeamDiscordNotifications
+			}
+			after_rename_new {
+				Write-Warning 'Failed after renaming new version. Cleaning up and reverting.'
+				Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -Force
+				Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications -Recurse -Force
+				Rename-Item $PSScriptRoot\VeeamDiscordNotifications-old $PSScriptRoot\VeeamDiscordNotifications
+			}
 		}
-		unzip {
-			Write-Warning 'Failed to unzip update. Cleaning up and reverting.'
-			Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -Force
-		}
-		rename_old {
-			Write-Warning 'Failed to rename old version. Cleaning up and reverting.'
-			Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -Force
-			Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion -Recurse -Force
-		}
-		rename_new {
-			Write-Warning 'Failed to rename new version. Cleaning up and reverting.'
-			Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -Force
-			Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion -Recurse -Force
-			Rename-Item $PSScriptRoot\VeeamDiscordNotifications-old $PSScriptRoot\VeeamDiscordNotifications
-		}
-		after_rename_new {
-			Write-Warning 'Failed after renaming new version. Cleaning up and reverting.'
-			Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -Force
-			Remove-Item -Path $PSScriptRoot\VeeamDiscordNotifications -Recurse -Force
-			Rename-Item $PSScriptRoot\VeeamDiscordNotifications-old $PSScriptRoot\VeeamDiscordNotifications
-		}
+
+		# Trigger the Update-Notification function and then End-Script function.
+		Update-Notification
+		End-Script
 	}
-
-	# Trigger the Update-Notification function and then End-Script function.
-	Invoke-Expression Update-Notification
-	Invoke-Expression End-Script
 }
 
 # End of script function
 function Stop-Script {
-	# Clean up.
-	Write-Output 'Remove downloaded ZIP.'
-	If (Test-Path "$PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip") {
-		Remove-Item "$PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip"
+	[CmdletBinding(
+		SupportsShouldProcess,
+		ConfirmImpact = 'Low'
+	)]
+	Param ()
+	If ($PSCmdlet.ShouldProcess('Updater', 'Cleanup & stop')) {
+		# Clean up.
+		Write-Output 'Remove downloaded ZIP.'
+		If (Test-Path "$PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip") {
+			Remove-Item "$PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip"
+		}
+		Write-Output 'Remove UpdateVeeamDiscordNotification.ps1.'
+		Remove-Item -LiteralPath $PSCommandPath -Force
+
+		# Stop logging
+		Write-Output 'Stop logging.'
+		Stop-Logging $logFile
+
+		# Move log file
+		Write-Output 'Move log file to log directory in VeeamDiscordNotifications.'
+		Move-Item $logFile "$PSScriptRoot\VeeamDiscordNotifications\log\"
+
+		# Report result and exit script
+		Write-Output "Update result: $result"
+		Write-Output 'Exiting.'
+		Exit
 	}
-	Write-Output 'Remove UpdateVeeamDiscordNotification.ps1.'
-	Remove-Item -LiteralPath $PSCommandPath -Force
-
-	# Stop logging
-	Write-Output 'Stop logging.'
-	Stop-Logging $logFile
-
-	# Move log file
-	Write-Output 'Move log file to log directory in VeeamDiscordNotifications.'
-	Move-Item $logFile "$PSScriptRoot\VeeamDiscordNotifications\log\"
-
-	# Report result and exit script
-	Write-Output "Update result: $result"
-	Write-Output 'Exiting.'
-	Exit
 }
 
 # Pull current config to variable
