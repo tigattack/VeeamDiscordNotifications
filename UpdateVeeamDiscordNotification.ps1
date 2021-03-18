@@ -205,7 +205,7 @@ Try {
 Catch {
 	$errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
 	Write-Output "$errorVar"
-	Invoke-Expression Update-Fail
+	Update-Fail
 }
 
 # Get currently downloaded version
@@ -216,7 +216,7 @@ Try {
 Catch {
 	$errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
 	Write-Output "$errorVar"
-	Invoke-Expression Update-Fail
+	Update-Fail
 }
 
 # Wait until the alert sender has finished running, or quit this if it's still running after 60s. It should never take that long.
@@ -226,7 +226,7 @@ while (Get-CimInstance win32_process -filter "name='powershell.exe' and commandl
 	If ($timer -eq '60') {
 		Write-Output 'Timeout reached. Updater quitting as DiscordVeeamAlertSender.ps1 is still running after 60 seconds.'
 	}
-	Invoke-Expression Update-Fail
+	Update-Fail
 }
 
 # Pull latest version of script from GitHub
@@ -239,7 +239,7 @@ Catch {
 	$errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
 	Write-Output "$errorVar"
 	$fail = 'download'
-	Invoke-Expression Update-Fail
+	Update-Fail
 }
 
 # Expand downloaded ZIP
@@ -251,7 +251,7 @@ Catch {
 	$errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
 	Write-Output "$errorVar"
 	$fail = 'unzip'
-	Invoke-Expression Update-Fail
+	Update-Fail
 }
 
 # Rename old version to keep as a backup while the update is in progress.
@@ -263,7 +263,7 @@ Catch {
 	$errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
 	Write-Output "$errorVar"
 	$fail = 'rename_old'
-	Invoke-Expression Update-Fail
+	Update-Fail
 }
 
 # Rename extracted update
@@ -275,7 +275,7 @@ Catch {
 	$errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
 	Write-Output "$errorVar"
 	$fail = 'rename_new'
-	Invoke-Expression Update-Fail
+	Update-Fail
 }
 
 # Pull configuration from new conf file
@@ -287,7 +287,7 @@ Catch {
 	$errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
 	Write-Output "$errorVar"
 	$fail = 'after_rename_new'
-	Invoke-Expression Update-Fail
+	Update-Fail
 }
 
 # Unblock script files
@@ -317,7 +317,7 @@ Catch {
 	$errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
 	Write-Output "$errorVar"
 	$fail = 'after_rename_new'
-	Invoke-Expression Update-Fail
+	Update-Fail
 }
 
 # Get newly downloaded version
@@ -329,13 +329,13 @@ Catch {
 	$errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
 	Write-Output "$errorVar"
 	$fail = 'after_rename_new'
-	Invoke-Expression Update-Fail
+	Update-Fail
 }
 
 # Send notification
 If ($newVersion -eq $LatestVersion) {
-	Invoke-Expression Update-Success
+	Update-Success
 }
 Else {
-	Invoke-Expression Update-Fail
+	Update-Fail
 }
