@@ -6,7 +6,7 @@ Param(
 
 # Import functions
 Import-Module "$PSScriptRoot\resources\logger.psm1"
-Import-Module "$PSScriptRoot\resources\ConvertTo-ByteUnits.psm1"
+Import-Module "$PSScriptRoot\resources\ConvertTo-ByteUnit.psm1"
 
 # Get config from your config file
 $config = Get-Content -Raw "$PSScriptRoot\config\conf.json" | ConvertFrom-Json
@@ -89,10 +89,10 @@ $jobEndTime = $session.Info.EndTime
 $jobStartTime = $session.Info.CreationTime
 
 # Convert bytes to rounded units.
-$jobSizeRound = ConvertTo-ByteUnits -InputObject $jobSize
-$transferSizeRound = ConvertTo-ByteUnits -InputObject $transferSize
+$jobSizeRound = ConvertTo-ByteUnit -InputObject $jobSize
+$transferSizeRound = ConvertTo-ByteUnit -InputObject $transferSize
 ## Convert speed in B/s to rounded units and append '/s'
-$speedRound = (ConvertTo-ByteUnits -InputObject $speed) + '/s'
+$speedRound = (ConvertTo-ByteUnit -InputObject $speed) + '/s'
 
 # Write "Unknown" processing speed if 0B/s to avoid confusion.
 If ($speedRound -eq '0 B/s') {
