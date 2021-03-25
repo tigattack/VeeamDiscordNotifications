@@ -20,3 +20,7 @@ Foreach ($i in $warnings) {
 Foreach ($i in $infos) {
   Write-Output "There were $($errors.Count) errors, $($warnings.Count) warnings, and $($infos.Count) infos in total." | Format-Table -AutoSize
 }
+
+If ($errors) {
+	exit 1
+}
