@@ -6,29 +6,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  Lint:
+  lint:
     name: Run PSScriptAnalyzer
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Install PSScriptAnalyzer module
-      shell: pwsh
-      run: |
-            Set-PSRepository PSGallery -InstallationPolicy Trusted
-            Install-Module PSScriptAnalyzer -ErrorAction Stop
     - name: Lint with PSScriptAnalyzer
       shell: pwsh
       run: |
-            Invoke-ScriptAnalyzer -Path * -Recurse -OutVariable issues | Out-Null
-            $errors   = $issues.Where({$_.Severity -eq 'Error' -or $_.Severity -eq 'ParseError'})
-            $warnings = $issues.Where({$_.Severity -eq 'Warning'})
-            $infos    = $issues.Where({$_.Severity -eq 'Information'})
-            Foreach ($i in $errors) {
-              Write-Output "::error file=$($i.ScriptName),line=$($i.Line),col=$($i.Column)::$($i.RuleName) - $($i.Message)"
-            }
-            Foreach ($i in $warnings) {
-              Write-Output "::warning file=$($i.ScriptName),line=$($i.Line),col=$($i.Column)::$($i.RuleName) - $($i.Message)"
-            }
-            Foreach ($i in $infos) {
-              Write-Output "There were $($errors.Count) errors, $($warnings.Count) warnings, and $($infos.Count) infos in total." | Format-Table -AutoSize
-            }
+            ./.github/scripts/pssa.ps1
