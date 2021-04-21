@@ -1,7 +1,7 @@
 
 
 # Check user has webhook URL ready
-$userprompt = Read-Host -Prompt "Confimation that you have your webhook URL ready? Y/N"
+$userPrompt = Read-Host -Prompt "Do you have your webhook URL ready? Y/N"
 if ($userprompt -ne 'Y') {
     write-host"Please create your discord channel and generate your webhook before continuing"
     exit
