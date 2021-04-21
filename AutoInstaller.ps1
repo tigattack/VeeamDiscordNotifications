@@ -1,6 +1,6 @@
 
 
-#CheckUser has webhook url ready
+# Check user has webhook URL ready
 $userprompt = Read-Host -Prompt "Confimation that you have your webhook URL ready? Y/N"
 if ($userprompt -ne 'Y') {
     write-host"Please create your discord channel and generate your webhook before continuing"
@@ -30,4 +30,3 @@ ConvertTo-Json $Config | Set-Content C:\VeeamScripts\VeeamDiscordNotifications\c
 
 Write-Host "Sucsess, copy the following command into Advanced Settings of Each Job you which to have reported."
 Write-Host "Powershell.exe -File C:\VeeamScripts\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1"
-
