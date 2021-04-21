@@ -30,4 +30,4 @@ Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\UpdateVeeamDiscordNotific
 #Display the command for Veeam
 
 Write-Host "Success. Copy the following command into the following area of each job you would like to have reported.`nJob settings -> Storage -> Advanced -> Scripts -> Post-Job Script"
-Write-Host "Powershell.exe -File C:\VeeamScripts\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1"
+Write-Host "Powershell.exe -ExecutionPolicy Bypass -File C:\VeeamScripts\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1"
