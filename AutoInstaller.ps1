@@ -23,7 +23,8 @@ ConvertTo-Json $Config | Set-Content C:\VeeamScripts\VeeamDiscordNotifications\c
  # Unblock script files
  Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1
  Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\DiscordVeeamAlertSender.ps1
- Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\resources\logger.psm1
+Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\resources\logger.psm1
+Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\UpdateVeeamDiscordNotification.ps1
 
 
 #Display the command for Veeam
