@@ -9,7 +9,7 @@ if($config.debug_log) {
 	Start-Logging "$PSScriptRoot\log\debug.log"
 }
 
-# Add Veeam snap-in.
+# Import Veeam module.
 Import-Module Veeam.Backup.PowerShell
 
 # Get the Veeam job from parent process.
