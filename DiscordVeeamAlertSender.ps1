@@ -52,8 +52,8 @@ Elseif ($currentversion -gt $latestversion) {
     $footeraddition = (Get-Random -InputObject $updatenewerarray -Count 1)
 }
 
-# Add Veeam snap-in
-Add-PSSnapin VeeamPSSnapin
+# Import Veeam module
+Import-Module Veeam.Backup.PowerShell
 
 # Get the session
 $session = Get-VBRBackupSession | ?{($_.OrigJobName -eq $JobName) -and ($Id -eq $_.Id.ToString())}
