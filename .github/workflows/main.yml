@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  Lint:
+  lint:
     name: Run PSScriptAnalyzer
     runs-on: ubuntu-latest
     steps:
