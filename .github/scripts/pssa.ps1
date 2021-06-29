@@ -3,7 +3,7 @@ Set-PSRepository PSGallery -InstallationPolicy Trusted
 Install-Module PSScriptAnalyzer -ErrorAction Stop
 
 # Run PSSA
-Invoke-ScriptAnalyzer -Path * -Recurse -OutVariable issues | Out-Null
+Invoke-ScriptAnalyzer -Path * -Recurse -Settings ./.github/scripts/pssa-settings.psd1 -OutVariable issues | Out-Null
 
 # Get results and separate types
 $errors   = $issues.Where({$_.Severity -eq 'Error' -or $_.Severity -eq 'ParseError'})
@@ -18,8 +18,10 @@ Foreach ($i in $warnings) {
   Write-Output "::warning file=$($i.ScriptName),line=$($i.Line),col=$($i.Column)::$($i.RuleName) - $($i.Message)"
 }
 Foreach ($i in $infos) {
-  Write-Output "There were $($errors.Count) errors, $($warnings.Count) warnings, and $($infos.Count) infos in total." | Format-Table -AutoSize
+  Write-Output "::debug file=$($i.ScriptName),line=$($i.Line),col=$($i.Column)::$($i.RuleName) - $($i.Message)"
 }
+
+Write-Output "There were $($errors.Count) errors, $($warnings.Count) warnings, and $($infos.Count) infos in total."
 
 If ($errors) {
 	exit 1
