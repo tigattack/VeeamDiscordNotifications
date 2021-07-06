@@ -14,12 +14,12 @@ if($config.debug_log) {
 	Start-Logging $logFile
 }
 
-# Add Veeam snap-in.
-Add-PSSnapin VeeamPSSnapin
+# Import Veeam module.
+Import-Module Veeam.Backup.PowerShell
 
 # Get the command line used to start the Veeam session.
-$parentPID = (Get-WmiObject Win32_Process -Filter "processid='$pid'").parentprocessid.ToString()
-$parentCmd = (Get-WmiObject Win32_Process -Filter "processid='$parentPID'").CommandLine
+$parentPID = (Get-CimInstance Win32_Process -Filter "processid='$pid'").parentprocessid.ToString()
+$parentCmd = (Get-CimInstance Win32_Process -Filter "processid='$parentPID'").CommandLine
 
 # Get the Veeam job and session IDs
 $jobId = ([regex]::Matches($parentCmd, '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')).Value[0]
@@ -49,5 +49,5 @@ Start-Process -FilePath "powershell" -Verb runAs -ArgumentList $powershellArgume
 
 # Stop logging.
 if($config.debug_log) {
-	Stop-Logging $logFile
+	Stop-Logging
 }

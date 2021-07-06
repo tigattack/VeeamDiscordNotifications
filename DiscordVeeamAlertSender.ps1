@@ -67,8 +67,8 @@ Elseif ($currentVersion -gt $latestVersion) {
 	$footerAddition = (Get-Random -InputObject $updateNewerArray -Count 1)
 }
 
-# Add Veeam snap-in.
-Add-PSSnapin VeeamPSSnapin
+# Import Veeam module
+Import-Module Veeam.Backup.PowerShell
 
 # Get the backup session information.
 $session = Get-VBRSessionInfo -SessionID $id -JobType $jobType
@@ -229,6 +229,11 @@ $embedArray = @(
 	}
 )
 
+# Decide whether to mention user
+If (($config.mention_on_fail -and $Status -eq 'Failed') -or ($config.mention_on_warning -and $Status -eq 'Warning')) {
+	$mention = $true
+}
+
 # Create payload
 ## Mention user on job failure if configured to do so.
 If ($config.mention_on_fail -and $status -eq 'Failed') {
@@ -263,5 +268,5 @@ If ($currentVersion -lt $latestVersion -and $config.auto_update) {
 
 # Stop logging.
 if($config.debug_log) {
-	Stop-Logging $logFile
+	Stop-Logging
 }
