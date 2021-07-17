@@ -23,7 +23,7 @@ Function Get-VBRSessionInfo {
 			{$_ -eq 'Agent'} {
 				# Get the session details.
 				$session = Get-VBRComputerBackupJobSession -Id $sessionId
-				
+
 				# Copy the job's name to it's own variable.
 				$jobName = $job.Info.Name
 			}
