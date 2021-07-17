@@ -41,6 +41,8 @@ Switch ($job.JobType) {
 $sessionInfo = Get-VBRSessionInfo -SessionID $sessionId -JobType $jobType
 $jobName = $sessionInfo.JobName
 
+Write-LogMessage -Tag Info -Message "Bootstrap script for Veeam job '$jobName' ($jobId)."
+
 # Build argument string for the alert sender.
 $powershellArguments = "-file $PSScriptRoot\DiscordVeeamAlertSender.ps1", "-JobName $jobName", "-Id $sessionId", "-JobType $jobType"
 
