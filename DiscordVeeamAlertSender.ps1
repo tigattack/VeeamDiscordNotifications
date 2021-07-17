@@ -9,6 +9,7 @@ Param(
 Import-Module "$PSScriptRoot\resources\logger.psm1"
 Import-Module "$PSScriptRoot\resources\ConvertTo-ByteUnits.psm1"
 Import-Module "$PSScriptRoot\resources\Get-VBRSessionInfo.psm1"
+Import-Module "$PSScriptRoot\resources\Get-UpdateInformation.psm1"
 
 # Get config from your config file
 $config = Get-Content -Raw "$PSScriptRoot\config\conf.json" | ConvertFrom-Json
@@ -23,49 +24,14 @@ if($config.debug_log) {
 }
 
 # Determine if an update is required
-## Get currently downloaded version of this project.
-$currentVersion = Get-Content "$PSScriptRoot\resources\version.txt" -Raw
+$updateStatus = Get-UpdateStatus
 
-## Get latest release from GitHub and use that to determine the latest version.
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$latestRelease = Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/latest -Headers @{"Accept"="application/json"} -UseBasicParsing
-## Release IDs are returned in a format of {"id":3622206,"tag_name":"v1.0"}, so we need to extract tag_name.
-$latestVersion = ConvertFrom-Json $latestRelease.Content | ForEach-Object {$_.tag_name}
 
-## Define version announcement phrases.
-$updateOlderArray = @(
-	"Jesus mate, you're out of date! Latest is $latestVersion. Check your update logs.",
-	"Bloody hell you muppet, you need to update! Latest is $latestVersion. Check your update logs.",
-	"Fuck me sideways, you're out of date! Latest is $latestVersion. Check your update logs.",
-	"Shitting heck lad, you need to update! Latest is $latestVersion. Check your update logs.",
-	"Christ almighty, you're out of date! Latest is $latestVersion. Check your update logs."
-)
-$updateCurrentArray = @(
-	"Nice work mate, you're up to date.",
-	"Good shit buddy, you're up to date.",
-	"Top stuff my dude, you're running the latest version.",
-	"Good job fam, you're all up to date.",
-	"Lovely stuff mate, you're running the latest version."
-)
-$updateNewerArray = @(
-	"Wewlad, check you out running a pre-release version, latest is $latestVersion!",
-	"Christ m8e, this is mental, you're ahead of release, latest is $latestVersion!",
-	"You nutter, you're running a pre-release version! Latest is $latestVersion!",
-	"Bloody hell mate, this is unheard of, $currentVersion isn't even released yet, latest is $latestVersion!"
-	"Fuuuckin hell, $currentVersion hasn't even been released! Latest is $latestVersion."
-)
+# Define static output objects.
 
-## Comparing local and latest versions and determine if an update is required, then use that information to build the footer text.
-## Picks a phrase at random from the list above for the version statement in the footer of the backup report.
-If ($currentVersion -lt $latestVersion) {
-	$footerAddition = (Get-Random -InputObject $updateOlderArray -Count 1)
-}
-Elseif ($currentVersion -eq $latestVersion) {
-	$footerAddition = (Get-Random -InputObject $updateCurrentArray -Count 1)
-}
-Elseif ($currentVersion -gt $latestVersion) {
-	$footerAddition = (Get-Random -InputObject $updateNewerArray -Count 1)
-}
+## Get and define update status message.
+$footerAddition = Get-UpdateMessage -CurrentVersion $updateStatus.CurrentVersion -LatestVersion $updateStatus.LatestVersion
+
 
 # Import Veeam module
 Import-Module Veeam.Backup.PowerShell

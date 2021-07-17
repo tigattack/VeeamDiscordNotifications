@@ -1,0 +1,23 @@
+{
+	"older": [
+		"Jesus mate, you're out of date! Latest is $latestVersion.",
+		"Bloody hell you muppet, you need to update! Latest is $latestVersion.",
+		"Fuck me sideways, you're out of date! Latest is $latestVersion.",
+		"Shitting heck lad, you need to update! Latest is $latestVersion.",
+		"Christ almighty, you're out of date! Latest is $latestVersion."
+	],
+	"current": [
+		"Nice work mate, you're up to date.",
+		"Good shit buddy, you're up to date.",
+		"Top stuff my dude, you're running the latest version.",
+		"Good job fam, you're all up to date.",
+		"Lovely stuff mate, you're running the latest version."
+	],
+	"newer": [
+		"Wewlad, check you out running a pre-release version, latest is $latestVersion!",
+		"Christ m8e, this is mental, you're ahead of release, latest is $latestVersion!",
+		"You nutter, you're running a pre-release version! Latest is $latestVersion!",
+		"Bloody hell mate, this is unheard of, $currentVersion isn't even released yet, latest is $latestVersion!",
+		"Fuuuckin hell, $currentVersion hasn't even been released! Latest is $latestVersion."
+	]
+}
