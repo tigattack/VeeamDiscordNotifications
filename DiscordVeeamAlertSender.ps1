@@ -53,7 +53,7 @@ $session = (Get-VBRSessionInfo -SessionID $id -JobType $jobType).Session
 ## Wait for the backup session to finish.
 While ($session.State -ne 'Stopped') {
 	Write-LogMessage -Tag 'Info' -Message 'Session not finished. Sleeping...'
-	Start-Sleep -m 200
+	Start-Sleep -Milliseconds 500
 	$session = (Get-VBRSessionInfo -SessionID $id -JobType $jobType).Session
 }
 
