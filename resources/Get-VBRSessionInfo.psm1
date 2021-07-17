@@ -22,10 +22,10 @@ Function Get-VBRSessionInfo {
 	}
 
 	Elseif ($null -eq $sessionId) {
-		Write-Host 'Error: $sessionId is null.'
+		Write-Warning '$sessionId is null.'
 	}
 
 	Elseif ($null -eq $jobType) {
-		Write-Host 'Error: $jobType is null.'
+		Write-Warning '$jobType is null.'
 	}
 }
