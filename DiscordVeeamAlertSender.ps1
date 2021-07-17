@@ -7,7 +7,7 @@ Param(
 
 # Import functions
 Import-Module "$PSScriptRoot\resources\logger.psm1"
-Import-Module "$PSScriptRoot\resources\ConvertTo-ByteUnits.psm1"
+Import-Module "$PSScriptRoot\resources\ConvertTo-ByteUnit.psm1"
 Import-Module "$PSScriptRoot\resources\Get-VBRSessionInfo.psm1"
 Import-Module "$PSScriptRoot\resources\Get-UpdateInformation.psm1"
 
@@ -111,10 +111,10 @@ if ($jobType -eq 'VM') {
 	[Float]$speed = $session.Info.Progress.AvgSpeed
 
 	# Convert bytes to rounded units.
-	$jobSizeRound = ConvertTo-ByteUnits -InputObject $jobSize
-	$transferSizeRound = ConvertTo-ByteUnits -InputObject $transferSize
-	## Convert speed from B/s to rounded units and append '/s'
-	$speedRound = (ConvertTo-ByteUnits -InputObject $speed) + '/s'
+	$jobSizeRound = ConvertTo-ByteUnit -InputObject $jobSize
+	$transferSizeRound = ConvertTo-ByteUnit -InputObject $transferSize
+	# Convert speed from B/s to rounded units and append '/s'
+	$speedRound = (ConvertTo-ByteUnit -InputObject $speed) + '/s'
 
 	# Set processing speed  "Unknown" if 0B/s to avoid confusion.
 	If ($speedRound -eq '0 B/s') {
