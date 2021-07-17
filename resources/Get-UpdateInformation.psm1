@@ -34,16 +34,16 @@ function Get-UpdateMessage {
 
 		# Comparing local and latest versions and determine if an update is required, then use that information to build the footer text.
 		# Picks a phrase at random from the list above for the version statement in the footer of the backup report.
-		Switch ($currentVersion) {
-			{$_ -lt $latestVersion} {
+		Switch ($CurrentVersion) {
+			{$_ -lt $LatestVersion} {
 				$updateMessage = (Get-Random -InputObject $phrases.older -Count 1)
 			}
 
-			{$_ -eq $latestVersion} {
+			{$_ -eq $LatestVersion} {
 				$updateMessage = (Get-Random -InputObject $phrases.current -Count 1)
 			}
 
-			{$_ -gt $latestVersion} {
+			{$_ -gt $LatestVersion} {
 				$updateMessage = (Get-Random -InputObject $phrases.newer -Count 1)
 			}
 		}
