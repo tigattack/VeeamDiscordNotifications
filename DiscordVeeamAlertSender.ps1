@@ -33,17 +33,16 @@ $updateStatus = Get-UpdateStatus
 $footerAddition = Get-UpdateMessage -CurrentVersion $updateStatus.CurrentVersion -LatestVersion $updateStatus.LatestVersion
 
 
-# Import Veeam module
-Import-Module Veeam.Backup.PowerShell
+# Job info preparation
 
-# Get the backup session information.
-$session = Get-VBRSessionInfo -SessionID $id -JobType $jobType
+## Get the backup session information.
+$session = (Get-VBRSessionInfo -SessionID $id -JobType $jobType).Session
 
 # Wait for the backup session to finish.
 While ($session.State -ne 'Stopped') {
 	Write-LogMessage -Tag 'Info' -Message 'Session not finished. Sleeping...'
 	Start-Sleep -m 200
-	Get-VBRSessionInfo -SessionID $id -JobType $jobType
+	$session = (Get-VBRSessionInfo -SessionID $id -JobType $jobType).Session
 }
 
 # Gather generic session info

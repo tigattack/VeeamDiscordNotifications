@@ -4,20 +4,35 @@ Function Get-VBRSessionInfo {
 		[Parameter(Mandatory=$true)]$jobType
 	)
 
+	# Import VBR module
+	Import-Module Veeam.Backup.PowerShell
+
 	If (($null -ne $sessionId) -and ($null -ne $jobType)) {
+
+		# Switch on job type.
 		Switch ($jobType) {
 			{$_ -eq 'VM'} {
+
 				# Get the session details.
-				$script:session = Get-VBRBackupSession | Where-Object {$_.Id.Guid -eq $sessionId}
-				# Get the session's name.
-				$script:jobName = $session.OrigJobName
+				$session = Get-VBRBackupSession | Where-Object {$_.Id.Guid -eq $sessionId}
+
+				# Get the job's name from the session details.
+				$jobName = $session.OrigJobName
 			}
+
 			{$_ -eq 'Agent'} {
+				# Get the session details.
+				$session = Get-VBRComputerBackupJobSession -Id $sessionId
+				
 				# Copy the job's name to it's own variable.
-				$script:jobName = $job.Info.Name
-				# Get the Veeam session.
-				$script:session = Get-VBRComputerBackupJobSession -Id $sessionId
+				$jobName = $job.Info.Name
 			}
+		}
+
+		# Create PSObject to return.
+		New-Object PSObject -Property @{
+			Session = $session
+			JobName = $jobName
 		}
 	}
 
