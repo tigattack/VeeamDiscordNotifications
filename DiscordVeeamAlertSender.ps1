@@ -99,13 +99,15 @@ Switch ($duration) {
 	}
 }
 
+## Initialise fieldArray variable.
+$fieldArray = @()
+
 
 # Define session statistics for the report.
 
 ## If VM backup, gather and include session info
 if ($jobType -eq 'VM') {
-	# Gatherr session info for VM backup.
-	[String]$status = $session.Result
+	# Gather session info.
 	[Float]$jobSize = $session.BackupStats.DataSize
 	[Float]$transferSize = $session.BackupStats.BackupSize
 	[Float]$speed = $session.Info.Progress.AvgSpeed
@@ -118,7 +120,7 @@ if ($jobType -eq 'VM') {
 
 	# Set processing speed  "Unknown" if 0B/s to avoid confusion.
 	If ($speedRound -eq '0 B/s') {
-		$speedRound = 'Unknown.'
+		$speedRound = 'Unknown'
 	}
 
 	# Add session information to fieldArray.
@@ -175,7 +177,7 @@ If ($jobType -eq 'Agent') {
 	$fieldArray += @(
 		[PSCustomObject]@{
 			name = 'Notice'
-			value = "Veeam's PowerShell snappin provides very little information about agent backups, so unfortunately this is all that can be provided for the time being."
+			value = "Due to limitations in Veeam's PowerShell module, this information is unfortunately all that can be provided."
 			inline = 'false'
 		}
 	)
@@ -235,7 +237,8 @@ If ($request.Length -gt '0') {
 
 
 # Trigger update if there's a newer version available.
-If ($currentVersion -lt $latestVersion -and $config.auto_update) {
+If (($updateStatus.CurrentVersion -lt $updateStatus.latestVersion) -and $config.auto_update) {
+	# Copy update script out of working directory.
 	Copy-Item $PSScriptRoot\UpdateVeeamDiscordNotification.ps1 $PSScriptRoot\..\UpdateVeeamDiscordNotification.ps1
 	Unblock-File $PSScriptRoot\..\UpdateVeeamDiscordNotification.ps1
 
