@@ -77,9 +77,9 @@ if ($jobType -eq 'VM') {
 	$jobStartTime 			= $session.Info.CreationTime
 
 	# Convert bytes to closest unit.
-	$jobSizeRound		= ConvertTo-ByteUnit -InputObject $jobSize
-	$transferSizeRound	= ConvertTo-ByteUnit -InputObject $transferSize
-	$speedRound			= (ConvertTo-ByteUnit -InputObject $speed) + '/s'
+	$jobSizeRound		= ConvertTo-ByteUnit -Data $jobSize
+	$transferSizeRound	= ConvertTo-ByteUnit -Data $transferSize
+	$speedRound			= (ConvertTo-ByteUnit -Data $speed) + '/s'
 
 	# Set processing speed "Unknown" if 0B/s to avoid confusion.
 	If ($speedRound -eq '0 B/s') {

@@ -43,6 +43,7 @@ $parentCmd = (Get-CimInstance Win32_Process -Filter "processid='$parentPID'").Co
 # Get the Veeam job and session IDs
 $jobId = ([regex]::Matches($parentCmd, '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')).Value[0]
 $sessionId = ([regex]::Matches($parentCmd, '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')).Value[1]
+
 # Get the Veeam job details and hide warnings to mute the warning regarding deprecation of the use of this cmdlet to get Agent job details. At time of writing, there is no alternative.
 $job = Get-VBRJob -WarningAction SilentlyContinue | Where-Object {$_.Id.Guid -eq $jobId}
 
