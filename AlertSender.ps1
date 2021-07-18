@@ -23,6 +23,11 @@ If ($Config.debug_log) {
 }
 
 
+# Initialise some variables.
+$fieldArray = @()
+$mention = $false
+
+
 # Determine if an update is required
 $updateStatus = Get-UpdateStatus
 
@@ -97,9 +102,6 @@ Switch ($duration) {
 		$durationFormatted	= '{0}d {1}h {2}m {3}s' -f $_.Days, $_.Hours, $_.Minutes, $_.Seconds
 	}
 }
-
-## Initialise fieldArray variable.
-$fieldArray = @()
 
 
 # Define session statistics for the report.
