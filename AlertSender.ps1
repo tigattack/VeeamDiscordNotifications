@@ -209,18 +209,17 @@ If (($config.mention_on_fail -and $Status -eq 'Failed') -or ($config.mention_on_
 }
 
 # Create payload object.
-## Mention user on job failure if configured to do so.
-If ($mention) {
-	$payload = [PSCustomObject]@{
-		content = "<@!$($config.userid)> Job status $status"
-		embeds	= $embedArray
+Switch ($mention) {
+	## Mention user on job failure if configured to do so.
+	$true {
+		$payload = [PSCustomObject]@{
+			content = "<@!$($Config.userid)> Job $Status!"
+			embeds	= $embedArray
+		}
 	}
-}
-
-## Otherwise do not mention user.
-Else {
-	$payload = [PSCustomObject]@{
-		embeds	= $embedArray
+	## Otherwise do not mention user.
+	$False {
+		$payload = [PSCustomObject]@{ embeds = $embedArray }
 	}
 }
 
