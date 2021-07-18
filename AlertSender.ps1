@@ -178,7 +178,7 @@ $fieldArray += @(
 		inline	= 'true'
 	}
 	[PSCustomObject]@{
-		name	= 'Time Completed'
+		name	= 'Time Ended'
 		value	= '{0}:{1}:{2}' -f $jobTimes.EndHour, $jobTimes.EndMinute, $jobTimes.EndSecond
 		inline	= 'true'
 	}
