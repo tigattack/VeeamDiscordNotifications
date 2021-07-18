@@ -5,7 +5,7 @@ Function Get-VBRSessionInfo {
 	)
 
 	# Import VBR module
-	Import-Module Veeam.Backup.PowerShell
+	Import-Module Veeam.Backup.PowerShell -DisableNameChecking
 
 	If (($null -ne $SessionId) -and ($null -ne $JobType)) {
 

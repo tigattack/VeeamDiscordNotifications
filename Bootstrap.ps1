@@ -8,7 +8,7 @@ $logFile = "$PSScriptRoot\log\Log_Bootstrap-$date.log"
 Start-Transcript -Path $logFile
 
 # Import modules.
-Import-Module Veeam.Backup.PowerShell
+Import-Module Veeam.Backup.PowerShell -DisableNameChecking
 Import-Module "$PSScriptRoot\resources\Logger.psm1"
 Import-Module "$PSScriptRoot\resources\VBRSessionInfo.psm1"
 
