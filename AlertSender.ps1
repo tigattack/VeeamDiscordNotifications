@@ -35,7 +35,7 @@ $updateStatus = Get-UpdateStatus
 # Define static output objects.
 
 ## Get and define update status message.
-$footerAddition = Get-UpdateMessage -CurrentVersion $updateStatus.CurrentVersion -LatestVersion $updateStatus.LatestVersion
+$footerAddition = (Get-UpdateMessage -CurrentVersion $updateStatus.CurrentVersion -LatestVersion $updateStatus.LatestVersion) -replace 'latestVerPlaceholder', $updateStatus.LatestVersion
 
 ## Define thumbnail object.
 $thumbObject = [PSCustomObject]@{
