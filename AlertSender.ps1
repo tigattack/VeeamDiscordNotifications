@@ -61,57 +61,20 @@ While ($session.State -ne 'Stopped') {
 	$session = (Get-VBRSessionInfo -SessionId $id -JobType $jobType).Session
 }
 
-## Gather generic session info
+## Gather generic session info.
 [String]$status = $session.Result
-$jobEndTime = $session.Info.EndTime
-$jobStartTime = $session.Info.CreationTime
-
-## Create writeable object using their values, prepending 0 to single-digit values.
-## Necessary because $jobEndTime and $jobStartTime are readonly.
-$jobTimes = [PSCustomObject]@{
-	StartHour	= $jobStartTime.Hour.ToString("00")
-	StartMinute	= $jobStartTime.Minute.ToString("00")
-	StartSecond	= $jobStartTime.Second.ToString("00")
-	EndHour		= $jobEndTime.Hour.ToString("00")
-	EndMinute	= $jobEndTime.Minute.ToString("00")
-	EndSecond	= $jobEndTime.Second.ToString("00")
-}
-
-## Calculate difference between job start and end time.
-$duration = $jobEndTime - $jobStartTime
-
-## Switch for job duration; define pretty output.
-Switch ($duration) {
-	{$_.Days -ge '1'} {
-		$durationFormatted	= '{0}d {1}h {2}m {3}s' -f $_.Days, $_.Hours, $_.Minutes, $_.Seconds
-		break
-	}
-	{$_.Hours -ge '1'} {
-		$durationFormatted	= '{0}h {1}m {2}s' -f $_.Hours, $_.Minutes, $_.Seconds
-		break
-	}
-	{$_.Minutes -ge '1'} {
-		$durationFormatted	= '{0}m {1}s' -f $_.Minutes, $_.Seconds
-		break
-	}
-	{$_.Seconds -ge '1'} {
-		$durationFormatted	= '{0}s' -f $_.Seconds
-		break
-	}
-	Default {
-		$durationFormatted	= '{0}d {1}h {2}m {3}s' -f $_.Days, $_.Hours, $_.Minutes, $_.Seconds
-	}
-}
 
 
 # Define session statistics for the report.
 
-## If VM backup, gather and include session info
+## If VM backup, gather and include session info.
 if ($jobType -eq 'VM') {
 	# Gather session info.
 	[Float]$jobSize			= $session.BackupStats.DataSize
 	[Float]$transferSize	= $session.BackupStats.BackupSize
 	[Float]$speed			= $session.Info.Progress.AvgSpeed
+	$jobEndTime 			= $session.Info.EndTime
+	$jobStartTime 			= $session.Info.CreationTime
 
 	# Convert bytes to closest unit.
 	$jobSizeRound		= ConvertTo-ByteUnit -InputObject $jobSize
@@ -153,6 +116,55 @@ if ($jobType -eq 'VM') {
 	)
 }
 
+# If agent backup, gather and include session info.
+If ($jobType -eq 'Agent') {
+	# Gather session info.
+	$jobEndTime 			= $session.EndTime
+	$jobStartTime 			= $session.CreationTime
+}
+
+
+# Job timings
+
+## Create array of job timings.
+# Necessary because $jobEndTime and $jobStartTime are readonly.
+# Create writeable object using their values, prepending 0 to single-digit values.
+$jobTimes = [PSCustomObject]@{
+	StartHour	= $jobStartTime.Hour.ToString("00")
+	StartMinute	= $jobStartTime.Minute.ToString("00")
+	StartSecond	= $jobStartTime.Second.ToString("00")
+	EndHour		= $jobEndTime.Hour.ToString("00")
+	EndMinute	= $jobEndTime.Minute.ToString("00")
+	EndSecond	= $jobEndTime.Second.ToString("00")
+}
+
+# Calculate difference between job start and end time.
+$duration = $jobEndTime - $jobStartTime
+
+## Switch for job duration; define pretty output.
+Switch ($duration) {
+	{$_.Days -ge '1'} {
+		$durationFormatted	= '{0}d {1}h {2}m {3}s' -f $_.Days, $_.Hours, $_.Minutes, $_.Seconds
+		break
+	}
+	{$_.Hours -ge '1'} {
+		$durationFormatted	= '{0}h {1}m {2}s' -f $_.Hours, $_.Minutes, $_.Seconds
+		break
+	}
+	{$_.Minutes -ge '1'} {
+		$durationFormatted	= '{0}m {1}s' -f $_.Minutes, $_.Seconds
+		break
+	}
+	{$_.Seconds -ge '1'} {
+		$durationFormatted	= '{0}s' -f $_.Seconds
+		break
+	}
+	Default {
+		$durationFormatted	= '{0}d {1}h {2}m {3}s' -f $_.Days, $_.Hours, $_.Minutes, $_.Seconds
+	}
+}
+
+
 ## Add job times to fieldArray.
 $fieldArray += @(
 	[PSCustomObject]@{
@@ -172,6 +184,7 @@ $fieldArray += @(
 	}
 )
 
+
 # If agent backup, add notice to fieldArray.
 If ($jobType -eq 'Agent') {
 	$fieldArray += @(
@@ -182,6 +195,7 @@ If ($jobType -eq 'Agent') {
 		}
 	)
 }
+
 
 # Switch for the session status to decide the embed colour.
 Switch ($status) {
