@@ -40,7 +40,7 @@ function ConvertTo-ByteUnit {
 			{$_ -ge 1KB } {
 				$Value = $Data / 1KB
 				[String]$Value = [math]::Round($Value,2)
-				$Value += ' GB'
+				$Value += ' KB'
 				break
 			}
 			default {
