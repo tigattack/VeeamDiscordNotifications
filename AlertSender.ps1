@@ -2,7 +2,8 @@
 Param(
 	[String]$jobName,
 	[String]$id,
-	[String]$jobType
+	[String]$jobType,
+	[PSObject]$Config
 )
 
 # Import modules.
@@ -11,11 +12,9 @@ Import-Module "$PSScriptRoot\resources\ConvertTo-ByteUnit.psm1"
 Import-Module "$PSScriptRoot\resources\VBRSessionInfo.psm1"
 Import-Module "$PSScriptRoot\resources\UpdateInfo.psm1"
 
-# Get config from file
-$config = Get-Content -Raw "$PSScriptRoot\config\conf.json" | ConvertFrom-Json
 
 # Start logging if logging is enabled in config
-if($config.debug_log) {
+If ($Config.debug_log) {
 	## Set log file name
 	$date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ":", "." })
 	$logFile = "$PSScriptRoot\log\Log_$jobName-$date.log"
@@ -35,7 +34,7 @@ $footerAddition = Get-UpdateMessage -CurrentVersion $updateStatus.CurrentVersion
 
 ## Define thumbnail object.
 $thumbObject = [PSCustomObject]@{
-	url = $config.thumbnail
+	url = $Config.thumbnail
 }
 
 ## Define footer object.
@@ -227,7 +226,7 @@ Else {
 
 
 # Send iiiit.
-$request = Invoke-RestMethod -Uri $config.webhook -Body ($payload | ConvertTo-Json -Depth 4) -Method Post -ContentType 'application/json'
+$request = Invoke-RestMethod -Uri $Config.webhook -Body ($payload | ConvertTo-Json -Depth 4) -Method Post -ContentType 'application/json'
 
 # Write error if message fails to send to Discord.
 If ($request.Length -gt '0') {
@@ -237,7 +236,7 @@ If ($request.Length -gt '0') {
 
 
 # Trigger update if there's a newer version available.
-If (($updateStatus.CurrentVersion -lt $updateStatus.latestVersion) -and $config.auto_update) {
+If (($updateStatus.CurrentVersion -lt $updateStatus.latestVersion) -and $Config.auto_update) {
 	# Copy update script out of working directory.
 	Copy-Item $PSScriptRoot\Updater.ps1 $PSScriptRoot\..\VDNotifs-Updater.ps1
 	Unblock-File $PSScriptRoot\..\VDNotifs-Updater.ps1
@@ -248,6 +247,6 @@ If (($updateStatus.CurrentVersion -lt $updateStatus.latestVersion) -and $config.
 }
 
 # Stop logging.
-if($config.debug_log) {
+If ($Config.debug_log) {
 	Stop-Logging
 }
