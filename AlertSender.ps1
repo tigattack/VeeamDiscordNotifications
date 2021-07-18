@@ -191,6 +191,28 @@ Switch ($status) {
 	Default {$colour = '16777215'}
 }
 
+# Decide whether to mention user
+## On fail
+Try {
+	If ($Config.mention_on_fail -and $Status -eq 'Failed') {
+		$mention = $true
+	}
+}
+Catch {
+	Write-LogMessage -Tag 'Warning' -Message "Unable to determine 'mention on fail' configuration. User will not be mentioned."
+}
+
+## On warning
+Try {
+	If ($Config.mention_on_warning -and $Status -eq 'Warning') {
+		$mention = $true
+	}
+}
+Catch {
+	Write-LogMessage -Tag 'Warning' -Message "Unable to determine 'mention on warning' configuration. User will not be mentioned."
+}
+
+
 # Build embed object.
 $embedArray = @(
 	[PSCustomObject]@{
@@ -202,11 +224,6 @@ $embedArray = @(
 		footer		= $footerObject
 	}
 )
-
-# Decide whether to mention user
-If (($config.mention_on_fail -and $Status -eq 'Failed') -or ($config.mention_on_warning -and $Status -eq 'Warning')) {
-	$mention = $true
-}
 
 # Create payload object.
 Switch ($mention) {
