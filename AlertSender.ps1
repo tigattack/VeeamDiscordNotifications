@@ -5,11 +5,11 @@ Param(
 	[String]$jobType
 )
 
-# Import functions
-Import-Module "$PSScriptRoot\resources\logger.psm1"
+# Import modules.
+Import-Module "$PSScriptRoot\resources\Logger.psm1"
 Import-Module "$PSScriptRoot\resources\ConvertTo-ByteUnit.psm1"
-Import-Module "$PSScriptRoot\resources\Get-VBRSessionInfo.psm1"
-Import-Module "$PSScriptRoot\resources\Get-UpdateInformation.psm1"
+Import-Module "$PSScriptRoot\resources\VBRSessionInfo.psm1"
+Import-Module "$PSScriptRoot\resources\UpdateInfo.psm1"
 
 # Get config from file
 $config = Get-Content -Raw "$PSScriptRoot\config\conf.json" | ConvertFrom-Json
@@ -239,11 +239,11 @@ If ($request.Length -gt '0') {
 # Trigger update if there's a newer version available.
 If (($updateStatus.CurrentVersion -lt $updateStatus.latestVersion) -and $config.auto_update) {
 	# Copy update script out of working directory.
-	Copy-Item $PSScriptRoot\UpdateVeeamDiscordNotification.ps1 $PSScriptRoot\..\UpdateVeeamDiscordNotification.ps1
-	Unblock-File $PSScriptRoot\..\UpdateVeeamDiscordNotification.ps1
+	Copy-Item $PSScriptRoot\Updater.ps1 $PSScriptRoot\..\VDNotifs-Updater.ps1
+	Unblock-File $PSScriptRoot\..\VDNotifs-Updater.ps1
 
 	# Run update script.
-	$updateArgs = "-file $PSScriptRoot\..\UpdateVeeamDiscordNotification.ps1", "-LatestVersion $latestVersion"
+	$updateArgs = "-file $PSScriptRoot\..\VDNotifs-Updater.ps1", "-LatestVersion $latestVersion"
 	Start-Process -FilePath "powershell" -Verb runAs -ArgumentList $updateArgs -WindowStyle hidden
 }
 

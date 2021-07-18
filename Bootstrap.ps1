@@ -1,6 +1,7 @@
-# Import Functions.
-Import-Module "$PSScriptRoot\resources\logger.psm1"
-Import-Module "$PSScriptRoot\resources\Get-VBRSessionInfo.psm1"
+# Import modules.
+Import-Module Veeam.Backup.PowerShell
+Import-Module "$PSScriptRoot\resources\Logger.psm1"
+Import-Module "$PSScriptRoot\resources\VBRSessionInfo.psm1"
 
 # Get the config from our config file.
 $config = (Get-Content "$PSScriptRoot\config\conf.json") -Join "`n" | ConvertFrom-Json
@@ -13,9 +14,6 @@ if($config.debug_log) {
 	## Start logging to file
 	Start-Logging $logFile
 }
-
-# Import Veeam module.
-Import-Module Veeam.Backup.PowerShell
 
 # Get the command line used to start the Veeam session.
 $parentPID = (Get-CimInstance Win32_Process -Filter "processid='$pid'").parentprocessid.ToString()
@@ -44,7 +42,7 @@ $jobName = $sessionInfo.JobName
 Write-LogMessage -Tag Info -Message "Bootstrap script for Veeam job '$jobName' ($jobId)."
 
 # Build argument string for the alert sender.
-$powershellArguments = "-file $PSScriptRoot\DiscordVeeamAlertSender.ps1", "-JobName $jobName", "-Id $sessionId", "-JobType $jobType"
+$powershellArguments = "-file $PSScriptRoot\AlertSender.ps1", "-JobName $jobName", "-Id $sessionId", "-JobType $jobType"
 
 # Start a new new script in a new process with some of the information gathered here.
 # This allows Veeam to finish the current session faster and allows us gather information from the completed job.

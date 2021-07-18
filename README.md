@@ -33,8 +33,8 @@ Configuration is set in ./config/conf.json
 ## [MS Teams fork.](https://github.com/tigattack/VeeamTeamsNotifications)
 
 ## Credits
-[MelonSmasher](https://github.com/MelonSmasher)//[TheSageColleges](https://github.com/TheSageColleges) for [the project](https://github.com/TheSageColleges/VeeamSlackNotifications) on which this is based.
+[MelonSmasher](https://github.com/MelonSmasher)//[TheSageColleges](https://github.com/TheSageColleges) for [the project](https://github.com/TheSageColleges/VeeamSlackNotifications) on which this is loosely based.
 
-[dannyt66](https://github.com/dannyt66) for various things - Assistance with silly little issues, the odd bugfix here and there, and the inspiration and first works on the `UpdateVeeamDiscordNotifications.ps1` script.
+[dannyt66](https://github.com/dannyt66) for various things - Assistance with silly little issues, the odd bugfix here and there, and the inspiration and first works on the `Updater.ps1` script.
 
-[Lee_Dailey](https://reddit.com/u/Lee_Dailey) for general pointers and the original [`ConvertTo-ByteUnit.psm1` function.](https://pastebin.com/srN5CKty)
+[Lee_Dailey](https://reddit.com/u/Lee_Dailey) for general pointers and the original [`ConvertTo-ByteUnit` function.](https://pastebin.com/srN5CKty)

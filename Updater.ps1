@@ -4,7 +4,7 @@ Param (
 )
 
 # Import functions
-Import-Module "$PSScriptRoot\VeeamDiscordNotifications\resources\logger.psm1"
+Import-Module "$PSScriptRoot\VeeamDiscordNotifications\resources\Logger.psm1"
 
 # Logging
 ## Set log file name
@@ -292,10 +292,22 @@ Catch {
 
 # Unblock script files
 Write-Output 'Unblock script files.'
-Unblock-File $PSScriptRoot\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1 -ErrorAction Continue
-Unblock-File $PSScriptRoot\VeeamDiscordNotifications\DiscordVeeamAlertSender.ps1 -ErrorAction Continue
-Unblock-File $PSScriptRoot\VeeamDiscordNotifications\resources\logger.psm1 -ErrorAction Continue
-Unblock-File $PSScriptRoot\VeeamDiscordNotifications\UpdateVeeamDiscordNotification.ps1 -ErrorAction Continue
+
+## Get script files
+$pwshFiles = Get-ChildItem $PSScriptRoot\VeeamDiscordNotifications\ -Recurse | Where-Object { $_.Name -match '^.*\.ps(m)?1$' }
+
+## Unblock them
+Try {
+	foreach ($i in $pwshFiles) {
+		Unblock-File -Path $i.FullName
+	}
+}
+Catch {
+	$errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()
+	Write-Output "$errorVar"
+	$fail = 'unblock_scripts'
+	Update-Fail
+}
 
 # Populate conf.json with previous configuration
 Try {
