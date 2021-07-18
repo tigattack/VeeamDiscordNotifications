@@ -5,11 +5,11 @@ Function Write-LogMessage {
 		ConfirmImpact = 'Low'
 	)]
 	Param (
-		$tag,
-		$message
+		$Tag,
+		$Message
 	)
 	If ($PSCmdlet.ShouldProcess('Output stream', 'Write log message')) {
-		Write-Output "[$tag] $message"
+		Write-Output "[$Tag] $Message"
 	}
 }
 
@@ -21,15 +21,15 @@ Function Start-Logging {
 	)]
 	Param(
 		[Parameter(Mandatory)]
-		$path
+		$Path
 	)
-	If ($PSCmdlet.ShouldProcess($path, 'Start-Transcript')) {
+	If ($PSCmdlet.ShouldProcess($Path, 'Start-Transcript')) {
 		Try {
-			Start-Transcript -Path $path -Force -Append
-			Write-LogMessage -Tag 'Info' -Message "Transcript is being logged to $path"
+			Start-Transcript -Path $Path -Force -Append
+			Write-LogMessage -Tag 'INFO' -Message "Transcript is being logged to $Path"
 		}
 		Catch [Exception] {
-			Write-LogMessage -Tag 'Info' -Message "Transcript is already being logged to $path"
+			Write-LogMessage -Tag 'INFO' -Message "Transcript is already being logged to $Path"
 		}
 	}
 }
@@ -40,7 +40,7 @@ Function Stop-Logging {
 	)]
 	Param()
 	If ($PSCmdlet.ShouldProcess('log file', 'Stop-Transcript')) {
-		Write-LogMessage -Tag 'Info' -Message "Stopping transcript logging."
+		Write-LogMessage -Tag 'INFO' -Message "Stopping transcript logging."
 		Stop-Transcript
 	}
 }

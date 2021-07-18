@@ -1,20 +1,20 @@
 Function Get-VBRSessionInfo {
 	param (
-		[Parameter(Mandatory=$true)]$sessionId,
-		[Parameter(Mandatory=$true)]$jobType
+		[Parameter(Mandatory=$true)]$SessionId,
+		[Parameter(Mandatory=$true)]$JobType
 	)
 
 	# Import VBR module
 	Import-Module Veeam.Backup.PowerShell
 
-	If (($null -ne $sessionId) -and ($null -ne $jobType)) {
+	If (($null -ne $SessionId) -and ($null -ne $JobType)) {
 
 		# Switch on job type.
-		Switch ($jobType) {
+		Switch ($JobType) {
 			{$_ -eq 'VM'} {
 
 				# Get the session details.
-				$session = Get-VBRBackupSession | Where-Object {$_.Id.Guid -eq $sessionId}
+				$session = Get-VBRBackupSession | Where-Object {$_.Id.Guid -eq $SessionId}
 
 				# Get the job's name from the session details.
 				$jobName = $session.OrigJobName
@@ -22,7 +22,7 @@ Function Get-VBRSessionInfo {
 
 			{$_ -eq 'Agent'} {
 				# Get the session details.
-				$session = Get-VBRComputerBackupJobSession -Id $sessionId
+				$session = Get-VBRComputerBackupJobSession -Id $SessionId
 
 				# Copy the job's name to it's own variable.
 				$jobName = $job.Info.Name
@@ -36,11 +36,11 @@ Function Get-VBRSessionInfo {
 		}
 	}
 
-	Elseif ($null -eq $sessionId) {
-		Write-Warning '$sessionId is null.'
+	Elseif ($null -eq $SessionId) {
+		Write-Warning '$SessionId is null.'
 	}
 
-	Elseif ($null -eq $jobType) {
-		Write-Warning '$jobType is null.'
+	Elseif ($null -eq $JobType) {
+		Write-Warning '$JobType is null.'
 	}
 }

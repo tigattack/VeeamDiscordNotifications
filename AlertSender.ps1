@@ -52,13 +52,13 @@ $footerObject = [PSCustomObject]@{
 # Job info preparation
 
 ## Get the backup session information.
-$session = (Get-VBRSessionInfo -SessionID $id -JobType $jobType).Session
+$session = (Get-VBRSessionInfo -SessionId $id -JobType $jobType).Session
 
 ## Wait for the backup session to finish.
 While ($session.State -ne 'Stopped') {
-	Write-LogMessage -Tag 'Info' -Message 'Session not finished. Sleeping...'
+	Write-LogMessage -Tag 'INFO' -Message 'Session not finished. Sleeping...'
 	Start-Sleep -Milliseconds 500
-	$session = (Get-VBRSessionInfo -SessionID $id -JobType $jobType).Session
+	$session = (Get-VBRSessionInfo -SessionId $id -JobType $jobType).Session
 }
 
 ## Gather generic session info
@@ -200,7 +200,7 @@ Try {
 	}
 }
 Catch {
-	Write-LogMessage -Tag 'Warning' -Message "Unable to determine 'mention on fail' configuration. User will not be mentioned."
+	Write-LogMessage -Tag 'WARN' -Message "Unable to determine 'mention on fail' configuration. User will not be mentioned."
 }
 
 ## On warning
@@ -210,7 +210,7 @@ Try {
 	}
 }
 Catch {
-	Write-LogMessage -Tag 'Warning' -Message "Unable to determine 'mention on warning' configuration. User will not be mentioned."
+	Write-LogMessage -Tag 'WARN' -Message "Unable to determine 'mention on warning' configuration. User will not be mentioned."
 }
 
 
@@ -247,8 +247,8 @@ $request = Invoke-RestMethod -Uri $Config.webhook -Body ($payload | ConvertTo-Js
 
 # Write error if message fails to send to Discord.
 If ($request.Length -gt '0') {
-	Write-LogMessage -Tag 'Error' -Message 'Failed to send message to Discord. Response below.'
-	Write-LogMessage -Tag 'Error' -Message "$request"
+	Write-LogMessage -Tag 'ERROR' -Message 'Failed to send message to Discord. Response below.'
+	Write-LogMessage -Tag 'ERROR' -Message "$request"
 }
 
 

@@ -26,7 +26,7 @@ Try {
 	}
 }
 Catch {
-	Write-LogMessage -Tag "Error" -Message "Failed to validate configuration: $_"
+	Write-LogMessage -Tag 'ERROR' -Message "Failed to validate configuration: $_"
 }
 
 
@@ -60,7 +60,7 @@ Switch ($job.JobType) {
 $sessionInfo = Get-VBRSessionInfo -SessionID $sessionId -JobType $jobType
 $jobName = $sessionInfo.JobName
 
-Write-LogMessage -Tag Info -Message "Bootstrap script for Veeam job '$jobName' ($jobId)."
+Write-LogMessage -Tag 'INFO' -Message "Bootstrap script for Veeam job '$jobName' ($jobId)."
 
 # Build argument string for the alert sender script.
 $powershellArguments = "-file $PSScriptRoot\AlertSender.ps1", "-JobName $jobName", "-Id $sessionId", "-JobType $jobType", "-Config $config"
