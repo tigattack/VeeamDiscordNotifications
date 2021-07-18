@@ -5,5 +5,6 @@
 	"mention_on_fail": false,
 	"mention_on_warning": false,
 	"debug_log": false,
-	"auto_update": true
+	"auto_update": false,
+	"comment": "Auto updater is still experimental. Use at your own risk."
 }
