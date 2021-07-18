@@ -39,8 +39,8 @@ $thumbObject = [PSCustomObject]@{
 
 ## Define footer object.
 $footerObject = [PSCustomObject]@{
-	text = "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion). $footerAddition"
-	icon_url = 'https://avatars0.githubusercontent.com/u/10629864'
+	text 		= "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion). $footerAddition"
+	icon_url	= 'https://avatars0.githubusercontent.com/u/10629864'
 }
 
 
@@ -64,12 +64,12 @@ $jobStartTime = $session.Info.CreationTime
 ## Create writeable object using their values, prepending 0 to single-digit values.
 ## Necessary because $jobEndTime and $jobStartTime are readonly.
 $jobTimes = [PSCustomObject]@{
-	StartHour = $jobStartTime.Hour.ToString("00")
-	StartMinute = $jobStartTime.Minute.ToString("00")
-	StartSecond = $jobStartTime.Second.ToString("00")
-	EndHour = $jobEndTime.Hour.ToString("00")
-	EndMinute = $jobEndTime.Minute.ToString("00")
-	EndSecond = $jobEndTime.Second.ToString("00")
+	StartHour	= $jobStartTime.Hour.ToString("00")
+	StartMinute	= $jobStartTime.Minute.ToString("00")
+	StartSecond	= $jobStartTime.Second.ToString("00")
+	EndHour		= $jobEndTime.Hour.ToString("00")
+	EndMinute	= $jobEndTime.Minute.ToString("00")
+	EndSecond	= $jobEndTime.Second.ToString("00")
 }
 
 ## Calculate difference between job start and end time.
@@ -78,23 +78,23 @@ $duration = $jobEndTime - $jobStartTime
 ## Switch for job duration; define pretty output.
 Switch ($duration) {
 	{$_.Days -ge '1'} {
-		$durationFormatted = '{0}d {1}h {2}m {3}s' -f $_.Days, $_.Hours, $_.Minutes, $_.Seconds
+		$durationFormatted	= '{0}d {1}h {2}m {3}s' -f $_.Days, $_.Hours, $_.Minutes, $_.Seconds
 		break
 	}
 	{$_.Hours -ge '1'} {
-		$durationFormatted = '{0}h {1}m {2}s' -f $_.Hours, $_.Minutes, $_.Seconds
+		$durationFormatted	= '{0}h {1}m {2}s' -f $_.Hours, $_.Minutes, $_.Seconds
 		break
 	}
 	{$_.Minutes -ge '1'} {
-		$durationFormatted = '{0}m {1}s' -f $_.Minutes, $_.Seconds
+		$durationFormatted	= '{0}m {1}s' -f $_.Minutes, $_.Seconds
 		break
 	}
 	{$_.Seconds -ge '1'} {
-		$durationFormatted = '{0}s' -f $_.Seconds
+		$durationFormatted	= '{0}s' -f $_.Seconds
 		break
 	}
 	Default {
-		$durationFormatted = '{0}d {1}h {2}m {3}s' -f $_.Days, $_.Hours, $_.Minutes, $_.Seconds
+		$durationFormatted	= '{0}d {1}h {2}m {3}s' -f $_.Days, $_.Hours, $_.Minutes, $_.Seconds
 	}
 }
 
@@ -107,17 +107,16 @@ $fieldArray = @()
 ## If VM backup, gather and include session info
 if ($jobType -eq 'VM') {
 	# Gather session info.
-	[Float]$jobSize = $session.BackupStats.DataSize
-	[Float]$transferSize = $session.BackupStats.BackupSize
-	[Float]$speed = $session.Info.Progress.AvgSpeed
+	[Float]$jobSize			= $session.BackupStats.DataSize
+	[Float]$transferSize	= $session.BackupStats.BackupSize
+	[Float]$speed			= $session.Info.Progress.AvgSpeed
 
-	# Convert bytes to rounded units.
-	$jobSizeRound = ConvertTo-ByteUnit -InputObject $jobSize
-	$transferSizeRound = ConvertTo-ByteUnit -InputObject $transferSize
-	# Convert speed from B/s to rounded units and append '/s'
-	$speedRound = (ConvertTo-ByteUnit -InputObject $speed) + '/s'
+	# Convert bytes to closest unit.
+	$jobSizeRound		= ConvertTo-ByteUnit -InputObject $jobSize
+	$transferSizeRound	= ConvertTo-ByteUnit -InputObject $transferSize
+	$speedRound			= (ConvertTo-ByteUnit -InputObject $speed) + '/s'
 
-	# Set processing speed  "Unknown" if 0B/s to avoid confusion.
+	# Set processing speed "Unknown" if 0B/s to avoid confusion.
 	If ($speedRound -eq '0 B/s') {
 		$speedRound = 'Unknown'
 	}
@@ -125,29 +124,29 @@ if ($jobType -eq 'VM') {
 	# Add session information to fieldArray.
 	$fieldArray = @(
 		[PSCustomObject]@{
-			name = 'Backup Size'
-			value = [String]$jobSizeRound
-			inline = 'true'
+			name	= 'Backup Size'
+			value	= [String]$jobSizeRound
+			inline	= 'true'
 		},
 		[PSCustomObject]@{
-			name = 'Transferred Data'
-			value = [String]$transferSizeRound
-			inline = 'true'
+			name	= 'Transferred Data'
+			value	= [String]$transferSizeRound
+			inline	= 'true'
 		}
 		[PSCustomObject]@{
-			name = 'Dedup Ratio'
-			value = [String]$session.BackupStats.DedupRatio
-			inline = 'false'
+			name	= 'Dedup Ratio'
+			value	= [String]$session.BackupStats.DedupRatio
+			inline	= 'false'
 		}
 		[PSCustomObject]@{
-			name = 'Compression Ratio'
-			value = [String]$session.BackupStats.CompressRatio
-			inline = 'false'
+			name	= 'Compression Ratio'
+			value	= [String]$session.BackupStats.CompressRatio
+			inline	= 'false'
 		}
 		[PSCustomObject]@{
-			name = 'Processing Rate'
-			value = $speedRound
-			inline = 'false'
+			name	= 'Processing Rate'
+			value	= $speedRound
+			inline	= 'false'
 		}
 	)
 }
@@ -155,19 +154,19 @@ if ($jobType -eq 'VM') {
 ## Add job times to fieldArray.
 $fieldArray += @(
 	[PSCustomObject]@{
-		name = 'Job Duration'
-		value = $durationFormatted
-		inline = 'true'
+		name	= 'Job Duration'
+		value	= $durationFormatted
+		inline	= 'true'
 	}
 	[PSCustomObject]@{
-		name = 'Time Started'
-		value = '{0}:{1}:{2}' -f $jobTimes.StartHour, $jobTimes.StartMinute, $jobTimes.StartSecond
-		inline = 'true'
+		name	= 'Time Started'
+		value	= '{0}:{1}:{2}' -f $jobTimes.StartHour, $jobTimes.StartMinute, $jobTimes.StartSecond
+		inline	= 'true'
 	}
 	[PSCustomObject]@{
-		name = 'Time Completed'
-		value = '{0}:{1}:{2}' -f $jobTimes.EndHour, $jobTimes.EndMinute, $jobTimes.EndSecond
-		inline = 'true'
+		name	= 'Time Completed'
+		value	= '{0}:{1}:{2}' -f $jobTimes.EndHour, $jobTimes.EndMinute, $jobTimes.EndSecond
+		inline	= 'true'
 	}
 )
 
@@ -175,20 +174,20 @@ $fieldArray += @(
 If ($jobType -eq 'Agent') {
 	$fieldArray += @(
 		[PSCustomObject]@{
-			name = 'Notice'
-			value = "Due to limitations in Veeam's PowerShell module, this information is unfortunately all that can be provided."
-			inline = 'false'
+			name	= 'Notice'
+			value	= "Due to limitations in Veeam's PowerShell module, this information is unfortunately all that can be provided."
+			inline	= 'false'
 		}
 	)
 }
 
 # Switch for the session status to decide the embed colour.
 Switch ($status) {
-	None {$colour = '16777215'}
-	Warning {$colour = '16776960'}
-	Success {$colour = '65280'}
-	Failed {$colour = '16711680'}
-	Default {$colour = '16777215'}
+	None {$colour		= '16777215'}
+	Warning {$colour	= '16776960'}
+	Success {$colour	= '65280'}
+	Failed {$colour		= '16711680'}
+	Default {$colour	= '16777215'}
 }
 
 # Decide whether to mention user
