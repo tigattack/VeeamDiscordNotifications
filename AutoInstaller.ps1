@@ -11,7 +11,7 @@ If ($userprompt -ne 'Y') {
 
 # Get latest release from GitHub
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$latestRelease = Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/latest -Headers @{"Accept"="application/json"} -UseBasicParsing
+$latestRelease = Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/latest -ContentType 'application/json` -UseBasicParsing
 
 # Release IDs are returned in a format of {"id":3622206,"tag_name":"v1.0"} so we need to extract tag_name.
 $latestVersion = $latestRelease.Content | ConvertFrom-Json | Select-Object tag_name -ExpandProperty tag_name
