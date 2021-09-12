@@ -11,8 +11,10 @@ If ($userprompt -ne 'Y') {
 # Get latest release from GitHub
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $latestRelease = Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/latest -Headers @{"Accept"="application/json"} -UseBasicParsing
+
 # Release IDs are returned in a format of {"id":3622206,"tag_name":"v1.0"} so we need to extract tag_name.
 $latestVersion = $latestRelease.Content | ConvertFrom-Json | Select-Object tag_name -ExpandProperty tag_name
+
 # Pull latest version of script from GitHub
 Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/download/$LatestVersion/VeeamDiscordNotifications-$LatestVersion.zip -OutFile $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip
 
@@ -20,14 +22,17 @@ Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/re
 Expand-Archive $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -DestinationPath C:\VeeamScripts
 Rename-Item C:\VeeamScripts\VeeamDiscordNotifications-$LatestVersion C:\VeeamScripts\VeeamDiscordNotifications
 Remove-Item $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip
+
 # Assign webhook url to variable
 $webhookurl = Read-Host -Prompt "Please paste your Webhook URL now"
 
 # Get the config file and write the user webhook
 $Config = Get-Content "C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json" -Raw | ConvertFrom-Json
 $Config.webhook = $webhookurl
+
 # Write Config
 ConvertTo-Json $Config | Set-Content C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json
+
 # Unblock script files
 Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1
 Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\DiscordVeeamAlertSender.ps1
