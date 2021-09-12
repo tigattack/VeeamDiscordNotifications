@@ -17,12 +17,12 @@ $latestRelease = Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscor
 $latestVersion = ($latestRelease.Content | ConvertFrom-Json).tag_name
 
 # Pull latest version of script from GitHub
-Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/download/$LatestVersion/VeeamDiscordNotifications-$LatestVersion.zip -OutFile $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip
+Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/download/$latestVersion/VeeamDiscordNotifications-$latestVersion.zip -OutFile $PSScriptRoot\VeeamDiscordNotifications-$latestVersion.zip
 
 # Expand downloaded ZIP and cleanup
-Expand-Archive $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip -DestinationPath C:\VeeamScripts
-Rename-Item C:\VeeamScripts\VeeamDiscordNotifications-$LatestVersion C:\VeeamScripts\VeeamDiscordNotifications
-Remove-Item $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip
+Expand-Archive $PSScriptRoot\VeeamDiscordNotifications-$latestVersion.zip -DestinationPath C:\VeeamScripts
+Rename-Item C:\VeeamScripts\VeeamDiscordNotifications-$latestVersion C:\VeeamScripts\VeeamDiscordNotifications
+Remove-Item $PSScriptRoot\VeeamDiscordNotifications-$latestVersion.zip
 
 # Assign webhook url to variable
 $webhookurl = Read-Host -Prompt "Please paste your Webhook URL now"
