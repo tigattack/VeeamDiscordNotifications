@@ -1,10 +1,11 @@
-# Start logging
+# Set config location
+$configFile = "$PSScriptRoot\config\conf.json"
 
-## Set log file name
+# Set log file name
 $date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ":", "." })
 $logFile = "$PSScriptRoot\log\Log_Bootstrap-$date.log"
 
-## Start logging to file
+# Start logging to file
 Start-Transcript -Path $logFile
 
 # Import modules.
@@ -13,8 +14,12 @@ Import-Module "$PSScriptRoot\resources\Logger.psm1"
 Import-Module "$PSScriptRoot\resources\VBRSessionInfo.psm1"
 
 # Retrieve configuration.
-## Get config.
-$config = Get-Content -Raw "$PSScriptRoot\config\conf.json" | ConvertFrom-Json
+## Pull config to PSCustomObject
+$config = Get-Content -Raw $configFile | ConvertFrom-Json
+
+## Pull raw config and format for later.
+## This is necessary since $config as a PSCustomObject was not passed through correctly with Start-Process and $powershellArguments.
+$configRaw = (Get-Content -Raw $configFile).replace('"','\"')
 
 ## Test config.
 Try {
@@ -64,7 +69,7 @@ $jobName = $sessionInfo.JobName
 Write-LogMessage -Tag 'INFO' -Message "Bootstrap script for Veeam job '$jobName' ($jobId)."
 
 # Build argument string for the alert sender script.
-$powershellArguments = "-file $PSScriptRoot\AlertSender.ps1", "-JobName $jobName", "-Id $sessionId", "-JobType $jobType", "-Config $config"
+$powershellArguments = "-file $PSScriptRoot\AlertSender.ps1", "-JobName $jobName", "-Id $sessionId", "-JobType $jobType", "-Config `"$($configRaw)`""
 
 # Start a new new script in a new process with some of the information gathered here.
 # This allows Veeam to finish the current session faster and allows us gather information from the completed job.

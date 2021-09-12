@@ -3,8 +3,11 @@ Param(
 	[String]$jobName,
 	[String]$id,
 	[String]$jobType,
-	[PSObject]$Config
+	$Config
 )
+
+# Convert config from JSON
+$Config = $Config | ConvertFrom-Json
 
 # Import modules.
 Import-Module "$PSScriptRoot\resources\Logger.psm1"
