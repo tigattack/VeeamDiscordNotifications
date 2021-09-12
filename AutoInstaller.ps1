@@ -8,6 +8,7 @@ If ($userprompt -ne 'Y') {
     Write-Output "Please create a Discord webhook before continuing. `nFull instructions avalible at https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks"
     exit
 }
+
 # Get latest release from GitHub
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $latestRelease = Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/latest -Headers @{"Accept"="application/json"} -UseBasicParsing
