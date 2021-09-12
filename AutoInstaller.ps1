@@ -22,7 +22,7 @@ Remove-Item $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip
 $webhookurl = Read-Host -Prompt "Please paste your Webhook URL now"
 
 # Get the config file and write the user webhook
-$Config = (Get-Content C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json) | ConvertFrom-Json
+$Config = Get-Content "C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json" -Raw | ConvertFrom-Json
 $Config.webhook = $webhookurl
 # Write Config
 ConvertTo-Json $Config | Set-Content C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json
