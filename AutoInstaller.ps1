@@ -25,14 +25,14 @@ Rename-Item C:\VeeamScripts\VeeamDiscordNotifications-$latestVersion C:\VeeamScr
 Remove-Item $PSScriptRoot\VeeamDiscordNotifications-$latestVersion.zip
 
 # Assign webhook url to variable
-$webhookurl = Read-Host -Prompt "Please paste your Webhook URL now"
+$webhookUrl = Read-Host -Prompt "Please paste your webhook URL now"
 
 # Get the config file and write the user webhook
-$Config = Get-Content "C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json" -Raw | ConvertFrom-Json
-$Config.webhook = $webhookurl
+$config = Get-Content "C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json" -Raw | ConvertFrom-Json
+$config.webhook = $webhookUrl
 
 # Write Config
-ConvertTo-Json $Config | Set-Content C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json
+ConvertTo-Json $config | Set-Content C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json
 
 # Unblock script files
 Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1
