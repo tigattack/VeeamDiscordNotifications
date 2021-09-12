@@ -19,7 +19,8 @@ $latestVersion = ($latestRelease.Content | ConvertFrom-Json).tag_name
 # Pull latest version of script from GitHub
 Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/download/$latestVersion/VeeamDiscordNotifications-$latestVersion.zip -OutFile $PSScriptRoot\VeeamDiscordNotifications-$latestVersion.zip
 
-# Expand downloaded ZIP and cleanup
+# Unblock, Expand downloaded ZIP and cleanup
+Unblock-File -LiteralPath $PSScriptRoot\VeeamDiscordNotifications-$latestVersion.zip
 Expand-Archive $PSScriptRoot\VeeamDiscordNotifications-$latestVersion.zip -DestinationPath C:\VeeamScripts
 Rename-Item C:\VeeamScripts\VeeamDiscordNotifications-$latestVersion C:\VeeamScripts\VeeamDiscordNotifications
 Remove-Item $PSScriptRoot\VeeamDiscordNotifications-$latestVersion.zip
@@ -33,12 +34,6 @@ $config.webhook = $webhookUrl
 
 # Write Config
 ConvertTo-Json $config | Set-Content C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json
-
-# Unblock script files
-Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1
-Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\DiscordVeeamAlertSender.ps1
-Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\resources\logger.psm1
-Unblock-File C:\VeeamScripts\VeeamDiscordNotifications\UpdateVeeamDiscordNotification.ps1
 
 # Display the command for Veeam
 Write-Output "Success. Copy the following command into the following area of each job you would like to have reported."
