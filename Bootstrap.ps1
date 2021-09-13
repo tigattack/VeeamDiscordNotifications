@@ -49,21 +49,11 @@ $parentCmd = (Get-CimInstance Win32_Process -Filter "processid='$parentPID'").Co
 $jobId = ([regex]::Matches($parentCmd, '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')).Value[0]
 $sessionId = ([regex]::Matches($parentCmd, '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')).Value[1]
 
-# Get the Veeam job details and hide warnings to mute the warning regarding deprecation of the use of this cmdlet to get Agent job details. At time of writing, there is no alternative.
+# Get the Veeam job details and hide warnings to mute the warning regarding deprecation of the use of this cmdlet to get Agent job details. At time of writing, there is no alternative way to discover the job time.
 $job = Get-VBRJob -WarningAction SilentlyContinue | Where-Object {$_.Id.Guid -eq $jobId}
 
-# Get the job time
-Switch ($job.JobType) {
-	{$_ -eq 'Backup'} {
-		$jobType = 'VM'
-	}
-	{$_ -eq 'EpAgentBackup'} {
-		$jobType = 'Agent'
-	}
-}
-
 # Get the session information and name.
-$sessionInfo = Get-VBRSessionInfo -SessionID $sessionId -JobType $jobType
+$sessionInfo = Get-VBRSessionInfo -SessionID $sessionId -JobType $job.JobType
 $jobName = $sessionInfo.JobName
 
 Write-LogMessage -Tag 'INFO' -Message "Bootstrap script for Veeam job '$jobName' ($jobId)."

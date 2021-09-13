@@ -11,7 +11,9 @@ Function Get-VBRSessionInfo {
 
 		# Switch on job type.
 		Switch ($JobType) {
-			{$_ -eq 'VM'} {
+			
+			# VM job
+			{$_ -eq 'Backup'} {
 
 				# Get the session details.
 				$session = Get-VBRBackupSession | Where-Object {$_.Id.Guid -eq $SessionId}
@@ -20,9 +22,13 @@ Function Get-VBRSessionInfo {
 				$jobName = $session.OrigJobName
 			}
 
-			{$_ -eq 'Agent'} {
+			# Agent job
+			{$_ -eq 'EpAgentBackup'} {
 				# Get the session details.
 				$session = Get-VBRComputerBackupJobSession -Id $SessionId
+				
+				$session = [Veeam.Backup.Core.CBackupSession]::GetByOriginalSessionId($SessionId)
+				$jobName = ($session.JobName | Select-String -Pattern '^(.+)(-.+)$').Matches.Groups[1].Value
 
 				# Copy the job's name to it's own variable.
 				$jobName = $job.Info.Name
