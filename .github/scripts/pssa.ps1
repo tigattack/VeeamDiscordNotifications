@@ -2,27 +2,47 @@
 Set-PSRepository PSGallery -InstallationPolicy Trusted
 Install-Module PSScriptAnalyzer -ErrorAction Stop
 
+# Get all relevant PowerShell files
+$psFiles = Get-ChildItem -Path ./* -Include *.ps1,*.psm1 -Recurse
+
 # Run PSSA
-Invoke-ScriptAnalyzer -Path * -Recurse -Settings ./.github/scripts/pssa-settings.psd1 -OutVariable issues | Out-Null
-
-# Get results and separate types
-$errors   = $issues.Where({$_.Severity -eq 'Error' -or $_.Severity -eq 'ParseError'})
-$warnings = $issues.Where({$_.Severity -eq 'Warning'})
-$infos    = $issues.Where({$_.Severity -eq 'Information'})
-
-# Report results to GitHub Actions
-Foreach ($i in $errors) {
-  Write-Output "::error file=$($i.ScriptName),line=$($i.Line),col=$($i.Column)::$($i.RuleName) - $($i.Message)"
-}
-Foreach ($i in $warnings) {
-  Write-Output "::warning file=$($i.ScriptName),line=$($i.Line),col=$($i.Column)::$($i.RuleName) - $($i.Message)"
-}
-Foreach ($i in $infos) {
-  Write-Output "::debug file=$($i.ScriptName),line=$($i.Line),col=$($i.Column)::$($i.RuleName) - $($i.Message)"
+$issues = foreach ($i in $psFiles.FullName) {
+	Invoke-ScriptAnalyzer -Path $i -Recurse -Settings ./.github/scripts/pssa-settings.psd1
 }
 
-Write-Output "There were $($errors.Count) errors, $($warnings.Count) warnings, and $($infos.Count) infos in total."
+# Get results, types and report to GitHub Actions
+$errors = $warnings = $infos = $unknowns = 0
 
-If ($errors) {
+foreach ($i in $issues) {
+	switch ($issue.Severity) {
+		{$_ -eq 'Error' -or $_ -eq 'ParseError'} {
+			Write-Output "::error file=$($i.ScriptName),line=$($i.Line),col=$($i.Column)::$($i.RuleName) - $($i.Message)"
+			$errors++
+		}
+		{$_ -eq 'Warning'} {
+			Write-Output "::warning file=$($i.ScriptName),line=$($i.Line),col=$($i.Column)::$($i.RuleName) - $($i.Message)"
+			$warnings++
+		}
+		{$_ -eq 'Information'} {
+			Write-Output "::warning file=$($i.ScriptName),line=$($i.Line),col=$($i.Column)::$($i.RuleName) - $($i.Message)"
+			$infos++
+		}
+		Default {
+			Write-Output "::debug file=$($i.ScriptName),line=$($i.Line),col=$($i.Column)::$($i.RuleName) - $($i.Message)"
+			$unknowns++
+		}
+	}
+}
+
+# Report summary to GitHub Actions
+If ($unknowns -gt 0) {
+	Write-Output "There were $errors errors, $warnings warnings, $infos infos, and $unknowns unknowns in total."
+}
+Else {
+	Write-Output "There were $errors errors, $warnings warnings, and $infos infos in total."
+}
+
+# Exit with error if any PSSA errors
+If ($errors -gt 0) {
 	exit 1
 }
