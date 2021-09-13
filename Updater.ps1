@@ -8,7 +8,7 @@ Import-Module "$PSScriptRoot\VeeamDiscordNotifications\resources\Logger.psm1"
 
 # Logging
 ## Set log file name
-$date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ":", "." })
+$date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ':', '.' })
 $logFile = "$PSScriptRoot\Log_Update-$date.log"
 ## Start logging to file
 Start-Logging $logFile
@@ -181,7 +181,7 @@ function Stop-Script {
 		}
 		Write-LogMessage -Tag 'INFO' -Message 'Remove Updater.ps1.'
 		Remove-Item -LiteralPath $PSCommandPath -Force
-		
+
 		# Report result
 		Write-LogMessage -Tag 'INFO' -Message "Update result: $result"
 
@@ -235,7 +235,9 @@ while (Get-CimInstance win32_process -filter "name='powershell.exe' and commandl
 Try {
 	Write-LogMessage -Tag 'INFO' -Message 'Pull latest version of script from GitHub.'
 	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-	Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/download/$LatestVersion/VeeamDiscordNotifications-$LatestVersion.zip -OutFile $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip
+	Invoke-WebRequest -Uri `
+		https://github.com/tigattack/VeeamDiscordNotifications/releases/download/$LatestVersion/VeeamDiscordNotifications-$LatestVersion.zip `
+		-OutFile $PSScriptRoot\VeeamDiscordNotifications-$LatestVersion.zip
 }
 Catch {
 	$errorVar = $_.CategoryInfo.Activity + ' : ' + $_.ToString()

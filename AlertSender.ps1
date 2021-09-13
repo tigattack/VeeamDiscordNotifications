@@ -10,6 +10,7 @@ Param(
 $Config = $Config | ConvertFrom-Json
 
 # Import modules.
+Import-Module Veeam.Backup.PowerShell -DisableNameChecking
 Import-Module "$PSScriptRoot\resources\Logger.psm1"
 Import-Module "$PSScriptRoot\resources\ConvertTo-ByteUnit.psm1"
 Import-Module "$PSScriptRoot\resources\VBRSessionInfo.psm1"
@@ -19,7 +20,7 @@ Import-Module "$PSScriptRoot\resources\UpdateInfo.psm1"
 # Start logging if logging is enabled in config
 If ($Config.debug_log) {
 	## Set log file name
-	$date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ":", "." })
+	$date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ':', '.' })
 	$logFile = "$PSScriptRoot\log\Log_$jobName-$date.log"
 	## Start logging to file
 	Start-Logging $logFile
@@ -38,7 +39,8 @@ $updateStatus = Get-UpdateStatus
 # Define static output objects.
 
 ## Get and define update status message.
-$footerAddition = (Get-UpdateMessage -CurrentVersion $updateStatus.CurrentVersion -LatestVersion $updateStatus.LatestVersion) -replace 'latestVerPlaceholder', $updateStatus.LatestVersion
+$footerAddition = (Get-UpdateMessage -CurrentVersion $updateStatus.CurrentVersion -LatestVersion $updateStatus.LatestVersion) `
+	-replace 'latestVerPlaceholder', $updateStatus.LatestVersion
 
 ## Define thumbnail object.
 $thumbObject = [PSCustomObject]@{
@@ -133,12 +135,12 @@ If ($jobType -eq 'Agent') {
 # Necessary because $jobEndTime and $jobStartTime are readonly.
 # Create writeable object using their values, prepending 0 to single-digit values.
 $jobTimes = [PSCustomObject]@{
-	StartHour	= $jobStartTime.Hour.ToString("00")
-	StartMinute	= $jobStartTime.Minute.ToString("00")
-	StartSecond	= $jobStartTime.Second.ToString("00")
-	EndHour		= $jobEndTime.Hour.ToString("00")
-	EndMinute	= $jobEndTime.Minute.ToString("00")
-	EndSecond	= $jobEndTime.Second.ToString("00")
+	StartHour	= $jobStartTime.Hour.ToString('00')
+	StartMinute	= $jobStartTime.Minute.ToString('00')
+	StartSecond	= $jobStartTime.Second.ToString('00')
+	EndHour		= $jobEndTime.Hour.ToString('00')
+	EndMinute	= $jobEndTime.Minute.ToString('00')
+	EndSecond	= $jobEndTime.Second.ToString('00')
 }
 
 # Calculate difference between job start and end time.
@@ -193,7 +195,7 @@ If ($jobType -eq 'Agent') {
 	$fieldArray += @(
 		[PSCustomObject]@{
 			name	= 'Notice'
-			value	= "Due to limitations in Veeam's PowerShell module, this information is unfortunately all that can be provided."
+			value	= "The information you see here is all that is available due to limitations in Veeam's PowerShell module."
 			inline	= 'false'
 		}
 	)
@@ -277,7 +279,7 @@ If (($updateStatus.CurrentVersion -lt $updateStatus.latestVersion) -and $Config.
 
 	# Run update script.
 	$updateArgs = "-file $PSScriptRoot\..\VDNotifs-Updater.ps1", "-LatestVersion $latestVersion"
-	Start-Process -FilePath "powershell" -Verb runAs -ArgumentList $updateArgs -WindowStyle hidden
+	Start-Process -FilePath 'powershell' -Verb runAs -ArgumentList $updateArgs -WindowStyle hidden
 }
 
 # Stop logging.

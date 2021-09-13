@@ -2,7 +2,7 @@
 $configFile = "$PSScriptRoot\config\conf.json"
 
 # Set log file name
-$date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ":", "." })
+$date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ':', '.' })
 $logFile = "$PSScriptRoot\log\Log_Bootstrap-$date.log"
 
 # Start logging to file
@@ -49,7 +49,8 @@ $parentCmd = (Get-CimInstance Win32_Process -Filter "processid='$parentPID'").Co
 $jobId = ([regex]::Matches($parentCmd, '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')).Value[0]
 $sessionId = ([regex]::Matches($parentCmd, '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')).Value[1]
 
-# Get the Veeam job details and hide warnings to mute the warning regarding deprecation of the use of this cmdlet to get Agent job details. At time of writing, there is no alternative way to discover the job time.
+# Get the Veeam job details and hide warnings to mute the warning regarding deprecation of the use of this cmdlet to get Agent job details.
+# At time of writing, there is no alternative way to discover the job time.
 $job = Get-VBRJob -WarningAction SilentlyContinue | Where-Object {$_.Id.Guid -eq $jobId}
 
 # Get the session information and name.
@@ -63,7 +64,7 @@ $powershellArguments = "-file $PSScriptRoot\AlertSender.ps1", "-JobName $jobName
 
 # Start a new new script in a new process with some of the information gathered here.
 # This allows Veeam to finish the current session faster and allows us gather information from the completed job.
-Start-Process -FilePath "powershell" -Verb runAs -ArgumentList $powershellArguments -WindowStyle hidden
+Start-Process -FilePath 'powershell' -Verb runAs -ArgumentList $powershellArguments -WindowStyle hidden
 
 # Stop logging.
 If ($config.debug_log) {
