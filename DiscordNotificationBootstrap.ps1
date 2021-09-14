@@ -14,7 +14,7 @@ if($config.debug_log) {
 }
 
 # Import Veeam module.
-Import-Module Veeam.Backup.PowerShell
+Import-Module Veeam.Backup.PowerShell -DisableNameChecking
 
 # Get the command line used to start the Veeam session.
 $parentPID = (Get-CimInstance Win32_Process -Filter "processid='$pid'").parentprocessid.ToString()
