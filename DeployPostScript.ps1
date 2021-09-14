@@ -21,7 +21,7 @@ foreach ($JobName in $AllJobs) {
     # Different actions whether Post Script is already enabled. If yes we ask to modify it, if not we ask to enable & set it.
     if ($PostScriptEnabled -eq 'True') 
     {
-        $OverWriteCurrentCL = Read-Host "`r`nThere is already a Post Script set for $JobName`r`nScript: $PostScriptCommandLine`r`nDo you want to overwrite it? Y/N"
+        $OverWriteCurrentCL = Read-Host "`nThere is already a Post Script set for $JobName`nScript: $PostScriptCommandLine`nDo you want to overwrite it? Y/N"
         switch ($OverWriteCurrentCL)
         {
             # Default action will be to skip the job.
