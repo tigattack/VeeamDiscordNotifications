@@ -14,7 +14,7 @@ $config = Get-Content -Raw "$PSScriptRoot\config\conf.json" | ConvertFrom-Json
 # Start logging if logging is enabled in config
 if($config.debug_log) {
 	## Set log file name
-	$date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ":", "." })
+	$date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ':', '.' })
 	$logFile = "$PSScriptRoot\log\Log_$jobName-$date.log"
 	## Start logging to file
 	Start-Logging $logFile
@@ -26,7 +26,8 @@ $currentVersion = Get-Content "$PSScriptRoot\resources\version.txt" -Raw
 
 ## Get latest release from GitHub and use that to determine the latest version.
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$latestRelease = Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/latest -Headers @{"Accept"="application/json"} -UseBasicParsing
+$latestRelease = Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/latest `
+	-Headers @{'Accept'='application/json'} -UseBasicParsing
 ## Release IDs are returned in a format of {"id":3622206,"tag_name":"v1.0"}, so we need to extract tag_name.
 $latestVersion = ConvertFrom-Json $latestRelease.Content | ForEach-Object {$_.tag_name}
 
@@ -74,14 +75,14 @@ $session = Get-VBRBackupSession | Where-Object{($_.OrigjobName -eq $jobName) -an
 # Wait for the backup session to finish.
 While ($session.IsCompleted -eq $false) {
 	Write-LogMessage -Tag 'Info' -Message 'Session not finished. Sleeping...'
-	Start-Sleep -m 200
+	Start-Sleep -Milliseconds 200
 	$session = Get-VBRBackupSession | Where-Object{($_.OrigjobName -eq $jobName) -and ($id -eq $_.Id.ToString())}
 }
 
 # Gather backup session info.
 [String]$status = $session.Result
 $jobName = $session.Name.ToString().Trim()
-$JobType = $session.JobTypeString.Trim()
+#$JobType = $session.JobTypeString.Trim() # Not utilised (PSUseDeclaredVarsMoreThanAssignments).
 [Float]$jobSize = $session.BackupStats.DataSize
 [Float]$transferSize = $session.BackupStats.BackupSize
 [Float]$speed = $session.Info.Progress.AvgSpeed
@@ -104,12 +105,12 @@ $duration = $jobEndTime - $jobStartTime
 
 # $jobEndTime and $jobStartTime are readonly. Create writeable object using their values, prepending 0 to single-digit values.
 $jobTimes = [PSCustomObject]@{
-	StartHour = $jobStartTime.Hour.ToString("00")
-	StartMinute = $jobStartTime.Minute.ToString("00")
-	StartSecond = $jobStartTime.Second.ToString("00")
-	EndHour = $jobEndTime.Hour.ToString("00")
-	EndMinute = $jobEndTime.Minute.ToString("00")
-	EndSecond = $jobEndTime.Second.ToString("00")
+	StartHour = $jobStartTime.Hour.ToString('00')
+	StartMinute = $jobStartTime.Minute.ToString('00')
+	StartSecond = $jobStartTime.Second.ToString('00')
+	EndHour = $jobEndTime.Hour.ToString('00')
+	EndMinute = $jobEndTime.Minute.ToString('00')
+	EndSecond = $jobEndTime.Second.ToString('00')
 }
 
 # Switch for job duration.
@@ -245,7 +246,7 @@ If ($currentVersion -lt $latestVersion -and $config.auto_update) {
 	Copy-Item $PSScriptRoot\UpdateVeeamDiscordNotification.ps1 $PSScriptRoot\..\UpdateVeeamDiscordNotification.ps1
 	Unblock-File $PSScriptRoot\..\UpdateVeeamDiscordNotification.ps1
 	$powershellArguments = "-file $PSScriptRoot\..\UpdateVeeamDiscordNotification.ps1", "-LatestVersion $latestVersion"
-	Start-Process -FilePath "powershell" -Verb runAs -ArgumentList $powershellArguments -WindowStyle hidden
+	Start-Process -FilePath 'powershell' -Verb runAs -ArgumentList $powershellArguments -WindowStyle hidden
 }
 
 # Stop logging.
