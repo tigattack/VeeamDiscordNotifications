@@ -14,7 +14,7 @@ $issues = foreach ($i in $psFiles.FullName) {
 $errors = $warnings = $infos = $unknowns = 0
 
 foreach ($i in $issues) {
-	switch ($issue.Severity) {
+	switch ($i.Severity) {
 		{$_ -eq 'Error' -or $_ -eq 'ParseError'} {
 			Write-Output "::error file=$($i.ScriptName),line=$($i.Line),col=$($i.Column)::$($i.RuleName) - $($i.Message)"
 			$errors++
