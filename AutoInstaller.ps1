@@ -39,7 +39,5 @@ $config.webhook = $webhookUrl
 # Write Config
 ConvertTo-Json $config | Set-Content C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json
 
-# Display the command for Veeam
-Write-Output 'Success. Copy the following command into the following area of each job you would like to have reported.'
-Write-Output "`nJob settings -> Storage -> Advanced -> Scripts -> Post-Job Script"
-Write-Output 'Powershell.exe -ExecutionPolicy Bypass -File C:\VeeamScripts\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1'
+# Run Post Script action.
+& "$PSScriptRoot\DeployPostScript.ps1"
