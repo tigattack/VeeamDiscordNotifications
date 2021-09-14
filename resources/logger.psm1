@@ -40,7 +40,7 @@ Function Stop-Logging {
 	)]
 	Param()
 	If ($PSCmdlet.ShouldProcess('log file', 'Stop-Transcript')) {
-		Write-LogMessage -Tag 'Info' -Message "Stopping transcript logging."
+		Write-LogMessage -Tag 'Info' -Message 'Stopping transcript logging.'
 		Stop-Transcript
 	}
 }
