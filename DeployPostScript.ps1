@@ -8,7 +8,7 @@ if ([string]::IsNullOrEmpty($AllJobs)) {
 	exit
 }
 # Command that Veeam needs to use for the Post Script action.
-$VeeamPowershellCommand = 'Powershell.exe -File C:\VeeamScripts\VeeamDiscordNotifications\Bootstrap.ps1'
+$VeeamPowershellCommand = 'Powershell.exe -File C:\VeeamScripts\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1'
 
 # Run foreach loop for all found jobs
 foreach ($JobName in $AllJobs) {
