@@ -73,8 +73,8 @@ While ($session.State -ne 'Stopped') {
 # Define session statistics for the report.
 
 ## If VM backup, gather and include session info.
-if ($jobType -eq 'VM') {
-	# Gather session info.
+if ($jobType -eq 'Backup') {
+	# Gather session data sizes and timing.
 	[Float]$jobSize			= $session.BackupStats.DataSize
 	[Float]$transferSize	= $session.BackupStats.BackupSize
 	[Float]$speed			= $session.Info.Progress.AvgSpeed
@@ -89,6 +89,26 @@ if ($jobType -eq 'VM') {
 	# Set processing speed "Unknown" if 0B/s to avoid confusion.
 	If ($speedRound -eq '0 B/s') {
 		$speedRound = 'Unknown'
+	}
+
+	# Get objects in session.
+	$sessionObjects = $session.GetTaskSessions()
+
+	## Count total
+	$sessionObjectsCount = $sessionObjects.Count
+
+	## Count warns and fails
+	$sessionObjectWarns = 0
+	$sessionObjectFails = 0
+
+	foreach ($object in $sessionObjects) {
+		If ($object.Status -eq 'Warning') {
+			$sessionObjectWarns++
+		}
+		# TODO: check if 'Failed' is a valid state.
+		If ($object.Status -eq 'Failed') {
+			$sessionObjectFails++
+		}
 	}
 
 	# Add session information to fieldArray.
@@ -106,26 +126,104 @@ if ($jobType -eq 'VM') {
 		[PSCustomObject]@{
 			name	= 'Dedup Ratio'
 			value	= [String]$session.BackupStats.DedupRatio
-			inline	= 'false'
+			inline	= 'true'
 		}
 		[PSCustomObject]@{
 			name	= 'Compression Ratio'
 			value	= [String]$session.BackupStats.CompressRatio
-			inline	= 'false'
+			inline	= 'true'
 		}
 		[PSCustomObject]@{
 			name	= 'Processing Rate'
 			value	= $speedRound
-			inline	= 'false'
+			inline	= 'true'
+		}
+		[PSCustomObject]@{
+			name	= 'Bottleneck'
+			value	= [String]$session.Info.Progress.BottleneckInfo.Bottleneck
+			inline	= 'true'
 		}
 	)
+
+	# Add object warns/fails to fieldArray if any.
+	If ($sessionObjectWarns -gt 0) {
+		$fieldArray += @(
+			[PSCustomObject]@{
+				name	= 'Warnings'
+				value	= "$sessionObjectWarns/$sessionobjectsCount"
+				inline	= 'true'
+			}
+		)
+	}
+	If ($sessionObjectFails -gt 0) {
+		$fieldArray += @(
+			[PSCustomObject]@{
+				name	= 'Fails'
+				value	= "$sessionObjectFails/$sessionobjectsCount"
+				inline	= 'true'
+			}
+		)
+	}
 }
 
 # If agent backup, gather and include session info.
-If ($jobType -eq 'Agent') {
-	# Gather session info.
-	$jobEndTime 			= $session.EndTime
-	$jobStartTime 			= $session.CreationTime
+If ($jobType -eq 'EpAgentBackup') {
+	# Gather session data sizes and timings.
+	[Float]$jobProcessedSize	= $session.Info.Progress.ProcessedSize
+	[Float]$jobTransferredSize	= $session.Info.Progress.TransferedSize
+	[Float]$speed				= $session.Info.Progress.AvgSpeed
+	$jobEndTime 				= $session.EndTime
+	$jobStartTime 				= $session.CreationTime
+
+	# Convert bytes to closest unit.
+	$jobProcessedSizeRound		= ConvertTo-ByteUnit -Data $jobProcessedSize
+	$jobTransferredSizeRound	= ConvertTo-ByteUnit -Data $jobTransferredSize
+	$speedRound					= (ConvertTo-ByteUnit -Data $speed) + '/s'
+
+	# Get number of objects in job.
+	$jobObjects = (Get-VBRComputerBackupJob -Name "$jobName").BackupObject
+
+	# Initialise job object count variable.
+	$jobObjectCount = 0
+
+	# Determine if object is individual computer or container.
+	foreach ($i in 0..($jobObjects.Count-1)) {
+		# Switch on object type.
+		Switch ($jobObjects[$i].GetType()) {
+			# Individual computer
+			'VBRIndividualComputer' {
+				$jobObjectCount++
+			}
+			# Protection group
+			'VBRProtectionGroup' {
+				$jobObjectCount = $jobObjectsCount+$objects[$i].Container.Entity.Count
+			}
+		}
+	}
+
+	# Add session information to fieldArray.
+	$fieldArray = @(
+		[PSCustomObject]@{
+			name	= 'Processed Size'
+			value	= [String]$jobProcessedSizeRound
+			inline	= 'true'
+		},
+		[PSCustomObject]@{
+			name	= 'Transferred Data'
+			value	= [String]$jobTransferredSizeRound
+			inline	= 'true'
+		},
+		[PSCustomObject]@{
+			name	= 'Processing Rate'
+			value	= $speedRound
+			inline	= 'true'
+		},
+		[PSCustomObject]@{
+			name	= 'Objects'
+			value	= "$jobObjectCount"
+			inline	= 'true'
+		}
+	)
 }
 
 
@@ -191,8 +289,13 @@ $fieldArray += @(
 
 
 # If agent backup, add notice to fieldArray.
-If ($jobType -eq 'Agent') {
+If ($jobType -eq 'EpAgentBackup') {
 	$fieldArray += @(
+		[PSCustomObject]@{
+			name = 'Job Objects'
+			value = $jobObjectsCount
+			inline = 'false'
+		}
 		[PSCustomObject]@{
 			name	= 'Notice'
 			value	= "The information you see here is all that is available due to limitations in Veeam's PowerShell module."
