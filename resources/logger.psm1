@@ -1,18 +1,46 @@
 # This function logs messages with a type tag
-function Write-LogMessage($tag, $message) {
-    Write-Host "[$tag] $message"
+Function Write-LogMessage {
+	[CmdletBinding(
+		SupportsShouldProcess,
+		ConfirmImpact = 'Low'
+	)]
+	Param (
+		$tag,
+		$message
+	)
+	If ($PSCmdlet.ShouldProcess('Output stream', 'Write log message')) {
+		Write-Output "[$tag] $message"
+	}
 }
 
-# This function handles Logging
-function Start-Logging($path) {
-    try {
-        Start-Transcript -path $path -force -append 
-        Write-LogMessage -Tag 'Info' -Message "Transcript is being logged to $path"
-    } catch [Exception] {
-        Write-LogMessage -Tag 'Info' -Message "Transcript is already being logged to $path"
-    }
+# These functions handles Logging
+Function Start-Logging {
+	[CmdletBinding(
+		SupportsShouldProcess,
+		ConfirmImpact = 'Low'
+	)]
+	Param(
+		[Parameter(Mandatory)]
+		$path
+	)
+	If ($PSCmdlet.ShouldProcess($path, 'Start-Transcript')) {
+		Try {
+			Start-Transcript -Path $path -Force -Append
+			Write-LogMessage -Tag 'Info' -Message "Transcript is being logged to $path"
+		}
+		Catch [Exception] {
+			Write-LogMessage -Tag 'Info' -Message "Transcript is already being logged to $path"
+		}
+	}
 }
-function Stop-Logging {
-    Write-LogMessage -Tag 'Info' -Message "Stopping transcript logging."
-    Stop-Transcript
+Function Stop-Logging {
+	[CmdletBinding(
+		SupportsShouldProcess,
+		ConfirmImpact = 'Low'
+	)]
+	Param()
+	If ($PSCmdlet.ShouldProcess('log file', 'Stop-Transcript')) {
+		Write-LogMessage -Tag 'Info' -Message 'Stopping transcript logging.'
+		Stop-Transcript
+	}
 }
