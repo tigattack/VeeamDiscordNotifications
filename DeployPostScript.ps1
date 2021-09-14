@@ -47,7 +47,7 @@ foreach ($JobName in $AllJobs) {
               N { Write-Output "Skipping Job: $JobName"}
         }
     } else {
-        $SetNewPostScript = Read-Host "`r`nThere is no Post Script for $JobName. Do you want to add a new one? Y/N"
+        $SetNewPostScript = Read-Host "`nThere is no Post Script for $JobName. Do you want to add a new one? Y/N"
         Switch ($SetNewPostScript)
         {
             # Default action will be to skip the job.
