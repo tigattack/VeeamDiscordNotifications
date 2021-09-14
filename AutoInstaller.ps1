@@ -40,4 +40,4 @@ $config.webhook = $webhookUrl
 ConvertTo-Json $config | Set-Content C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json
 
 # Run Post Script action.
-Powershell.exe .\DeployPostScript.ps1
+& "$PSScriptRoot\DeployPostScript.ps1"
