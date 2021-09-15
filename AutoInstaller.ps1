@@ -1,7 +1,7 @@
 #Requires -RunAsAdministrator
 
 # Check user has webhook URL ready
-$userPrompt = Read-Host -Prompt 'Do you have your webhook URL ready? Y/N'
+$userPrompt = Read-Host -Prompt 'Do you have your Discord webhook URL ready? Y/N'
 
 # Prompt user to create webhook first if not ready
 If ($userPrompt -ne 'Y') {
@@ -10,29 +10,30 @@ If ($userPrompt -ne 'Y') {
 	exit
 }
 
+# Prompt user for webhook URL
+$webhookUrl = Read-Host -Prompt 'Please enter your Discord webhook URL'
+
 # Get latest release from GitHub
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$latestRelease = Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/latest `
-	-Headers @{'Accept'='application/json'} -UseBasicParsing
-
-# Release IDs are returned in a format of {"id":3622206,"tag_name":"v1.0"} so we need to extract tag_name.
-$latestVersion = ($latestRelease.Content | ConvertFrom-Json).tag_name
+$latestVersion = ((Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/latest `
+	-Headers @{'Accept'='application/json'} -UseBasicParsing).Content | ConvertFrom-Json).tag_name
 
 # Pull latest version of script from GitHub
 Invoke-WebRequest -Uri `
 	https://github.com/tigattack/VeeamDiscordNotifications/releases/download/$latestVersion/VeeamDiscordNotifications-$latestVersion.zip `
 	-OutFile $PSScriptRoot\VeeamDiscordNotifications-$latestVersion.zip
 
-# Unblock, Expand downloaded ZIP and cleanup
+# Unblock downloaded ZIP
 Unblock-File -LiteralPath $PSScriptRoot\VeeamDiscordNotifications-$latestVersion.zip
+
+# Extract release to destination path
 Expand-Archive $PSScriptRoot\VeeamDiscordNotifications-$latestVersion.zip -DestinationPath C:\VeeamScripts
+
+# Rename destination and tidy up
 Rename-Item C:\VeeamScripts\VeeamDiscordNotifications-$latestVersion C:\VeeamScripts\VeeamDiscordNotifications
 Remove-Item $PSScriptRoot\VeeamDiscordNotifications-$latestVersion.zip
 
-# Assign webhook url to variable
-$webhookUrl = Read-Host -Prompt 'Please paste your webhook URL now'
-
-# Get the config file and write the user webhook
+# Get config
 $config = Get-Content 'C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json' -Raw | ConvertFrom-Json
 $config.webhook = $webhookUrl
 
