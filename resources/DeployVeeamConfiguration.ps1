@@ -5,7 +5,10 @@ function DeploymentError {
 	Write-Output "An error occured: $($_.ScriptStackTrace)"
 	Write-Output "Please raise an issue at $issues"
 
-	$launchIssues = Read-Host -Prompt 'Do you wish to launch this URL? Y/N'
+	do {
+		$launchIssues = Read-Host -Prompt 'Do you wish to launch this URL? Y/N'
+	}
+	until ($launchIssues -eq 'Y' -or $launchIssues -eq 'N')
 	If ($launchIssues -eq 'Y') {
 		Start-Process "$issues/new?assignees=tigattack&labels=bug&template=bug_report.md&title=[BUG]+Veeam%20configuration%20deployment%20error"
 	}
@@ -16,7 +19,7 @@ $vbrJobs = Get-VBRJob -ErrorAction SilentlyContinue -WarningAction SilentlyConti
 
 # Make sure we found some jobs
 if ($vbrJobs.Count -eq 0) {
-	Write-Output 'No supported jobs found.'
+	Write-Output 'No supported jobs found; Exiting.'
 	Start-Sleep 10
 	exit
 }
@@ -41,7 +44,12 @@ foreach ($job in $vbrJobs) {
 	if ($postScriptEnabled) {
 		Write-Output "`nJob '$($job.Name)' has an existing post-job script.`nScript: $postScriptCmd"
 		Write-Output "`nIf you wish to receive Discord notifications for this job, you must overwrite the existing post-job script."
-		$overWriteCurrentCmd = Read-Host -Prompt 'Do you wish to overwrite it? Y/N'
+
+		do {
+			$overWriteCurrentCmd = Read-Host -Prompt 'Do you wish to overwrite it? Y/N'
+		}
+		until ($overWriteCurrentCmd -eq 'Y' -or $overWriteCurrentCmd -eq 'N')
+
 		switch ($overWriteCurrentCmd) {
 			# Default action will be to skip the job.
 			default { Write-Output "`nSkipping job '$($job.Name)'`n"}
@@ -68,7 +76,11 @@ foreach ($job in $vbrJobs) {
 		}
 	}
 	else {
-		$setNewPostScript = Read-Host -Prompt "`nDo you wish to receive Discord notifications for job '$($job.Name)'? Y/N"
+		do {
+			$setNewPostScript = Read-Host -Prompt "`nDo you wish to receive Discord notifications for job '$($job.Name)'? Y/N"
+		}
+		until ($setNewPostScript -eq 'Y' -or $setNewPostScript -eq 'N')
+
 		Switch ($setNewPostScript) {
 			# Default action will be to skip the job.
 			default { Write-Output "Skipping job '$($job.Name)'`n"}
