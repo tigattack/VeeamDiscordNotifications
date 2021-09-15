@@ -80,4 +80,4 @@ Switch ($mentionPreference) {
 ConvertTo-Json $config | Set-Content "$rootPath\$project\config\conf.json"
 
 # Run Post Script action.
-& "$PSScriptRoot\DeployPostScript.ps1"
+& "$rootPath\$project\resources\DeployVeeamConfiguration.ps1"
