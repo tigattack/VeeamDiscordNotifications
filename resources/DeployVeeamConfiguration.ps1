@@ -41,7 +41,7 @@ foreach ($job in $vbrJobs) {
 	if ($postScriptEnabled) {
 		Write-Output "`nJob '$($job.Name)' has an existing post-job script.`nScript: $postScriptCmd"
 		Write-Output "`nIf you wish to receive Discord notifications for this job, you must overwrite the existing post-job script."
-		$overWriteCurrentCmd = Read-Host -Prompt "Do you wish to overwrite it? Y/N"
+		$overWriteCurrentCmd = Read-Host -Prompt 'Do you wish to overwrite it? Y/N'
 		switch ($overWriteCurrentCmd) {
 			# Default action will be to skip the job.
 			default { Write-Output "`nSkipping job '$($job.Name)'`n"}
