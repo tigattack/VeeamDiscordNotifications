@@ -1,75 +1,94 @@
-# Get all supported jobs
-$AllJobs = Get-VBRJob -ea silentlyContinue -WarningAction silentlyContinue | Where-Object {$_.IsBackupJob}
+# Function to be used when an error is encountered
+function DeploymentError {
+	$issues = 'https://github.com/tigattack/VeeamDiscordNotifications/issues'
 
-# Make sure we actually have jobs we can run this on.
-if ([string]::IsNullOrEmpty($AllJobs)) {
-	Write-Output 'No Jobs found to set Post Script for.'
+	Write-Output "An error occured: $($_.ScriptStackTrace)"
+	Write-Output "Please raise an issue at $issues"
+
+	$launchIssues = Read-Host -Prompt 'Do you wish to launch this URL? Y/N'
+	If ($launchIssues -eq 'Y') {
+		Start-Process "$issues/new?assignees=tigattack&labels=bug&template=bug_report.md&title=[BUG]+Veeam%20configuration%20deployment%20error"
+	}
+}
+
+# Get all supported jobs
+$vbrJobs = Get-VBRJob -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Where-Object {$_.IsBackupJob}
+
+# Make sure we found some jobs
+if ($vbrJobs.Count -eq 0) {
+	Write-Output 'No supported jobs found.'
 	Start-Sleep 10
 	exit
 }
-# Command that Veeam needs to use for the Post Script action.
-$VeeamPowershellCommand = 'Powershell.exe -File C:\VeeamScripts\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1'
+
+# Post-job script for Discord notifications
+$newPostScriptCmd = "Powershell.exe -ExecutionPolicy 'Bypass' -File 'C:\VeeamScripts\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1'"
 
 # Run foreach loop for all found jobs
-foreach ($JobName in $AllJobs) {
-	$Job = Get-VBRJob -Name $JobName -ea silentlyContinue -WarningAction silentlyContinue
-	# Get all required options/parameters for specific job
-	$JobOptions = $Job.GetOptions()
-	$JobScriptCommand = $JobOptions.JobScriptCommand
-	$PostScriptEnabled = $JobScriptCommand.PostScriptEnabled
-	$PostScriptCommandLine = $JobScriptCommand.PostScriptCommandLine
-	# Different actions whether Post Script is already enabled. If yes we ask to modify it, if not we ask to enable & set it.
-	if ($PostScriptEnabled -eq 'True') {
-		$OverWriteCurrentCL = Read-Host "`nThere is already a Post Script set for $JobName`nScript: $PostScriptCommandLine`nDo you want to overwrite it? Y/N"
-		switch ($OverWriteCurrentCL) {
+foreach ($job in $vbrJobs) {
+	# Get post-job script options for job
+	$jobOptions = $job.GetOptions()
+	$postScriptEnabled = $jobOptions.JobScriptCommand.PostScriptEnabled
+	$postScriptCmd = $jobOptions.JobScriptCommand.PostScriptCommandLine
+
+	# Check if job is already configured with correct post-job script
+	if ($postScriptCmd.EndsWith('DiscordNotificationBootstrap.ps1') -or $postScriptCmd.EndsWith("DiscordNotificationBootstrap.ps1'")) {
+		Write-Output "`nJob '$($job.Name)' is already configured for Discord notifications; Skipping."
+		Continue
+	}
+
+	# Different actions whether post-job script is already enabled. If yes we ask to modify it, if not we ask to enable & set it.
+	if ($postScriptEnabled) {
+		Write-Output "`nJob '$($job.Name)' has an existing post-job script.`nScript: $postScriptCmd"
+		Write-Output "`nIf you wish to receive Discord notifications for this job, you must overwrite the existing post-job script."
+		$overWriteCurrentCmd = Read-Host -Prompt "Do you wish to overwrite it? Y/N"
+		switch ($overWriteCurrentCmd) {
 			# Default action will be to skip the job.
-			default { Write-Output "Skipping Job $JobName"}
+			default { Write-Output "`nSkipping job '$($job.Name)'`n"}
 			Y {
 				try {
-					# Small check to see if the script has even changed
-					if ($PostScriptCommandLine -ne $VeeamPowershellCommand) {
+					# Check to see if the script has even changed
+					if ($postScriptCmd -ne $newPostScriptCmd) {
 						# Script is not the same. Update the script command line.
-						$JobOptions.JobScriptCommand.PostScriptCommandLine = $VeeamPowershellCommand
-						Set-VBRJobOptions $JobName $JobOptions | Out-Null
-						Write-Output "Updated Post Script for Job $JobName from '$PostScriptCommandLine' to '$VeeamPowershellCommand'"
+						$jobOptions.JobScriptCommand.PostScriptCommandLine = $newPostScriptCmd
+						Set-VBRJobOptions -Job $job -Options $jobOptions | Out-Null
+
+						Write-Output "Updated post-job script for job '$($job.Name)'.`nOld: $postScriptCmd`nNew: $newPostScriptCmd"
+						Write-Output "Job '$($job.Name)' is now configured for Discord notifications."
 					}
 					else {
 						# Script hasn't changed. Notify user of this and continue.
-						Write-Output "Post Script content hasn't changed. Not modifying."
+						Write-Output "Job '$($job.Name)' is already configured for Discord notifications; Skipping."
 					}
 				}
 				catch {
-					# Catch exceptions.
-					Write-Output "An error occured: $_.ScriptStackTrace"
+					DeploymentError
 				}
 			}
-			# Allow user to skip jobs they have incase there's already other post-scripts configured.
-			N { Write-Output "Skipping Job: $JobName"}
 		}
 	}
 	else {
-		$SetNewPostScript = Read-Host "`nThere is no Post Script for $JobName. Do you want to add a new one? Y/N"
-		Switch ($SetNewPostScript) {
+		$setNewPostScript = Read-Host -Prompt "`nDo you wish to receive Discord notifications for job '$($job.Name)'? Y/N"
+		Switch ($setNewPostScript) {
 			# Default action will be to skip the job.
-			default { Write-Output "Skipping Job $JobName"}
+			default { Write-Output "Skipping job '$($job.Name)'`n"}
 			Y {
 				try {
-					# Sets Post Script to Enabled and sets the command line to full command including path.
-					$JobOptions.JobScriptCommand.PostScriptEnabled = $True
-					$JobOptions.JobScriptCommand.PostScriptCommandLine = $VeeamPowershellCommand
-					Set-VBRJobOptions $JobName $JobOptions | Out-Null
-					Write-Output "Added Post Script for Job $JobName"
+					# Sets post-job script to Enabled and sets the command line to full command including path.
+					$jobOptions.JobScriptCommand.PostScriptEnabled = $true
+					$jobOptions.JobScriptCommand.PostScriptCommandLine = $newPostScriptCmd
+					Set-VBRJobOptions -Job $job -Options $jobOptions | Out-Null
+
+					Write-Output "Job '$($job.Name)' is now configured for Discord notifications."
 				}
 				catch {
-					# Catch exceptions.
-					Write-Output "An error occured: $_.ScriptStackTrace"
+					DeploymentError
 				}
 			}
-			# Allow user to skip job if they don't want to monitor a specific one.
-			N { Write-Output "Skipping Job: $JobName"}
 		}
 	}
 }
-Write-Output "`r`n`r`nAll Jobs Configured. Exiting."
-Start-Sleep 5
+
+Write-Output "`n`Finished. Exiting."
+Start-Sleep 10
 exit
