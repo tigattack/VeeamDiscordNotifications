@@ -1,5 +1,5 @@
-# Gets Name of all Jobs
-$AllJobs = Get-VBRJob -ea silentlyContinue -WarningAction silentlyContinue | Select-Object -ExpandProperty Name
+# Get all supported jobs
+$AllJobs = Get-VBRJob -ea silentlyContinue -WarningAction silentlyContinue | Where-Object {$_.IsBackupJob}
 
 # Make sure we actually have jobs we can run this on.
 if ([string]::IsNullOrEmpty($AllJobs)) {
