@@ -3,6 +3,7 @@
 # Prepare variables
 $rootPath = 'C:\VeeamScripts'
 $project = 'VeeamDiscordNotifications'
+$webhookRegex = 'https:\/\/(.*\.)?discord[app]?.com\/api\/webhooks\/([^\/]+)\/([^\/]+)'
 
 # Check user has webhook URL ready
 $userPrompt = Read-Host -Prompt 'Do you have your Discord webhook URL ready? Y/N'
@@ -22,12 +23,34 @@ If ($userPrompt -ne 'Y') {
 }
 
 # Prompt user with config options
-$webhookUrl = Read-Host -Prompt 'Please enter your Discord webhook URL'
-$mentionPreference = Read-Host -Prompt "Do you wish to be mentioned in Discord when a job fails or finishes with warnings?
-	1 = No`n2 = On warn`n3 = On fail`n4 = 2 and 3`nYour choice"
+do {
+	$webhookUrl = Read-Host -Prompt 'Please enter your Discord webhook URL'
+	If ($webhookUrl -notmatch $webhookRegex) {
+		Write-Output "`nInvalid webhook URL. Please try again."
+	}
+}
+until ($webhookUrl -match $webhookRegex)
+
+Write-Output "`nDo you wish to be mentioned in Discord when a job fails or finishes with warnings?"
+
+do {
+	$mentionPreference = Read-Host -Prompt "1 = No`n2 = On warn`n3 = On fail`n4 = 2 and 3`nYour choice"
+	If (1..4 -notcontains $mentionPreference) {
+		Write-Output "`nInvalid choice. Please try again."
+	}
+}
+until (1..4 -contains $mentionPreference)
 
 If ($mentionPreference -ne 1) {
-	$userId = Read-Host -Prompt 'Please enter your Discord user ID'
+	do {
+		try {
+			[Int64]$userId = Read-Host -Prompt "`nPlease enter your Discord user ID"
+		}
+		catch [System.Management.Automation.ArgumentTransformationMetadataException] {
+			Write-Output "`nInvalid user ID. Please try again."
+		}
+	}
+	until ($userId.ToString().Length -gt 1)
 }
 
 # Get latest release from GitHub
