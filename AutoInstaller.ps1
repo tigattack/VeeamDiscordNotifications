@@ -7,11 +7,24 @@ $userPrompt = Read-Host -Prompt 'Do you have your Discord webhook URL ready? Y/N
 If ($userPrompt -ne 'Y') {
 	Write-Output 'Please create a Discord webhook before continuing.' `
 		'Full instructions avalible at https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks'
+	
+	# Prompt user to launch URL
+	$launchPrompt = Read-Host -Prompt 'Open URL? Y/N'
+	If ($launchPrompt -eq 'Y') {
+		Start-Process "https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks"
+	}
+
 	exit
 }
 
-# Prompt user for webhook URL
+# Prompt user with config options
 $webhookUrl = Read-Host -Prompt 'Please enter your Discord webhook URL'
+$mentionPreference = Read-Host -Prompt "Do you wish to be mentioned in Discord when a job fails or finishes with warnings?
+	1 = No`n2 = On warn`n3 = On fail`n4 = 2 and 3`nYour choice"
+
+If ($mentionPreference -ne 1) {
+	$userId = Read-Host -Prompt 'Please enter your Discord user ID'
+}
 
 # Get latest release from GitHub
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -37,7 +50,29 @@ Remove-Item $PSScriptRoot\VeeamDiscordNotifications-$latestVersion.zip
 $config = Get-Content 'C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json' -Raw | ConvertFrom-Json
 $config.webhook = $webhookUrl
 
-# Write Config
+Switch ($mentionPreference) {
+	1 {
+		$config.mention_on_fail = 'false'
+		$config.mention_on_warning = 'false'
+	}
+	2 {
+		$config.mention_on_fail = 'false'
+		$config.mention_on_warning = 'true'
+		$config.userId = $userId
+	}
+	3 {
+		$config.mention_on_fail = 'true'
+		$config.mention_on_warning = 'false'
+		$config.userId = $userId
+	}
+	4 {
+		$config.mention_on_fail = 'true'
+		$config.mention_on_warning = 'true'
+		$config.userId = $userId
+	}
+}
+
+# Write config
 ConvertTo-Json $config | Set-Content C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json
 
 # Run Post Script action.
