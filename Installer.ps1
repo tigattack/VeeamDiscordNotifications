@@ -10,8 +10,8 @@ $userPrompt = Read-Host -Prompt 'Do you have your Discord webhook URL ready? Y/N
 
 # Prompt user to create webhook first if not ready
 If ($userPrompt -ne 'Y') {
-	Write-Output 'Please create a Discord webhook before continuing.' `
-		'Full instructions avalible at https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks'
+	Write-Output 'Please create a Discord webhook before continuing.'
+	Write-Output 'Full instructions available at https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks'
 
 	# Prompt user to launch URL
 	$launchPrompt = Read-Host -Prompt 'Open URL? Y/N'
