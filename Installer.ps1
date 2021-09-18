@@ -5,6 +5,21 @@ $rootPath = 'C:\VeeamScripts'
 $project = 'VeeamDiscordNotifications'
 $webhookRegex = 'https:\/\/(.*\.)?discord[app]?.com\/api\/webhooks\/([^\/]+)\/([^\/]+)'
 
+# Get latest release from GitHub
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$latestVersion = ((Invoke-WebRequest -Uri "https://github.com/tigattack/$project/releases/latest" `
+	-Headers @{'Accept'='application/json'} -UseBasicParsing).Content | ConvertFrom-Json).tag_name
+
+# Check if this project is already installed and, if so, whether it's the latest version.
+if (Test-Path $rootPath\$project) {
+	Write-Output 'VeeamDiscordNotifications is already installed; Checking version.'
+	$installedVersion = Get-Content -Raw "$rootPath\$project\resources\version.txt"
+	If ($installedVersion -ge $latestVersion) {
+		Write-Output "VeeamDiscordNotifications is already up to date.`nExiting."
+		exit
+	}
+}
+
 # Check user has webhook URL ready
 $userPrompt = Read-Host -Prompt 'Do you have your Discord webhook URL ready? Y/N'
 
@@ -52,11 +67,6 @@ If ($mentionPreference -ne 1) {
 	}
 	until ($userId.ToString().Length -gt 1)
 }
-
-# Get latest release from GitHub
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$latestVersion = ((Invoke-WebRequest -Uri "https://github.com/tigattack/$project/releases/latest" `
-	-Headers @{'Accept'='application/json'} -UseBasicParsing).Content | ConvertFrom-Json).tag_name
 
 # Pull latest version of script from GitHub
 Invoke-WebRequest -Uri `
