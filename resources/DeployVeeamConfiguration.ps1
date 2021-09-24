@@ -25,7 +25,7 @@ if ($vbrJobs.Count -eq 0) {
 }
 
 # Post-job script for Discord notifications
-$newPostScriptCmd = "Powershell.exe -ExecutionPolicy 'Bypass' -File 'C:\VeeamScripts\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1'"
+$newPostScriptCmd = 'Powershell.exe -ExecutionPolicy Bypass -File C:\VeeamScripts\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1'
 
 # Run foreach loop for all found jobs
 foreach ($job in $vbrJobs) {
