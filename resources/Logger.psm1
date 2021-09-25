@@ -25,11 +25,11 @@ Function Start-Logging {
 	)
 	If ($PSCmdlet.ShouldProcess($Path, 'Start-Transcript')) {
 		Try {
-			Start-Transcript -Path $Path -Force -Append
-			Write-LogMessage -Tag 'INFO' -Message "Transcript is being logged to $Path"
+			Start-Transcript -Path $Path -Force -Append | Out-Null
+			Write-LogMessage -Tag 'INFO' -Message "Transcript is being logged to '$Path'."
 		}
-		Catch [Exception] {
-			Write-LogMessage -Tag 'INFO' -Message "Transcript is already being logged to $Path"
+		Catch [System.IO.IOException] {
+			Write-LogMessage -Tag 'INFO' -Message "Transcript is already being logged to '$Path'."
 		}
 	}
 }
