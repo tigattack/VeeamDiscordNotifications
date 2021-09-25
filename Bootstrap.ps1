@@ -1,3 +1,8 @@
+# Import modules
+Import-Module Veeam.Backup.PowerShell -DisableNameChecking
+Import-Module "$PSScriptRoot\resources\Logger.psm1"
+Import-Module "$PSScriptRoot\resources\VBRSessionInfo.psm1"
+
 # Set config location
 $configFile = "$PSScriptRoot\config\conf.json"
 
@@ -10,11 +15,6 @@ Start-Logging -Path $logFile
 
 # Log version
 Write-LogMessage -Tag 'INFO' -Message "Version: $(Get-Content "$PSScriptRoot\resources\version.txt" -Raw)"
-
-# Import modules.
-Import-Module Veeam.Backup.PowerShell -DisableNameChecking
-Import-Module "$PSScriptRoot\resources\Logger.psm1"
-Import-Module "$PSScriptRoot\resources\VBRSessionInfo.psm1"
 
 # Retrieve configuration.
 ## Pull config to PSCustomObject
