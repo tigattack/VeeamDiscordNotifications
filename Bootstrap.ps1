@@ -20,6 +20,12 @@ Import-Module "$PSScriptRoot\resources\VBRSessionInfo.psm1"
 ## Pull config to PSCustomObject
 $config = Get-Content -Raw $configFile | ConvertFrom-Json
 
+# Stop logging and remove log file if logging is disable in config.
+If (-not $config.debug_log) {
+	Stop-Logging
+	Remove-Item $logFile -Force -ErrorAction SilentlyContinue
+}
+
 ## Pull raw config and format for later.
 ## This is necessary since $config as a PSCustomObject was not passed through correctly with Start-Process and $powershellArguments.
 $configRaw = (Get-Content -Raw $configFile).replace('"','\"')
@@ -35,13 +41,6 @@ Try {
 }
 Catch {
 	Write-LogMessage -Tag 'ERROR' -Message "Failed to validate configuration: $_"
-}
-
-
-# Stop logging and remove logfile if logging is disable in config.
-If (-not $config.debug_log) {
-	Stop-Logging
-	Remove-Item $logFile -Force -ErrorAction SilentlyContinue
 }
 
 # Get the command line used to start the Veeam session.
