@@ -43,10 +43,10 @@ Function Get-VBRSessionInfo {
 	}
 
 	Elseif ($null -eq $SessionId) {
-		Write-Warning '$SessionId is null.'
+		Write-LogMessage -Tag 'Warning' -Message 'SessionId is null.'
 	}
 
 	Elseif ($null -eq $JobType) {
-		Write-Warning '$JobType is null.'
+		Write-LogMessage -Tag 'Warning' -Message 'JobType is null.'
 	}
 }
