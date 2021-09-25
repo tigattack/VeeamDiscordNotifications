@@ -6,7 +6,7 @@ $date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ':', '.' }
 $logFile = "$PSScriptRoot\log\Log_Bootstrap-$date.log"
 
 # Start logging to file
-Start-Transcript -Path $logFile
+Start-Logging -Path $logFile
 
 # Log version
 Write-LogMessage -Tag 'INFO' -Message "Version: $(Get-Content "$PSScriptRoot\resources\version.txt" -Raw)"
