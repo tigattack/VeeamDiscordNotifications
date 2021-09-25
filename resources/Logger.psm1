@@ -9,7 +9,7 @@ Function Write-LogMessage {
 		$Message
 	)
 	If ($PSCmdlet.ShouldProcess('Output stream', 'Write log message')) {
-		Write-Output "[$Tag] $Message"
+		Write-Output "[$($Tag.ToUpper())] $Message"
 	}
 }
 
