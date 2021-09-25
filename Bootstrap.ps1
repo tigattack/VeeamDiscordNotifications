@@ -62,7 +62,8 @@ $jobName = $sessionInfo.JobName
 Write-LogMessage -Tag 'INFO' -Message "Bootstrap script for Veeam job '$jobName' ($jobId)."
 
 # Build argument string for the alert sender script.
-$powershellArguments = "-file $PSScriptRoot\AlertSender.ps1", "-JobName '$jobName'", "-Id '$sessionId'", "-JobType '$jobType'", "-Config `"$($configRaw)`""
+$powershellArguments = "-file $PSScriptRoot\AlertSender.ps1", "-JobName '$jobName'", "-Id '$sessionId'","-JobType '$($job.JobType)'", `
+	"-Config `"$($configRaw)`""
 
 # Start a new new script in a new process with some of the information gathered here.
 # This allows Veeam to finish the current session faster and allows us gather information from the completed job.
