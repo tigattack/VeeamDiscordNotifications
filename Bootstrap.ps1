@@ -8,6 +8,9 @@ $logFile = "$PSScriptRoot\log\Log_Bootstrap-$date.log"
 # Start logging to file
 Start-Transcript -Path $logFile
 
+# Log version
+Write-LogMessage -Tag 'INFO' -Message "Version: $(Get-Content "$PSScriptRoot\resources\version.txt" -Raw)"
+
 # Import modules.
 Import-Module Veeam.Backup.PowerShell -DisableNameChecking
 Import-Module "$PSScriptRoot\resources\Logger.psm1"
