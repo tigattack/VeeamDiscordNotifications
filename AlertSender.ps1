@@ -50,8 +50,15 @@ $footerAddition = (Get-UpdateMessage -CurrentVersion $updateStatus.CurrentVersio
 	-replace 'latestVerPlaceholder', $updateStatus.LatestVersion
 
 ## Define thumbnail object.
-$thumbObject = [PSCustomObject]@{
-	url = $Config.thumbnail
+If ($Config.thumbnail) {
+	$thumbObject = [PSCustomObject]@{
+		url = $Config.thumbnail
+	}
+}
+Else {
+	$thumbObject = [PSCustomObject]@{
+		url = 'https://raw.githubusercontent.com/tigattack/VeeamDiscordNotifications/master/asset/thumb01.png'
+	}
 }
 
 ## Define footer object.
