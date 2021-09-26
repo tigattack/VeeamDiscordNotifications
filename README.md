@@ -23,7 +23,7 @@ Configuration is set in ./config/conf.json
 | Name                 | Type    | Required | Default           | Description                                                                                                |
 |--------------------- |-------- |--------- |------------------ | ---------------------------------------------------------------------------------------------------------- |
 | `webhook`            | string  | True     | null              | Your Discord webhook URL.                                                                                  |
-| `thumbnail`          | string  | True     | See example above | Image URL for the thumbnail shown in the report embed.                                                     |
+| `thumbnail`          | string  | False    | See example above | Image URL for the thumbnail shown in the report embed.                                                     |
 | `userid`             | string  | False    | null              | Your Discord user ID. Required if either of the following two options are `true`.                          |
 | `mention_on_fail`    | boolean | False    | False             | When `true`, you will be mentioned when a job finishes in a failed state. Requires that `userid` is set.   |
 | `mention_on_warning` | boolean | False    | False             | When `true`, you will be mentioned when a job finishes in a warning state. Requires that `userid` is set.  |
