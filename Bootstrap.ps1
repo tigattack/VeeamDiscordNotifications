@@ -71,12 +71,19 @@ Start-Process -FilePath 'powershell' -Verb runAs -ArgumentList $powershellArgume
 # Stop logging.
 If ($config.debug_log) {
 	Stop-Logging
-}
 
-# Rename log file to include the job name.
-Try {
-	Rename-Item -Path $logFile -NewName "$PSScriptRoot\log\Bootstrap_$($jobName)_$date.log"
-}
-Catch {
-	Write-LogMessage -Tag 'ERROR' -Message "Failed to rename log file: $_"
+	# Rename log file to include the job name.
+	Try {
+		## Replace spaces if any in the job name
+		If ($jobName -match ' ') {
+			$logJobName = $jobName.Replace(' ', '_')
+		}
+		Else {
+			$logJobName = $jobName
+		}
+		Rename-Item -Path $logFile -NewName "$PSScriptRoot\log\Bootstrap_$($logJobName)_$date.log"
+	}
+	Catch {
+		Write-LogMessage -Tag 'ERROR' -Message "Failed to rename log file: $_"
+	}
 }
