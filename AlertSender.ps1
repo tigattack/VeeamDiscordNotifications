@@ -381,7 +381,7 @@ Catch [System.Net.WebException] {
 
 
 # Trigger update if there's a newer version available.
-If (($updateStatus.CurrentVersion -lt $updateStatus.latestVersion) -and $Config.auto_update) {
+If (($updateStatus.CurrentVersion -lt $updateStatus.latestVersion) -and $Config.self_update) {
 	# Copy update script out of working directory.
 	Copy-Item $PSScriptRoot\Updater.ps1 $PSScriptRoot\..\VDNotifs-Updater.ps1
 	Unblock-File $PSScriptRoot\..\VDNotifs-Updater.ps1

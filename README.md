@@ -26,7 +26,7 @@ Configuration is set in ./config/conf.json
 | `mention_on_fail`    	| boolean 	| When `true`, you will be mentioned when a job finishes in a failed state.                                          	|
 | `mention_on_warning` 	| boolean 	| When `true`, you will be mentioned when a job finishes in a warning state.                                         	|
 | `debug_log`          	| boolean 	| When `true`, the script will log to a file in ./log/                                                               	|
-| `auto_update`        	| boolean 	| When `true`, the script will check for updates on each run and update itself if there's a newer version available. 	|
+| `self_update`        	| boolean 	| When `true`, the script will update itself if there's a newer version available. 	|
 
 ---
 ## [Slack fork.](https://github.com/tigattack/VeeamSlackNotifications)

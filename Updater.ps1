@@ -324,8 +324,8 @@ Try {
 	if ($currentConfig.debug_log -ne $newConfig.debug_log) {
 		$newConfig.debug_log = $currentConfig.debug_log
 	}
-	if ($currentConfig.auto_update -ne $newConfig.auto_update) {
-		$newConfig.auto_update = $currentConfig.auto_update
+	if ($currentConfig.self_update -ne $newConfig.self_update) {
+		$newConfig.self_update = $currentConfig.self_update
 	}
 	ConvertTo-Json $newConfig | Set-Content "$PSScriptRoot\VeeamDiscordNotifications\config\conf.json"
 }
