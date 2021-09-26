@@ -9,7 +9,7 @@ Import-Module "$PSScriptRoot\VeeamDiscordNotifications\resources\Logger.psm1"
 # Logging
 ## Set log file name
 $date = (Get-Date -UFormat %Y-%m-%d_%T).Replace(':','.')
-$logFile = "$PSScriptRoot\Update-$date.log"
+$logFile = "$PSScriptRoot\$($date)_Update.log"
 ## Start logging to file
 Start-Logging $logFile
 

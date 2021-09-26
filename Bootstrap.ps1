@@ -6,7 +6,7 @@ Import-Module "$PSScriptRoot\resources\VBRSessionInfo.psm1"
 # Set vars
 $configFile = "$PSScriptRoot\config\conf.json"
 $date = (Get-Date -UFormat %Y-%m-%d_%T).Replace(':','.')
-$logFile = "$PSScriptRoot\log\Bootstrap_$date.log"
+$logFile = "$PSScriptRoot\log\$($date)_Bootstrap.log"
 $idRegex = '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}'
 
 # Start logging to file
@@ -81,7 +81,7 @@ If ($config.debug_log) {
 		Else {
 			$logJobName = $jobName
 		}
-		Rename-Item -Path $logFile -NewName "$PSScriptRoot\log\Bootstrap_$($logJobName)_$date.log"
+		Rename-Item -Path $logFile -NewName "$PSScriptRoot\log\$($date)_Bootstrap_$($logJobName).log"
 	}
 	Catch {
 		Write-LogMessage -Tag 'ERROR' -Message "Failed to rename log file: $_"
