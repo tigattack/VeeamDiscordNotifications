@@ -372,12 +372,11 @@ Switch ($mention) {
 
 
 # Send iiiit.
-$request = Invoke-RestMethod -Uri $Config.webhook -Body ($payload | ConvertTo-Json -Depth 4) -Method Post -ContentType 'application/json'
-
-# Write error if message fails to send to Discord.
-If ($request.Length -gt '0') {
-	Write-LogMessage -Tag 'ERROR' -Message 'Failed to send message to Discord. Response below.'
-	Write-LogMessage -Tag 'ERROR' -Message "$request"
+Try {
+	Invoke-RestMethod -Uri $Config.webhook -Body ($payload | ConvertTo-Json -Depth 4) -Method Post -ContentType 'application/json'
+}
+Catch [System.Net.WebException] {
+	Write-LogMessage -Tag 'ERROR' -Message 'Unable to send webhook. Check your webhook URL or network connection.'
 }
 
 
