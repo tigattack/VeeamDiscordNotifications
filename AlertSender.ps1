@@ -396,7 +396,7 @@ If ($updateStatus.CurrentVersion -lt $updateStatus.latestVersion) {
 	}
 
 	# Send update notice if configured to do so.
-	If ($Config.notify_update) {
+	If ($false -ne $Config.notify_update) {
 
 		# Define
 		$updateNotice = [PSCustomObject]@{
