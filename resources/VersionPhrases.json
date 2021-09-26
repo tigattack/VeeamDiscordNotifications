@@ -17,7 +17,7 @@
 		"Wewlad, check you out running a pre-release version, latest is latestVerPlaceholder!",
 		"Christ m8e, this is mental, you're ahead of release, latest is latestVerPlaceholder!",
 		"You nutter, you're running a pre-release version! Latest is latestVerPlaceholder!",
-		"Bloody hell mate, this is unheard of, $currentVersion isn't even released yet, latest is latestVerPlaceholder!",
-		"Fuuuckin hell, $currentVersion hasn't even been released! Latest is latestVerPlaceholder."
+		"Bloody hell mate, this is unheard of, currentVerPlaceholder isn't even released yet, latest is latestVerPlaceholder!",
+		"Fuuuckin hell, currentVerPlaceholder hasn't even been released! Latest is latestVerPlaceholder."
 	]
 }

@@ -46,8 +46,9 @@ $updateStatus = Get-UpdateStatus
 # Define static output objects.
 
 ## Get and define update status message.
-$footerAddition = (Get-UpdateMessage -CurrentVersion $updateStatus.CurrentVersion -LatestVersion $updateStatus.LatestVersion) `
-	-replace 'latestVerPlaceholder', $updateStatus.LatestVersion
+$footerAddition = (Get-UpdateMessage -CurrentVersion $updateStatus.CurrentVersion -LatestVersion $updateStatus.LatestVersion)
+$footerAddition = $footerAddition.Replace('latestVerPlaceholder',"$($updateStatus.LatestVersion)")
+$footerAddition = $footerAddition.Replace('currentVerPlaceholder',"$($updateStatus.CurrentVersion)")
 
 ## Define thumbnail object.
 If ($Config.thumbnail) {
@@ -359,6 +360,7 @@ $embedArray = @(
 		thumbnail	= $thumbObject
 		fields		= $fieldArray
 		footer		= $footerObject
+		timestamp	= $((Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ss.fffK'))
 	}
 )
 

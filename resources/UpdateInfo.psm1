@@ -2,7 +2,7 @@ function Get-UpdateStatus {
 
 	process {
 		# Get currently downloaded version of this project.
-		$currentVersion = Get-Content "$PSScriptRoot\version.txt" -Raw
+		$currentVersion = (Get-Content "$PSScriptRoot\version.txt" -Raw).Replace("`n",'')
 
 		# Get latest release from GitHub.
 		[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
