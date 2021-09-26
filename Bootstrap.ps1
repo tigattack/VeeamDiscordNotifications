@@ -5,7 +5,7 @@ Import-Module "$PSScriptRoot\resources\VBRSessionInfo.psm1"
 
 # Set vars
 $configFile = "$PSScriptRoot\config\conf.json"
-$date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ':', '.' })
+$date = (Get-Date -UFormat %Y-%m-%d_%T).Replace(':','.')
 $logFile = "$PSScriptRoot\log\Log_Bootstrap_$date.log"
 $idRegex = '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}'
 
