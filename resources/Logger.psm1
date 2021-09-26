@@ -8,8 +8,9 @@ Function Write-LogMessage {
 		$Tag,
 		$Message
 	)
+	$time = Get-Date -Format "HH:mm:ss.ff"
 	If ($PSCmdlet.ShouldProcess('Output stream', 'Write log message')) {
-		Write-Output "[$($Tag.ToUpper())] $Message"
+		Write-Output "[$time] $($Tag.ToUpper()): $Message"
 	}
 }
 
