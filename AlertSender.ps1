@@ -19,9 +19,16 @@ Import-Module "$PSScriptRoot\resources\UpdateInfo.psm1"
 
 # Start logging if logging is enabled in config
 If ($Config.debug_log) {
+	## Replace spaces if any in the job name
+	If ($jobName -match ' ') {
+		$logJobName = $jobName.Replace(' ', '_')
+	}
+	Else {
+		$logJobName = $jobName
+	}
 	## Set log file name
 	$date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ':', '.' })
-	$logFile = "$PSScriptRoot\log\Log_$jobName-$date.log"
+	$logFile = "$PSScriptRoot\log\Log_$($logJobName)_$date.log"
 	## Start logging to file
 	Start-Logging $logFile
 }
