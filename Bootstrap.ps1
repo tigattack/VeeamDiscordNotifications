@@ -27,7 +27,7 @@ If (-not $config.debug_log) {
 
 ## Pull raw config and format for later.
 ## This is necessary since $config as a PSCustomObject was not passed through correctly with Start-Process and $powershellArguments.
-$configRaw = (Get-Content -Raw $configFile).replace('"','\"')
+$configRaw = (Get-Content -Raw $configFile).Replace('"','\"').Replace("`n",'').Replace("`t",'').Replace('  ',' ')
 
 ## Test config.
 Try {
@@ -61,7 +61,7 @@ $jobName = $sessionInfo.JobName
 Write-LogMessage -Tag 'INFO' -Message "Bootstrap script for Veeam job '$jobName' ($jobId)."
 
 # Build argument string for the alert sender script.
-$powershellArguments = "-file $PSScriptRoot\AlertSender.ps1", "-JobName '$jobName'", "-Id '$sessionId'","-JobType '$($job.JobType)'", `
+$powershellArguments = "-file $PSScriptRoot\AlertSender.ps1", "-JobName `"$jobName`"", "-Id `"$sessionId`"","-JobType `"$($job.JobType)`"", `
 	"-Config `"$($configRaw)`""
 
 # Start a new new script in a new process with some of the information gathered here.
