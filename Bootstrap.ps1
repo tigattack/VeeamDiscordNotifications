@@ -3,12 +3,11 @@ Import-Module Veeam.Backup.PowerShell -DisableNameChecking
 Import-Module "$PSScriptRoot\resources\Logger.psm1"
 Import-Module "$PSScriptRoot\resources\VBRSessionInfo.psm1"
 
-# Set config location
+# Set vars
 $configFile = "$PSScriptRoot\config\conf.json"
-
-# Set log file name
 $date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ':', '.' })
-$logFile = "$PSScriptRoot\log\Log_Bootstrap-$date.log"
+$logFile = "$PSScriptRoot\log\Log_Bootstrap_$date.log"
+$idRegex = '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}'
 
 # Start logging to file
 Start-Logging -Path $logFile
@@ -44,12 +43,12 @@ Catch {
 }
 
 # Get the command line used to start the Veeam session.
-$parentPID = (Get-CimInstance Win32_Process -Filter "processid='$pid'").parentprocessid.ToString()
+$parentPid = (Get-CimInstance Win32_Process -Filter "processid='$PID'").parentprocessid.ToString()
 $parentCmd = (Get-CimInstance Win32_Process -Filter "processid='$parentPID'").CommandLine
 
 # Get the Veeam job and session IDs
-$jobId = ([regex]::Matches($parentCmd, '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')).Value[0]
-$sessionId = ([regex]::Matches($parentCmd, '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')).Value[1]
+$jobId = ([regex]::Matches($parentCmd, $idRegex)).Value[0]
+$sessionId = ([regex]::Matches($parentCmd, $idRegex)).Value[1]
 
 # Get the Veeam job details and hide warnings to mute the warning regarding deprecation of the use of this cmdlet to get Agent job details.
 # At time of writing, there is no alternative way to discover the job time.
