@@ -32,11 +32,6 @@
 	},
 	"required": [
 		"webhook",
-		"thumbnail",
-		"userid",
-		"mention_on_fail",
-		"mention_on_warning",
-		"debug_log",
-		"self_update"
+		"thumbnail"
 	]
 }

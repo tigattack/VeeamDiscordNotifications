@@ -18,15 +18,16 @@ This is work that I will inevitably get to at some point, but I'd hate to see pe
 ## Configuration options
 Configuration is set in ./config/conf.json
 
-| Name                 	| Type    	| Description                                                                                                        	|
-|----------------------	|---------	|--------------------------------------------------------------------------------------------------------------------	|
-| `webhook`            	| string  	| Your Discord webhook URL.                                                                                          	|
-| `thumbnail`          	| string  	| Image URL for the thumbnail shown in the report embed.                                                             	|
-| `userid`             	| string  	| Your Discord user ID. Only required if either of the following two options are `true`.                             	|
-| `mention_on_fail`    	| boolean 	| When `true`, you will be mentioned when a job finishes in a failed state.                                          	|
-| `mention_on_warning` 	| boolean 	| When `true`, you will be mentioned when a job finishes in a warning state.                                         	|
-| `debug_log`          	| boolean 	| When `true`, the script will log to a file in ./log/                                                               	|
-| `self_update`        	| boolean 	| When `true`, the script will update itself if there's a newer version available. 	|
+| Name                 | Type    | Required | Description                                                                                                |
+|--------------------- |-------- |--------- |----------------------------------------------------------------------------------------------------------- |
+| `webhook`            | string  | True     | Your Discord webhook URL.                                                                                  |
+| `thumbnail`          | string  | True     | Image URL for the thumbnail shown in the report embed.                                                     |
+| `userid`             | string  | False    | Your Discord user ID. Required if either of the following two options are `true`.                      |
+| `mention_on_fail`    | boolean | False    | When `true`, you will be mentioned when a job finishes in a failed state. Requires that `userid` is set.   |
+| `mention_on_warning` | boolean | False    | When `true`, you will be mentioned when a job finishes in a warning state. Requires that `userid` is set.  |
+| `debug_log`          | boolean | False    | When `true`, the script will log to a file in ./log/                                                       |
+| `notify_update`      | boolean | False    | When `true`, the script will notify (but not mention) you on Discord if there's a newer version available. |
+| `self_update`        | boolean | False    | When `true`, the script will update itself if there's a newer version available.                           |
 
 ---
 ## [Slack fork.](https://github.com/tigattack/VeeamSlackNotifications)
