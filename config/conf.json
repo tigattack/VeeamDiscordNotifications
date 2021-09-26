@@ -5,6 +5,7 @@
 	"mention_on_fail": false,
 	"mention_on_warning": false,
 	"debug_log": false,
+	"notify_update": false,
 	"self_update": false,
 	"comment": "Self-updater is still experimental. Use at your own risk."
 }

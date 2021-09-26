@@ -380,15 +380,55 @@ Catch [System.Net.WebException] {
 }
 
 
-# Trigger update if there's a newer version available.
-If (($updateStatus.CurrentVersion -lt $updateStatus.latestVersion) -and $Config.self_update) {
-	# Copy update script out of working directory.
-	Copy-Item $PSScriptRoot\Updater.ps1 $PSScriptRoot\..\VDNotifs-Updater.ps1
-	Unblock-File $PSScriptRoot\..\VDNotifs-Updater.ps1
+# If newer version available...
+If ($updateStatus.CurrentVersion -lt $updateStatus.latestVersion) {
 
-	# Run update script.
-	$updateArgs = "-file $PSScriptRoot\..\VDNotifs-Updater.ps1", "-LatestVersion $latestVersion"
-	Start-Process -FilePath 'powershell' -Verb runAs -ArgumentList $updateArgs -WindowStyle hidden
+	# Trigger update if configured to do so.
+	If ($Config.self_update) {
+
+		# Copy update script out of working directory.
+		Copy-Item $PSScriptRoot\Updater.ps1 $PSScriptRoot\..\VDNotifs-Updater.ps1
+		Unblock-File $PSScriptRoot\..\VDNotifs-Updater.ps1
+
+		# Run update script.
+		$updateArgs = "-file $PSScriptRoot\..\VDNotifs-Updater.ps1", "-LatestVersion $latestVersion"
+		Start-Process -FilePath 'powershell' -Verb runAs -ArgumentList $updateArgs -WindowStyle hidden
+	}
+
+	# Send update notice if configured to do so.
+	If ($Config.notify_update) {
+
+		# Define
+		$updateNotice = [PSCustomObject]@{
+			embeds	= @(
+				[PSCustomObject]@{
+					title		= 'Update Available'
+					description	= 'A new version of VeeamDiscordNotifications is available!'
+					color		= 3429867
+					thumbnail	= $thumbObject
+					fields		= @(
+						[PSCustomObject]@{
+							name	= 'Download'
+							value	= '[Link.](https://github.com/tigattack/VeeamDiscordNotifications/releases/latest)'
+						}
+					)
+					footer		= [PSCustomObject]@{
+						text 		= "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion)."
+						icon_url	= 'https://avatars0.githubusercontent.com/u/10629864'
+					}
+					timestamp = $((Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ss.fffK'))
+				}
+			)
+		}
+
+		# Send
+		Try {
+			Invoke-RestMethod -Uri $Config.webhook -Body ($updateNotice | ConvertTo-Json -Depth 4) -Method Post -ContentType 'application/json'
+		}
+		Catch [System.Net.WebException] {
+			Write-LogMessage -Tag 'ERROR' -Message 'Unable to send webhook. Check your webhook URL or network connection.'
+		}
+	}
 }
 
 # Stop logging.
