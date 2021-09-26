@@ -1,4 +1,5 @@
 # Veeam Backup & Replication Notifications for Discord
+
 Sends notifications from Veeam Backup & Replication to Discord.
 
 Based upon [my fork](https://github.com/tigattack/VeeamSlackNotifications) of [TheSageColleges' original project](https://github.com/TheSageColleges/VeeamSlackNotifications).
@@ -16,6 +17,7 @@ This is work that I will inevitably get to at some point, but I'd hate to see pe
 ![Chat Example](https://github.com/tigattack/VeeamDiscordNotifications/blob/master/asset/example.png)
 
 ## Configuration options
+
 Configuration is set in ./config/conf.json
 
 | Name                 | Type    | Required | Description                                                                                                |
@@ -30,12 +32,15 @@ Configuration is set in ./config/conf.json
 | `self_update`        | boolean | False    | When `true`, the script will update itself if there's a newer version available.                           |
 
 ---
+
 ## [Slack fork.](https://github.com/tigattack/VeeamSlackNotifications)
+
 ## [MS Teams fork.](https://github.com/tigattack/VeeamTeamsNotifications)
 
 ## Credits
-[MelonSmasher](https://github.com/MelonSmasher)//[TheSageColleges](https://github.com/TheSageColleges) for [the project](https://github.com/TheSageColleges/VeeamSlackNotifications) on which this is loosely based.
 
-[dannyt66](https://github.com/dannyt66) for various things - Assistance with silly little issues, the odd bugfix here and there, and the inspiration and first works on the `Updater.ps1` script.
+[MelonSmasher](https://github.com/MelonSmasher)//[TheSageColleges](https://github.com/TheSageColleges) for [the project](https://github.com/TheSageColleges/VeeamSlackNotifications) on which this is (now loosely) based.
 
-[Lee_Dailey](https://reddit.com/u/Lee_Dailey) for general pointers and the original [`ConvertTo-ByteUnit` function.](https://pastebin.com/srN5CKty)
+[dannyt66](https://github.com/dannyt66) for various things - Assistance with silly little issues, the odd bugfix here and there, and the inspiration for and first works on the `Updater.ps1` script.
+
+[Lee_Dailey](https://reddit.com/u/Lee_Dailey) for general pointers and the first revision of the [`ConvertTo-ByteUnit` function](https://pastebin.com/srN5CKty).
