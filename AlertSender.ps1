@@ -28,7 +28,7 @@ If ($Config.debug_log) {
 	}
 	## Set log file name
 	$date = (Get-Date -UFormat %Y-%m-%d_%T).Replace(':','.')
-	$logFile = "$PSScriptRoot\log\$($date)_AlertSender_$($logJobName).log"
+	$logFile = "$PSScriptRoot\log\$($date)_AlertSender-$($logJobName).log"
 	## Start logging to file
 	Start-Logging $logFile
 }
@@ -119,6 +119,7 @@ if ($jobType -eq 'Backup') {
 		$speedRound = 'Unknown'
 	}
 
+	<# TODO: utilise this.
 	# Get objects in session.
 	$sessionObjects = $session.GetTaskSessions()
 
@@ -138,6 +139,7 @@ if ($jobType -eq 'Backup') {
 			$sessionObjectFails++
 		}
 	}
+	#>
 
 	# Add session information to fieldArray.
 	$fieldArray = @(
@@ -173,6 +175,7 @@ if ($jobType -eq 'Backup') {
 		}
 	)
 
+	<# TODO: utilise this.
 	# Add object warns/fails to fieldArray if any.
 	If ($sessionObjectWarns -gt 0) {
 		$fieldArray += @(
@@ -192,6 +195,7 @@ if ($jobType -eq 'Backup') {
 			}
 		)
 	}
+	#>
 }
 
 # If agent backup, gather and include session info.
@@ -295,7 +299,7 @@ If ($jobType -eq 'EpAgentBackup') {
 	$fieldArray += @(
 		[PSCustomObject]@{
 			name	= 'Notice'
-			value	= "All useful information has been provided; further details are missing due to limitations in Veeam's PowerShell module."
+			value	= "Further details are missing due to limitations in Veeam's PowerShell module."
 			inline	= 'false'
 		}
 	)
