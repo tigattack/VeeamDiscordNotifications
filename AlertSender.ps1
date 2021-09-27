@@ -75,15 +75,18 @@ $footerObject = [PSCustomObject]@{
 $session = (Get-VBRSessionInfo -SessionId $id -JobType $jobType).Session
 
 ## Wait for the backup session to finish.
-$nonStoppedStates = 'Idle','Pausing','Postprocessing','Resuming','Starting','Stopping','WaitingRepository','WaitingTape ','Working'
-$timeout = New-TimeSpan -Minutes 5
-$stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
-Do {
-	$session = (Get-VBRSessionInfo -SessionId $id -JobType $jobType).Session
-	Write-LogMessage -Tag 'INFO' -Message 'Session not finished. Sleeping...'
-	Start-Sleep -Seconds 10
+If ($session.State -ne 'Stopped') {
+	$nonStoppedStates = 'Idle','Pausing','Postprocessing','Resuming','Starting','Stopping','WaitingRepository','WaitingTape ','Working'
+	$timeout = New-TimeSpan -Minutes 5
+	$stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+	Do {
+		Write-LogMessage -Tag 'INFO' -Message 'Session not finished. Sleeping...'
+		Start-Sleep -Seconds 10
+		$session = (Get-VBRSessionInfo -SessionId $id -JobType $jobType).Session
+	}
+	While ($session.State -in $nonStoppedStates -and $stopwatch.elapsed -lt $timeout)
+	$stopwatch.Stop()
 }
-While ($session.State -in $nonStoppedStates) -and ($stopwatch.elapsed -lt $timeout)
 
 ## Quit if still not stopped
 If ($session.State -ne 'Stopped') {
