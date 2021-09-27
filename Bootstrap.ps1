@@ -8,6 +8,7 @@ $configFile = "$PSScriptRoot\config\conf.json"
 $date = (Get-Date -UFormat %Y-%m-%d_%T).Replace(':','.')
 $logFile = "$PSScriptRoot\log\$($date)_Bootstrap.log"
 $idRegex = '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}'
+$supportedTypes = 'Backup', 'EpAgentBackup'
 
 # Start logging to file
 Start-Logging -Path $logFile
@@ -54,6 +55,12 @@ $sessionId = ([regex]::Matches($parentCmd, $idRegex)).Value[1]
 # At time of writing, there is no alternative way to discover the job time.
 $job = Get-VBRJob -WarningAction SilentlyContinue | Where-Object {$_.Id.Guid -eq $jobId}
 
+# Quit if job type is not supported.
+If ($job.JobType -notin $supportedTypes) {
+	Write-LogMessage -Tag 'ERROR' -Message "Job type '$($job.JobType)' is not supported."
+	Exit 1
+}
+
 # Get the session information and name.
 $sessionInfo = Get-VBRSessionInfo -SessionID $sessionId -JobType $job.JobType
 $jobName = $sessionInfo.JobName
@@ -81,7 +88,7 @@ If ($config.debug_log) {
 		Else {
 			$logJobName = $jobName
 		}
-		Rename-Item -Path $logFile -NewName "$PSScriptRoot\log\$($date)_Bootstrap_$($logJobName).log"
+		Rename-Item -Path $logFile -NewName "$PSScriptRoot\log\$($date)_Bootstrap-$($logJobName).log"
 	}
 	Catch {
 		Write-LogMessage -Tag 'ERROR' -Message "Failed to rename log file: $_"
