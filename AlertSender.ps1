@@ -205,27 +205,6 @@ If ($jobType -eq 'EpAgentBackup') {
 	$jobTransferredSizeRound	= ConvertTo-ByteUnit -Data $jobTransferredSize
 	$speedRound					= (ConvertTo-ByteUnit -Data $speed) + '/s'
 
-	# Get number of objects in job.
-	$jobObjects = (Get-VBRComputerBackupJob -Name "$jobName").BackupObject
-
-	# Initialise job object count variable.
-	$jobObjectCount = 0
-
-	# Determine if object is individual computer or container.
-	foreach ($i in 0..($jobObjects.Count-1)) {
-		# Switch on object type.
-		Switch ($jobObjects[$i].GetType()) {
-			# Individual computer
-			'VBRIndividualComputer' {
-				$jobObjectCount++
-			}
-			# Protection group
-			'VBRProtectionGroup' {
-				$jobObjectCount = $jobObjectsCount+$objects[$i].Container.Entity.Count
-			}
-		}
-	}
-
 	# Add session information to fieldArray.
 	$fieldArray = @(
 		[PSCustomObject]@{
@@ -241,11 +220,6 @@ If ($jobType -eq 'EpAgentBackup') {
 		[PSCustomObject]@{
 			name	= 'Processing Rate'
 			value	= $speedRound
-			inline	= 'true'
-		},
-		[PSCustomObject]@{
-			name	= 'Objects'
-			value	= "$jobObjectCount"
 			inline	= 'true'
 		}
 	)
@@ -317,13 +291,8 @@ $fieldArray += @(
 If ($jobType -eq 'EpAgentBackup') {
 	$fieldArray += @(
 		[PSCustomObject]@{
-			name = 'Job Objects'
-			value = $jobObjectsCount
-			inline = 'false'
-		}
-		[PSCustomObject]@{
 			name	= 'Notice'
-			value	= "The information you see here is all that is available due to limitations in Veeam's PowerShell module."
+			value	= "All useful information has been provided; further details are missing due to limitations in Veeam's PowerShell module."
 			inline	= 'false'
 		}
 	)
