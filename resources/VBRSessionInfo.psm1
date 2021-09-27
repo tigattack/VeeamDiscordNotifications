@@ -25,10 +25,7 @@ Function Get-VBRSessionInfo {
 			# Agent job
 			{$_ -eq 'EpAgentBackup'} {
 				# Get the session details.
-				$session = Get-VBRComputerBackupJobSession -Id $SessionId
-
 				$session = [Veeam.Backup.Core.CBackupSession]::GetByOriginalSessionId($SessionId)
-				$jobName = ($session.JobName | Select-String -Pattern '^(.+)(-.+)$').Matches.Groups[1].Value
 
 				# Copy the job's name to it's own variable.
 				$jobName = $job.Info.Name

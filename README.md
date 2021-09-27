@@ -4,7 +4,7 @@ Sends notifications from Veeam Backup & Replication to Discord.
 
 Based upon [my fork](https://github.com/tigattack/VeeamSlackNotifications) of [TheSageColleges' original project](https://github.com/TheSageColleges/VeeamSlackNotifications).
 
-### Looking for volunteers.
+### Looking for volunteers
 
 If you enjoy this project and would like to help out, please do so. If you're interested in helping out, contact me on Discord - `tigatack#7987`
 
