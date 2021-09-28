@@ -19,7 +19,7 @@ Function Get-VBRSessionInfo {
 				$session = Get-VBRBackupSession | Where-Object {$_.Id.Guid -eq $SessionId}
 
 				# Get the job's name from the session details.
-				$jobName = $session.OrigJobName
+				$jobName = $session.Name
 			}
 
 			# Agent job
