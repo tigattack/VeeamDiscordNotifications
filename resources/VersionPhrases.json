@@ -1,0 +1,23 @@
+{
+	"older": [
+		"Jesus mate, you're out of date! Latest is latestVerPlaceholder.",
+		"Bloody hell you muppet, you need to update! Latest is latestVerPlaceholder.",
+		"Fuck me sideways, you're out of date! Latest is latestVerPlaceholder.",
+		"Shitting heck lad, you need to update! Latest is latestVerPlaceholder.",
+		"Christ almighty, you're out of date! Latest is latestVerPlaceholder."
+	],
+	"current": [
+		"Nice work mate, you're up to date.",
+		"Good shit buddy, you're up to date.",
+		"Top stuff my dude, you're running the latest version.",
+		"Good job fam, you're all up to date.",
+		"Lovely stuff mate, you're running the latest version."
+	],
+	"newer": [
+		"Wewlad, check you out running a pre-release version, latest is latestVerPlaceholder!",
+		"Christ m8e, this is mental, you're ahead of release, latest is latestVerPlaceholder!",
+		"You nutter, you're running a pre-release version! Latest is latestVerPlaceholder!",
+		"Bloody hell mate, this is unheard of, currentVerPlaceholder isn't even released yet, latest is latestVerPlaceholder!",
+		"Fuuuckin hell, currentVerPlaceholder hasn't even been released! Latest is latestVerPlaceholder."
+	]
+}

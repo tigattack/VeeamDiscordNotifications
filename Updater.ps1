@@ -4,12 +4,12 @@ Param (
 )
 
 # Import functions
-Import-Module "$PSScriptRoot\VeeamDiscordNotifications\resources\logger.psm1"
+Import-Module "$PSScriptRoot\VeeamDiscordNotifications\resources\Logger.psm1"
 
 # Logging
 ## Set log file name
-$date = (Get-Date -UFormat %Y-%m-%d_%T | ForEach-Object { $_ -replace ':', '.' })
-$logFile = "$PSScriptRoot\Log_Update-$date.log"
+$date = (Get-Date -UFormat %Y-%m-%d_%T).Replace(':','.')
+$logFile = "$PSScriptRoot\$($date)_Update.log"
 ## Start logging to file
 Start-Logging $logFile
 
@@ -222,11 +222,11 @@ Catch {
 }
 
 # Wait until the alert sender has finished running, or quit this if it's still running after 60s. It should never take that long.
-while (Get-CimInstance win32_process -filter "name='powershell.exe' and commandline like '%DiscordVeeamAlertSender.ps1%'") {
+while (Get-CimInstance win32_process -filter "name='powershell.exe' and commandline like '%AlertSender.ps1%'") {
 	$timer++
 	Start-Sleep -Seconds 1
 	If ($timer -eq '90') {
-		Write-LogMessage -Tag 'INFO' -Message "Timeout reached. Updater quitting as DiscordVeeamAlertSender.ps1 is still running after $timer seconds."
+		Write-LogMessage -Tag 'INFO' -Message "Timeout reached. Updater quitting as AlertSender.ps1 is still running after $timer seconds."
 	}
 	Update-Fail
 }
@@ -324,8 +324,8 @@ Try {
 	if ($currentConfig.debug_log -ne $newConfig.debug_log) {
 		$newConfig.debug_log = $currentConfig.debug_log
 	}
-	if ($currentConfig.auto_update -ne $newConfig.auto_update) {
-		$newConfig.auto_update = $currentConfig.auto_update
+	if ($currentConfig.self_update -ne $newConfig.self_update) {
+		$newConfig.self_update = $currentConfig.self_update
 	}
 	ConvertTo-Json $newConfig | Set-Content "$PSScriptRoot\VeeamDiscordNotifications\config\conf.json"
 }
