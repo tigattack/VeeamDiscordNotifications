@@ -14,6 +14,9 @@ function DeploymentError {
 	}
 }
 
+# Import Veeam module
+Import-Module Veeam.Backup.PowerShell -DisableNameChecking
+
 # Get all supported jobs
 $vbrJobs = Get-VBRJob -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Where-Object {$_.IsBackupJob}
 
@@ -25,7 +28,7 @@ if ($vbrJobs.Count -eq 0) {
 }
 
 # Post-job script for Discord notifications
-$newPostScriptCmd = 'Powershell.exe -ExecutionPolicy Bypass -File C:\VeeamScripts\VeeamDiscordNotifications\DiscordNotificationBootstrap.ps1'
+$newPostScriptCmd = 'Powershell.exe -ExecutionPolicy Bypass -File C:\VeeamScripts\VeeamDiscordNotifications\Bootstrap.ps1'
 
 # Run foreach loop for all found jobs
 foreach ($job in $vbrJobs) {
@@ -35,7 +38,7 @@ foreach ($job in $vbrJobs) {
 	$postScriptCmd = $jobOptions.JobScriptCommand.PostScriptCommandLine
 
 	# Check if job is already configured with correct post-job script
-	if ($postScriptCmd.EndsWith('DiscordNotificationBootstrap.ps1') -or $postScriptCmd.EndsWith("DiscordNotificationBootstrap.ps1'")) {
+	if ($postScriptCmd.EndsWith('Bootstrap.ps1') -or $postScriptCmd.EndsWith("Bootstrap.ps1'")) {
 		Write-Output "`nJob '$($job.Name)' is already configured for Discord notifications; Skipping."
 		Continue
 	}
@@ -51,12 +54,14 @@ foreach ($job in $vbrJobs) {
 		until ($overWriteCurrentCmd -eq 'Y' -or $overWriteCurrentCmd -eq 'N')
 
 		switch ($overWriteCurrentCmd) {
+
 			# Default action will be to skip the job.
 			default { Write-Output "`nSkipping job '$($job.Name)'`n"}
 			Y {
 				try {
 					# Check to see if the script has even changed
 					if ($postScriptCmd -ne $newPostScriptCmd) {
+
 						# Script is not the same. Update the script command line.
 						$jobOptions.JobScriptCommand.PostScriptCommandLine = $newPostScriptCmd
 						Set-VBRJobOptions -Job $job -Options $jobOptions | Out-Null
