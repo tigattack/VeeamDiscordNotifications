@@ -18,10 +18,10 @@ function DeploymentError {
 Import-Module Veeam.Backup.PowerShell -DisableNameChecking
 
 # Get all supported jobs
-$vbrJobs = Get-VBRJob -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Where-Object {$_.IsBackupJob}
+$backupJobs = Get-VBRJob -WarningAction SilentlyContinue | Where-Object {$_.IsBackupJob}
 
 # Make sure we found some jobs
-if ($vbrJobs.Count -eq 0) {
+if ($backupJobs.Count -eq 0) {
 	Write-Output 'No supported jobs found; Exiting.'
 	Start-Sleep 10
 	exit
@@ -30,8 +30,8 @@ if ($vbrJobs.Count -eq 0) {
 # Post-job script for Discord notifications
 $newPostScriptCmd = 'Powershell.exe -ExecutionPolicy Bypass -File C:\VeeamScripts\VeeamDiscordNotifications\Bootstrap.ps1'
 
-# Run foreach loop for all found jobs
-foreach ($job in $vbrJobs) {
+# Run foreach loop for all found backup jobs
+foreach ($job in $backupJobs) {
 	# Get post-job script options for job
 	$jobOptions = $job.GetOptions()
 	$postScriptEnabled = $jobOptions.JobScriptCommand.PostScriptEnabled
@@ -104,6 +104,19 @@ foreach ($job in $vbrJobs) {
 			}
 		}
 	}
+}
+
+# Inform user about agent jobs
+$agentJobCount = (Get-VBRComputerBackupJob | Where-Object {$_.Mode -eq 'ManagedByBackupServer'}).Count
+If ($agentJobCount -gt 0) {
+	If ($agentJobCount -eq 1) {
+		Write-Output "`n$($agentJobCount) agent job has been found."
+	}
+	Else {
+		Write-Output "`n$($agentJobCount) agent jobs have been found."
+	}
+	Write-Output "Unfortunately they cannot be configured automatically due to limitations in Veeam's PowerShell module."
+	Write-Output 'Please manually configure them to receive Discord notifications.'
 }
 
 Write-Output "`n`Finished. Exiting."
