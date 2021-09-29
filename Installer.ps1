@@ -69,8 +69,7 @@ If ($mentionPreference -ne 1) {
 }
 
 # Pull latest version of script from GitHub
-Invoke-WebRequest -Uri `
-	"https://github.com/tigattack/$project/releases/download/$latestVersion/$project-$latestVersion.zip" `
+Invoke-WebRequest -Uri "https://github.com/tigattack/$project/archive/refs/heads/master.zip" `
 	-OutFile "$env:TEMP\$project-$latestVersion.zip"
 
 # Unblock downloaded ZIP
