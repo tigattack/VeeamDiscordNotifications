@@ -5,21 +5,6 @@ $rootPath = 'C:\VeeamScripts'
 $project = 'VeeamDiscordNotifications'
 $webhookRegex = 'https:\/\/(.*\.)?discord[app]?.com\/api\/webhooks\/([^\/]+)\/([^\/]+)'
 
-# Get latest release from GitHub
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$latestVersion = ((Invoke-WebRequest -Uri "https://github.com/tigattack/$project/releases/latest" `
-	-Headers @{'Accept'='application/json'} -UseBasicParsing).Content | ConvertFrom-Json).tag_name
-
-# Check if this project is already installed and, if so, whether it's the latest version.
-if (Test-Path $rootPath\$project) {
-	Write-Output 'VeeamDiscordNotifications is already installed; Checking version.'
-	$installedVersion = Get-Content -Raw "$rootPath\$project\resources\version.txt"
-	If ($installedVersion -ge $latestVersion) {
-		Write-Output "VeeamDiscordNotifications is already up to date.`nExiting."
-		exit
-	}
-}
-
 # Check user has webhook URL ready
 $userPrompt = Read-Host -Prompt 'Do you have your Discord webhook URL ready? Y/N'
 
@@ -70,17 +55,17 @@ If ($mentionPreference -ne 1) {
 
 # Pull latest version of script from GitHub
 Invoke-WebRequest -Uri "https://github.com/tigattack/$project/archive/refs/heads/master.zip" `
-	-OutFile "$env:TEMP\$project-$latestVersion.zip"
+	-OutFile "$env:TEMP\$project-master.zip"
 
 # Unblock downloaded ZIP
-Unblock-File -Path "$env:TEMP\$project-$latestVersion.zip"
+Unblock-File -Path "$env:TEMP\$project-master.zip"
 
 # Extract release to destination path
-Expand-Archive -Path "$env:TEMP\$project-$latestVersion.zip" -DestinationPath "$rootPath"
+Expand-Archive -Path "$env:TEMP\$project-master.zip" -DestinationPath "$rootPath"
 
 # Rename destination and tidy up
-Rename-Item -Path "$rootPath\$project-$latestVersion" -NewName "$rootPath\$project"
-Remove-Item -Path "$env:TEMP\$project-$latestVersion.zip"
+Rename-Item -Path "$rootPath\$project-master" -NewName "$rootPath\$project"
+Remove-Item -Path "$env:TEMP\$project-master.zip"
 
 # Get config
 $config = Get-Content "$rootPath\$project\config\conf.json" -Raw | ConvertFrom-Json
