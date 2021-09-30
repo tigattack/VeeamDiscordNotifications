@@ -43,8 +43,10 @@ Configuration is set in ./config/conf.json
 
 ## Credits
 
-[MelonSmasher](https://github.com/MelonSmasher)//[TheSageColleges](https://github.com/TheSageColleges) for [the project](https://github.com/TheSageColleges/VeeamSlackNotifications) on which this is (now loosely) based.
+[MelonSmasher](https://github.com/MelonSmasher)//[TheSageColleges](https://github.com/TheSageColleges) for [the project](https://github.com/TheSageColleges/VeeamSlackNotifications) on which this is (now loosely) based.  
+[dantho281](https://github.com/dantho281) for various things - Assistance with silly little issues, the odd bugfix here and there, and the inspiration for and first works on the `Updater.ps1` script.  
+[Lee_Dailey](https://reddit.com/u/Lee_Dailey) for general pointers and the [first revision](https://pastebin.com/srN5CKty) of the `ConvertTo-ByteUnit` function.  
+[philenst](https://github.com/philenst) for the `DeployVeeamConfiguration.ps1` script.  
+[s0yun](https://github.com/s0yun) for the `Installer.ps1` script.
 
-[dannyt66](https://github.com/dannyt66) for various things - Assistance with silly little issues, the odd bugfix here and there, and the inspiration for and first works on the `Updater.ps1` script.
-
-[Lee_Dailey](https://reddit.com/u/Lee_Dailey) for general pointers and the first revision of the [`ConvertTo-ByteUnit` function](https://pastebin.com/srN5CKty).
+Thank you all.
