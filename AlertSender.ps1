@@ -235,19 +235,7 @@ If ($jobType -eq 'EpAgentBackup') {
 
 # Job timings
 
-## Create array of job timings.
-# Necessary because $jobEndTime and $jobStartTime are readonly.
-# Create writeable object using their values, prepending 0 to single-digit values.
-$jobTimes = [PSCustomObject]@{
-	StartHour	= $jobStartTime.Hour.ToString('00')
-	StartMinute	= $jobStartTime.Minute.ToString('00')
-	StartSecond	= $jobStartTime.Second.ToString('00')
-	EndHour		= $jobEndTime.Hour.ToString('00')
-	EndMinute	= $jobEndTime.Minute.ToString('00')
-	EndSecond	= $jobEndTime.Second.ToString('00')
-}
-
-# Calculate difference between job start and end time.
+## Calculate difference between job start and end time.
 $duration = $jobEndTime - $jobStartTime
 
 ## Switch for job duration; define pretty output.
@@ -273,7 +261,6 @@ Switch ($duration) {
 	}
 }
 
-
 ## Add job times to fieldArray.
 $fieldArray += @(
 	[PSCustomObject]@{
@@ -283,12 +270,12 @@ $fieldArray += @(
 	}
 	[PSCustomObject]@{
 		name	= 'Time Started'
-		value	= '{0}:{1}:{2}' -f $jobTimes.StartHour, $jobTimes.StartMinute, $jobTimes.StartSecond
+		value	= "<t:$(([System.DateTimeOffset]$(Get-Date $jobStartTime)).ToUnixTimeSeconds())>"
 		inline	= 'true'
 	}
 	[PSCustomObject]@{
 		name	= 'Time Ended'
-		value	= '{0}:{1}:{2}' -f $jobTimes.EndHour, $jobTimes.EndMinute, $jobTimes.EndSecond
+		value	= "<t:$(([System.DateTimeOffset]$(Get-Date $jobEndTime)).ToUnixTimeSeconds())>"
 		inline	= 'true'
 	}
 )
