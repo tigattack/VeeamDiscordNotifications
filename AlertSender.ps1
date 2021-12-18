@@ -112,7 +112,7 @@ if ($jobType -eq 'Backup') {
 	# Convert bytes to closest unit.
 	$jobSizeRound		= ConvertTo-ByteUnit -Data $jobSize
 	$transferSizeRound	= ConvertTo-ByteUnit -Data $transferSize
-	$speedRound			= (ConvertTo-ByteUnit -Data $speed) + '/s'
+	$speedRound			= (ConvertTo-ByteUnit -Data $speed).ToString() + '/s'
 
 	# Set processing speed "Unknown" if 0B/s to avoid confusion.
 	If ($speedRound -eq '0 B/s') {
@@ -210,7 +210,7 @@ If ($jobType -eq 'EpAgentBackup') {
 	# Convert bytes to closest unit.
 	$jobProcessedSizeRound		= ConvertTo-ByteUnit -Data $jobProcessedSize
 	$jobTransferredSizeRound	= ConvertTo-ByteUnit -Data $jobTransferredSize
-	$speedRound					= (ConvertTo-ByteUnit -Data $speed) + '/s'
+	$speedRound					= (ConvertTo-ByteUnit -Data $speed).ToString() + '/s'
 
 	# Add session information to fieldArray.
 	$fieldArray = @(
