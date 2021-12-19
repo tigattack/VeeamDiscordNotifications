@@ -10,9 +10,10 @@ $issues = foreach ($i in $psFiles.FullName) {
 	Invoke-ScriptAnalyzer -Path $i -Recurse -Settings ./.github/scripts/pssa-settings.psd1
 }
 
-# Get results, types and report to GitHub Actions
+# init and set variables
 $errors = $warnings = $infos = $unknowns = 0
 
+# Get results, types and report to GitHub Actions
 foreach ($i in $issues) {
 	switch ($i.Severity) {
 		{$_ -eq 'Error' -or $_ -eq 'ParseError'} {
