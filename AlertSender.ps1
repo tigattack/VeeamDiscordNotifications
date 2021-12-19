@@ -30,7 +30,7 @@ If ($Config.debug_log) {
 	$date = (Get-Date -UFormat %Y-%m-%d_%T).Replace(':','.')
 	$logFile = "$PSScriptRoot\log\$($date)_AlertSender-$($logJobName).log"
 	## Start logging to file
-	Start-Logging $logFile
+	Start-Logging -Path $logFile -Append
 }
 
 

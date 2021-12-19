@@ -1,4 +1,4 @@
-# This function logs messages with a type tag
+# This function log messages with a type tag
 Function Write-LogMessage {
 	[CmdletBinding(
 		SupportsShouldProcess,
@@ -14,7 +14,7 @@ Function Write-LogMessage {
 	}
 }
 
-# These functions handles Logging
+# These functions handle Logging
 Function Start-Logging {
 	[CmdletBinding(
 		SupportsShouldProcess,
@@ -22,7 +22,9 @@ Function Start-Logging {
 	)]
 	Param(
 		[Parameter(Mandatory)]
-		$Path
+		$Path,
+		[Switch]
+		$Append
 	)
 	If ($PSCmdlet.ShouldProcess($Path, 'Start-Transcript')) {
 		Try {
@@ -34,6 +36,7 @@ Function Start-Logging {
 		}
 	}
 }
+
 Function Stop-Logging {
 	[CmdletBinding(
 		SupportsShouldProcess,
