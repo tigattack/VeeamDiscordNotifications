@@ -333,7 +333,7 @@ Catch {
 $embedArray = @(
 	[PSCustomObject]@{
 		title		= $jobName
-		description	= "$status ($jobTypeNice)"
+		description	= "Session result: $status\nJob type: $jobTypeNice"
 		color		= $colour
 		thumbnail	= $thumbObject
 		fields		= $fieldArray
