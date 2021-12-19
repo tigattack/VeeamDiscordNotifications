@@ -8,7 +8,7 @@ $webhookRegex = 'https:\/\/(.*\.)?discord[app]?.com\/api\/webhooks\/([^\/]+)\/([
 # Get latest release from GitHub
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $latestVersion = ((Invoke-WebRequest -Uri "https://github.com/tigattack/$project/releases/latest" `
-	-Headers @{'Accept'='application/json'} -UseBasicParsing).Content | ConvertFrom-Json).tag_name
+			-Headers @{'Accept'='application/json'} -UseBasicParsing).Content | ConvertFrom-Json).tag_name
 
 # Check if this project is already installed and, if so, whether it's the latest version.
 if (Test-Path $rootPath\$project) {
