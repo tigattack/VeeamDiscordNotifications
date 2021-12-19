@@ -88,7 +88,7 @@ If ($config.debug_log) {
 		Else {
 			$logJobName = $jobName
 		}
-		Rename-Item -Path $logFile -NewName "$PSScriptRoot\log\$($date)_Bootstrap-$($logJobName).log"
+		Rename-Item -Path $logFile -NewName "$PSScriptRoot\log\$($date)-$($logJobName).log"
 	}
 	Catch {
 		Write-LogMessage -Tag 'ERROR' -Message "Failed to rename log file: $_"

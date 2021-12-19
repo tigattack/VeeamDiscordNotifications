@@ -15,6 +15,7 @@ Import-Module "$PSScriptRoot\resources\Logger.psm1"
 Import-Module "$PSScriptRoot\resources\ConvertTo-ByteUnit.psm1"
 Import-Module "$PSScriptRoot\resources\VBRSessionInfo.psm1"
 Import-Module "$PSScriptRoot\resources\UpdateInfo.psm1"
+Import-Module "$PSScriptRoot\resources\Test-FileIsLocked.psm1"
 
 
 # Start logging if logging is enabled in config
@@ -26,9 +27,18 @@ If ($Config.debug_log) {
 	Else {
 		$logJobName = $jobName
 	}
+
 	## Set log file name
 	$date = (Get-Date -UFormat %Y-%m-%d_%T).Replace(':','.')
-	$logFile = "$PSScriptRoot\log\$($date)_AlertSender-$($logJobName).log"
+	$logFile = "$PSScriptRoot\log\$($date)-$($logJobName).log"
+
+	## Wait until log file is closed by Bootstrap.ps1
+	do {
+		$logLocked = $(Test-FileIsLocked -Path "$logFile.log").IsLocked
+		Start-Sleep -Seconds 1
+	}
+	until (-not $logLocked)
+
 	## Start logging to file
 	Start-Logging -Path $logFile -Append
 }
