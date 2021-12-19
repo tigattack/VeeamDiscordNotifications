@@ -18,7 +18,7 @@ Write-LogMessage -Tag 'INFO' -Message "Version: $(Get-Content "$PSScriptRoot\res
 
 # Retrieve configuration.
 ## Pull config to PSCustomObject
-$config = Get-Content -Raw $configFile | ConvertFrom-Json
+$config = Get-Content -Raw $configFile | ConvertFrom-Json # TODO: import config from param instead of later as file. Can then improve logging flow.
 
 # Stop logging and remove log file if logging is disable in config.
 If (-not $config.debug_log) {
@@ -65,11 +65,21 @@ If ($job.JobType -notin $supportedTypes) {
 $sessionInfo = Get-VBRSessionInfo -SessionID $sessionId -JobType $job.JobType
 $jobName = $sessionInfo.JobName
 
-Write-LogMessage -Tag 'INFO' -Message "Bootstrap script for Veeam job '$jobName' ($jobId)."
+Write-LogMessage -Tag 'INFO' -Message "Bootstrap script for Veeam job '$jobName' ($jobId) - Session & job detection complete."
+
+# Set log file name based on job
+## Replace spaces if any in the job name
+If ($jobName -match ' ') {
+	$logJobName = $jobName.Replace(' ', '_')
+}
+Else {
+	$logJobName = $jobName
+}
+$newLogfile = "$PSScriptRoot\log\$($date)-$($logJobName).log"
 
 # Build argument string for the alert sender script.
 $powershellArguments = "-file $PSScriptRoot\AlertSender.ps1", "-JobName `"$jobName`"", "-Id `"$sessionId`"","-JobType `"$($job.JobType)`"", `
-	"-Config `"$($configRaw)`""
+	"-Config `"$($configRaw)`"", "-Logfile `"$newLogfile`""
 
 # Start a new new script in a new process with some of the information gathered here.
 # This allows Veeam to finish the current session faster and allows us gather information from the completed job.
@@ -81,14 +91,7 @@ If ($config.debug_log) {
 
 	# Rename log file to include the job name.
 	Try {
-		## Replace spaces if any in the job name
-		If ($jobName -match ' ') {
-			$logJobName = $jobName.Replace(' ', '_')
-		}
-		Else {
-			$logJobName = $jobName
-		}
-		Rename-Item -Path $logFile -NewName "$PSScriptRoot\log\$($date)-$($logJobName).log"
+		Rename-Item -Path $logFile -NewName "$newLogfile"
 	}
 	Catch {
 		Write-LogMessage -Tag 'ERROR' -Message "Failed to rename log file: $_"

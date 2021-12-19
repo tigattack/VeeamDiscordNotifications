@@ -3,7 +3,8 @@ Param(
 	[String]$jobName,
 	[String]$id,
 	[String]$jobType,
-	$Config
+	$Config,
+	$Logfile
 )
 
 # Convert config from JSON
@@ -20,27 +21,15 @@ Import-Module "$PSScriptRoot\resources\Test-FileIsLocked.psm1"
 
 # Start logging if logging is enabled in config
 If ($Config.debug_log) {
-	## Replace spaces if any in the job name
-	If ($jobName -match ' ') {
-		$logJobName = $jobName.Replace(' ', '_')
-	}
-	Else {
-		$logJobName = $jobName
-	}
-
-	## Set log file name
-	$date = (Get-Date -UFormat %Y-%m-%d_%T).Replace(':','.')
-	$logFile = "$PSScriptRoot\log\$($date)-$($logJobName).log"
-
 	## Wait until log file is closed by Bootstrap.ps1
 	do {
-		$logLocked = $(Test-FileIsLocked -Path "$logFile.log").IsLocked
+		$logLocked = $(Test-FileIsLocked -Path "$Logfile").IsLocked
 		Start-Sleep -Seconds 1
 	}
 	until (-not $logLocked)
 
 	## Start logging to file
-	Start-Logging -Path $logFile -Append
+	Start-Logging -Path $Logfile -Append
 }
 
 
