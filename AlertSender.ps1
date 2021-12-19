@@ -293,8 +293,8 @@ If ($jobType -eq 'EpAgentBackup') {
 
 # Define nice job type name
 Switch ($jobType) {
-	Backup 			{$jobTypeNice = 'Backup'}
-	Replica			{$jobTypeNice = 'Replication'}
+	Backup 			{$jobTypeNice = 'VM Backup'}
+	Replica			{$jobTypeNice = 'VM Replication'}
 	EpAgentBackup	{$jobTypeNice = 'Agent Backup'}
 }
 
