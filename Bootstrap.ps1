@@ -8,7 +8,7 @@ $configFile = "$PSScriptRoot\config\conf.json"
 $date = (Get-Date -UFormat %Y-%m-%d_%T).Replace(':','.')
 $logFile = "$PSScriptRoot\log\$($date)_Bootstrap.log"
 $idRegex = '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}'
-$supportedTypes = 'Backup', 'EpAgentBackup'
+$supportedTypes = 'Backup', 'EpAgentBackup','Replica'
 
 # Start logging to file
 Start-Logging -Path $logFile

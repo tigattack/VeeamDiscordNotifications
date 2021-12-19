@@ -13,7 +13,7 @@ Function Get-VBRSessionInfo {
 		Switch ($JobType) {
 
 			# VM job
-			{$_ -eq 'Backup'} {
+			{$_ -in 'Backup','Replica'} {
 
 				# Get the session details.
 				$session = Get-VBRBackupSession | Where-Object {$_.Id.Guid -eq $SessionId}

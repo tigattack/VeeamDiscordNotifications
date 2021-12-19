@@ -111,7 +111,7 @@ If ($session.State -ne 'Stopped') {
 # Define session statistics for the report.
 
 ## If VM backup, gather and include session info.
-if ($jobType -eq 'Backup') {
+if ($jobType -in 'Backup','Replica') {
 	# Gather session data sizes and timing.
 	[Float]$jobSize			= $session.BackupStats.DataSize
 	[Float]$transferSize	= $session.BackupStats.BackupSize
@@ -302,14 +302,20 @@ If ($jobType -eq 'EpAgentBackup') {
 	)
 }
 
+# Define nice job type name
+Switch ($jobType) {
+	Backup 			{$jobTypeNice = 'Backup'}
+	Replica			{$jobTypeNice = 'Replication'}
+	EpAgentBackup	{$jobTypeNice = 'Agent Backup'}
+}
 
 # Switch for the session status to decide the embed colour.
 Switch ($status) {
-	None {$colour		= '16777215'}
-	Warning {$colour	= '16776960'}
-	Success {$colour	= '65280'}
-	Failed {$colour		= '16711680'}
-	Default {$colour	= '16777215'}
+	None    {$colour = '16777215'}
+	Warning {$colour = '16776960'}
+	Success {$colour = '65280'}
+	Failed  {$colour = '16711680'}
+	Default {$colour = '16777215'}
 }
 
 # Decide whether to mention user
@@ -338,7 +344,7 @@ Catch {
 $embedArray = @(
 	[PSCustomObject]@{
 		title		= $jobName
-		description	= $status
+		description	= "$status ($jobTypeNice)"
 		color		= $colour
 		thumbnail	= $thumbObject
 		fields		= $fieldArray
