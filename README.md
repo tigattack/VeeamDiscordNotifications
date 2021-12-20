@@ -16,9 +16,23 @@ Sends notifications from Veeam Backup & Replication to Discord.
 
 If you enjoy this project and would like to help out, please do so. If you're interested in helping out, contact me on Discord - `tigatack#7987`
 
-As much as I love this project, my free time is all but nonexistent and work is needed to add functionality for different types of jobs than just VM backups and to bring this project in-line with recent changes in Veeam Backup & Replication (VBR) and VBR's PowerShell module.
+As much as I love this project, free time is hard to find and some work is needed to add functionality for more types of jobs, add more optional detail to outputs, and to bring this project in-line with recent changes in Veeam Backup & Replication (VBR) and VBR's PowerShell module.
 
-This is work that I will inevitably get to at some point, but I'd hate to see people left in the lurch with this and would love to have it done sooner rather than later.
+## Supported Job Types
+
+* VM Backup
+* VM Replication
+* Agents managed by backup server
+
+### Agent job caveats
+
+Due to limitations caused by the way some types of Veeam Agent jobs are executed, only Agent jobs of type "Managed by backup server" support post-job scripts.  
+In the Veeam Backup & Replication Console, such jobs will show up with type "Windows/Linux Agent Backup". If you see "Windows/Linux Agent _Policy_", this job is not supported.  
+In the Veeam Backup & Replication PowerShell module, such jobs will show up with type "EpAgentBackup". If you see "EpAgentPolicy", this job is not supported.  
+You can read about the difference between these two Agent job types [here](https://helpcenter.veeam.com/docs/backup/agents/agent_job_protection_mode.html?ver=110#selecting-job-mode).
+
+Unfortunately, even Agent job sessions managed by the backup server, while supported, are limited in data output.  
+  As much relevant information as I've been able to discover from such job sessions is included in the Discord embed, but I welcome any suggestions for improvement in this area.
 
 ## Configuration options
 
