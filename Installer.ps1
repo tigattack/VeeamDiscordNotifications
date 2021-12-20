@@ -89,22 +89,22 @@ $config.webhook = $webhookUrl
 
 Switch ($mentionPreference) {
 	1 {
-		$config.mention_on_fail = 'false'
-		$config.mention_on_warning = 'false'
+		$config.mention_on_fail = $false
+		$config.mention_on_warning = $false
 	}
 	2 {
-		$config.mention_on_fail = 'false'
-		$config.mention_on_warning = 'true'
+		$config.mention_on_fail = $false
+		$config.mention_on_warning = $true
 		$config.userId = $userId
 	}
 	3 {
-		$config.mention_on_fail = 'true'
-		$config.mention_on_warning = 'false'
+		$config.mention_on_fail = $true
+		$config.mention_on_warning = $false
 		$config.userId = $userId
 	}
 	4 {
-		$config.mention_on_fail = 'true'
-		$config.mention_on_warning = 'true'
+		$config.mention_on_fail = $true
+		$config.mention_on_warning = $true
 		$config.userId = $userId
 	}
 }
