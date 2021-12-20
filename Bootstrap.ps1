@@ -65,7 +65,7 @@ If ($job.JobType -notin $supportedTypes) {
 $sessionInfo = Get-VBRSessionInfo -SessionID $sessionId -JobType $job.JobType
 $jobName = $sessionInfo.JobName
 
-Write-LogMessage -Tag 'INFO' -Message "Bootstrap script for Veeam job '$jobName' ($jobId) - Session & job detection complete."
+Write-LogMessage -Tag 'INFO' -Message "Bootstrap script for Veeam job '$jobName' (job $jobId session $sessionId) - Session & job detection complete."
 
 # Set log file name based on job
 ## Replace spaces if any in the job name
