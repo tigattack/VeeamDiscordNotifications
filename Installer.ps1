@@ -80,7 +80,7 @@ Unblock-File -Path "$env:TEMP\$project-$latestVersion.zip"
 Expand-Archive -Path "$env:TEMP\$project-$latestVersion.zip" -DestinationPath "$rootPath"
 
 # Rename destination and tidy up
-Rename-Item -Path "$rootPath\$project-$latestVersion" -NewName "$rootPath\$project"
+Rename-Item -Path "$rootPath\$project-$latestVersion" -NewName "$project"
 Remove-Item -Path "$env:TEMP\$project-$latestVersion.zip"
 
 # Get config
