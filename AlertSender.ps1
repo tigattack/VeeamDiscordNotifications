@@ -331,7 +331,7 @@ Switch ($status) {
 # Decide whether to mention user
 ## On fail
 Try {
-	If ($Config.mention_on_fail -and $Status -eq 'Failed') {
+	If ($Config.mention_on_fail -and $status -eq 'Failed') {
 		$mention = $true
 	}
 }
@@ -341,7 +341,7 @@ Catch {
 
 ## On warning
 Try {
-	If ($Config.mention_on_warning -and $Status -eq 'Warning') {
+	If ($Config.mention_on_warning -and $status -eq 'Warning') {
 		$mention = $true
 	}
 }
@@ -368,7 +368,7 @@ Switch ($mention) {
 	## Mention user on job failure if configured to do so.
 	$true {
 		$payload = [PSCustomObject]@{
-			content = "<@!$($Config.userid)> Job $Status!"
+			content = "<@!$($Config.userid)> Job $status!"
 			embeds	= $embedArray
 		}
 	}
