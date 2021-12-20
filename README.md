@@ -1,6 +1,6 @@
 # Veeam Backup & Replication Notifications for Discord
 
-Sends notifications from Veeam Backup & Replication to Discord, detailing session results and statistics and optionally alerting you via mention when a job finishes in a warning or failed state.
+Send Veeam Backup & Replication session summary notifications to Discord, detailing session result and statistics and optionally alerting you via mention when a job finishes in a warning or failed state.
 
 ![Chat Example](https://github.com/tigattack/VeeamDiscordNotifications/blob/master/asset/example.png)
 
@@ -28,8 +28,10 @@ As much as I love this project, free time is hard to find and some work is neede
 
 Due to limitations caused by the way some types of Veeam Agent jobs are executed, only Agent jobs of type "Managed by backup server" support post-job scripts.  
 Such jobs will show up as follows:
-* In Veeam Backup & Replication Console, with type "Windows/Linux Agent Backup". If you see "Windows/Linux Agent _Policy_", this job is not supported.  
-* In Veeam Backup & Replication PowerShell module, with type "EpAgentBackup". If you see "EpAgentPolicy", this job is not supported.  
+* In Veeam Backup & Replication Console, with type "Windows/Linux Agent Backup".  
+If you see "Windows/Linux Agent _Policy_", this job is not supported.  
+* In Veeam Backup & Replication PowerShell module, with type "EpAgentBackup".  
+If you see "EpAgentPolicy", this job is not supported.  
 
 You can read about the difference between these two Agent job types [here](https://helpcenter.veeam.com/docs/backup/agents/agent_job_protection_mode.html?ver=110#selecting-job-mode).
 
@@ -38,7 +40,7 @@ Unfortunately, even Agent job sessions managed by the backup server, while suppo
 
 ## Configuration options
 
-Configuration is set in ./config/conf.json
+Configuration can be found in `C:\VeeamScripts\VeeamDiscordNotifications\config\conf.json`
 
 | Name                 | Type    | Required | Default           | Description                                                                                                |
 |--------------------- |-------- |--------- |------------------ | ---------------------------------------------------------------------------------------------------------- |
