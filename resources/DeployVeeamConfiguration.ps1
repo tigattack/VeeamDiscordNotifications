@@ -17,11 +17,10 @@ function DeploymentError {
 # Import Veeam module
 Import-Module Veeam.Backup.PowerShell -DisableNameChecking
 
-# Write notice
-Write-Output "`nPlease note: This script can currently only be used to configure VM backup jobs and VM replica jobs.`n"
-
 # Get all supported jobs
-$backupJobs = Get-VBRJob -WarningAction SilentlyContinue | Where-Object {$_.IsBackupJob -or $_.IsReplica}
+$backupJobs = Get-VBRJob -WarningAction SilentlyContinue | Where-Object {
+	$_.JobType -in 'Backup', 'Replica', 'EpAgentBackup'
+}
 
 # Make sure we found some jobs
 if ($backupJobs.Count -eq 0) {
@@ -110,19 +109,6 @@ foreach ($job in $backupJobs) {
 			}
 		}
 	}
-}
-
-# Inform user about agent jobs
-$agentJobCount = (Get-VBRComputerBackupJob | Where-Object {$_.Mode -eq 'ManagedByBackupServer'}).Count
-If ($agentJobCount -gt 0) {
-	If ($agentJobCount -eq 1) {
-		Write-Output "`n$($agentJobCount) agent job has been found."
-	}
-	Else {
-		Write-Output "`n$($agentJobCount) agent jobs have been found."
-	}
-	Write-Output "Unfortunately they cannot be configured automatically due to limitations in Veeam's PowerShell module."
-	Write-Output 'Please manually configure them to receive Discord notifications.'
 }
 
 Write-Output "`n`Finished. Exiting."
