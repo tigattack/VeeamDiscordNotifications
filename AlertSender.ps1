@@ -44,10 +44,18 @@ $updateStatus = Get-UpdateStatus
 
 # Define static output objects.
 
-## Get and define update status message.
-$footerAddition = (Get-UpdateMessage -CurrentVersion $updateStatus.CurrentVersion -LatestVersion $updateStatus.LatestVersion)
-$footerAddition = $footerAddition.Replace('latestVerPlaceholder',"$($updateStatus.LatestVersion)")
-$footerAddition = $footerAddition.Replace('currentVerPlaceholder',"$($updateStatus.CurrentVersion)")
+## Footer message.
+Switch ($updateStatus) {
+	Current { $footerAddition = "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion) - Up to date."}
+	Behind { $footerAddition = "- Update to $($updateStatus.LatestVersion) is available!"}
+	Ahead { $footerAddition = "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion) - Pre-release."}
+}
+
+## Footer object.
+$footerObject = [PSCustomObject]@{
+	text 		= "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion) $footerAddition"
+	icon_url	= 'https://avatars0.githubusercontent.com/u/10629864'
+}
 
 ## Define thumbnail object.
 If ($Config.thumbnail) {
@@ -59,12 +67,6 @@ Else {
 	$thumbObject = [PSCustomObject]@{
 		url = 'https://raw.githubusercontent.com/tigattack/VeeamDiscordNotifications/master/asset/thumb01.png'
 	}
-}
-
-## Define footer object.
-$footerObject = [PSCustomObject]@{
-	text 		= "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion). $footerAddition"
-	icon_url	= 'https://avatars0.githubusercontent.com/u/10629864'
 }
 
 
@@ -333,7 +335,7 @@ Catch {
 $embedArray = @(
 	[PSCustomObject]@{
 		title		= $jobName
-		description	= "Session result: $status\nJob type: $jobTypeNice"
+		description	= "Session result: $status`nJob type: $jobTypeNice"
 		color		= $colour
 		thumbnail	= $thumbObject
 		fields		= $fieldArray

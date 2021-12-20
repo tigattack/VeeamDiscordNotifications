@@ -12,44 +12,24 @@ function Get-UpdateStatus {
 		# Release IDs are returned in a format of {"id":3622206,"tag_name":"v1.0"}, so we need to extract tag_name.
 		$latestVersion = ConvertFrom-Json $latestRelease.Content | ForEach-Object {$_.tag_name}
 
+		If ($currentVersion -gt $latestVersion) {
+			$status = 'Ahead'
+		}
+		elseif ($currentVersion -lt $latestVersion) {
+			$status = 'Behind'
+		}
+		else {
+			$status = 'Current'
+		}
+
 		# Create PSObject to return.
-		New-Object PSObject -Property @{
-			CurrentVersion = $currentVersion
-			LatestVersion = $latestVersion
-		}
-	}
-}
-
-function Get-UpdateMessage {
-	Param (
-		[Parameter(Mandatory)]
-		$CurrentVersion,
-		[Parameter(Mandatory)]
-		$LatestVersion
-	)
-
-	process {
-
-		# Get version announcement phrases.
-		$phrases = Get-Content -Raw "$PSScriptRoot\VersionPhrases.json" | ConvertFrom-Json
-
-		# Comparing local and latest versions and determine if an update is required, then use that information to build the footer text.
-		# Picks a phrase at random from the list above for the version statement in the footer of the backup report.
-		Switch ($CurrentVersion) {
-			{$_ -lt $LatestVersion} {
-				$updateMessage = (Get-Random -InputObject $phrases.older -Count 1)
-			}
-
-			{$_ -eq $LatestVersion} {
-				$updateMessage = (Get-Random -InputObject $phrases.current -Count 1)
-			}
-
-			{$_ -gt $LatestVersion} {
-				$updateMessage = (Get-Random -InputObject $phrases.newer -Count 1)
-			}
+		$out = New-Object PSObject -Property @{
+			CurrentVersion 	= $currentVersion
+			LatestVersion 	= $latestVersion
+			Status 			= $status
 		}
 
-		# Return update message.
-		$updateMessage
+		# Return PSObject.
+		return $out
 	}
 }
