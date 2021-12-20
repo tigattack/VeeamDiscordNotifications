@@ -38,11 +38,11 @@ else {
 
 # Query configure all or selected jobs
 do {
-	$configChoice = Read-Host -Prompt 'Do you wish to configure all supported jobs or make a choice for each job? A(ll)/S(elected)'
+	$configChoice = Read-Host -Prompt 'Do you wish to configure all supported jobs, make a decision for each job, or configure none? A(ll)/D(ecide)/N(one)'
 }
-until ($configChoice -in 'A', 'All', 'S', 'Selected')
+until ($configChoice -in 'A', 'All', 'D', 'Decide', 'N', 'None')
 
-If ($configChoice -in 'S', 'Selected') {
+If ($configChoice -in 'D', 'Decide') {
 	# Run foreach loop for all found backup jobs
 	foreach ($job in $backupJobs) {
 		# Set name string
@@ -221,6 +221,10 @@ elseif ($configChoice -in 'A', 'All') {
 			}
 		}
 	}
+}
+
+elseif ($configChoice -in 'N', 'None') {
+	Write-Output 'Skipping Discord notifications configuration deployment for all jobs.'
 }
 
 Write-Output "`n`Finished. Exiting."
