@@ -129,6 +129,16 @@ if ($jobType -in 'Backup','Replica') {
 		$speedRound = 'Unknown'
 	}
 
+	# Define bottleneck
+	Switch ($session.Info.Progress.BottleneckInfo.Bottleneck) {
+		'NotDefined' {
+			$bottleneck = 'Undefined'
+		}
+		Default {
+			$bottleneck = $_
+		}
+	}
+
 	<# TODO: utilise this.
 	# Get objects in session.
 	$sessionObjects = $session.GetTaskSessions()
@@ -180,7 +190,7 @@ if ($jobType -in 'Backup','Replica') {
 		}
 		[PSCustomObject]@{
 			name	= 'Bottleneck'
-			value	= [String]$session.Info.Progress.BottleneckInfo.Bottleneck
+			value	= [String]$bottleneck
 			inline	= 'true'
 		}
 	)
