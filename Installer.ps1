@@ -3,7 +3,7 @@
 # Prepare variables
 $rootPath = 'C:\VeeamScripts'
 $project = 'VeeamDiscordNotifications'
-$webhookRegex = 'https:\/\/(.*\.)?discord[app]?.com\/api\/webhooks\/([^\/]+)\/([^\/]+)'
+$webhookRegex = 'https:\/\/(.*\.)?discord(app)?\.com\/api\/webhooks\/([^\/]+)\/([^\/]+)'
 
 # Get latest release from GitHub
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
