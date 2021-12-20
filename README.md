@@ -2,7 +2,7 @@
 
 Send Veeam Backup & Replication session summary notifications to Discord, detailing session result and statistics and optionally alerting you via mention when a job finishes in a warning or failed state.
 
-<a href="https://github.com/tigattack/VeeamDiscordNotifications/blob/master/asset/embeds.png"><img src="https://github.com/tigattack/VeeamDiscordNotifications/blob/master/asset/embeds-small.png?raw=true" alt="Notification Example" width="30%"/></a>
+<a href="https://github.com/tigattack/VeeamDiscordNotifications/blob/master/asset/embeds.png"><img src="https://github.com/tigattack/VeeamDiscordNotifications/blob/dev/asset/embeds-small.png?raw=true" alt="Notification Example" width="90%"/></a>
 
 ## Installing
 
@@ -15,7 +15,7 @@ Send Veeam Backup & Replication session summary notifications to Discord, detail
       PS> Unblock-File C:\path\to\Installer.ps1
       PS> C:\path\to\Installer.ps1
       ```
-      <img src="https://github.com/tigattack/VeeamDiscordNotifications/blob/master/asset/installer.png?raw=true" alt="Installer Example" width="50%"/>
+      <img src="https://github.com/tigattack/VeeamDiscordNotifications/blob/dev/asset/installer.png?raw=true" alt="Installer Example" width="75%"/>
 
 * Option 2 - Manual install
   * Follow the [setup instructions](https://blog.tiga.tech/veeam-b-r-notifications-in-discord/).
