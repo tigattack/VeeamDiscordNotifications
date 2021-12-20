@@ -51,6 +51,21 @@ foreach ($job in $backupJobs) {
 		Write-Output "`n$($jobName) is already configured for Discord notifications; Skipping."
 		Continue
 	}
+	elseif ($postScriptCmd.EndsWith('\DiscordNotificationBootstrap.ps1') -or $postScriptCmd.EndsWith("\DiscordNotificationBootstrap.ps1'")) {
+		Write-Output "`n$($jobName) is configured for an older version of Discord notifications; Updating..."
+		try {
+			# Sets post-job script to Enabled and sets the command line to full command including path.
+			$jobOptions.JobScriptCommand.PostScriptEnabled = $true
+			$jobOptions.JobScriptCommand.PostScriptCommandLine = $newPostScriptCmd
+			Set-VBRJobOptions -Job $job -Options $jobOptions | Out-Null
+
+			Write-Output "$($jobName) is now updated."
+		}
+		catch {
+			DeploymentError
+		}
+		Continue
+	}
 
 	# Different actions whether post-job script is already enabled. If yes we ask to modify it, if not we ask to enable & set it.
 	if ($postScriptEnabled) {
