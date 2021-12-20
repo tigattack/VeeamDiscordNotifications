@@ -69,18 +69,19 @@ If ($mentionPreference -ne 1) {
 }
 
 # Pull latest version of script from GitHub
-Invoke-WebRequest -Uri "https://github.com/tigattack/$project/archive/refs/heads/master.zip" `
-	-OutFile "$env:TEMP\$project-master.zip"
+Invoke-WebRequest -Uri `
+	"https://github.com/tigattack/$project/releases/download/$latestVersion/$project-$latestVersion.zip" `
+	-OutFile "$env:TEMP\$project-$latestVersion.zip"
 
 # Unblock downloaded ZIP
-Unblock-File -Path "$env:TEMP\$project-master.zip"
+Unblock-File -Path "$env:TEMP\$project-$latestVersion.zip"
 
 # Extract release to destination path
-Expand-Archive -Path "$env:TEMP\$project-master.zip" -DestinationPath "$rootPath"
+Expand-Archive -Path "$env:TEMP\$project-$latestVersion.zip" -DestinationPath "$rootPath"
 
 # Rename destination and tidy up
-Rename-Item -Path "$rootPath\$project-master" -NewName "$rootPath\$project"
-Remove-Item -Path "$env:TEMP\$project-master.zip"
+Rename-Item -Path "$rootPath\$project-$latestVersion" -NewName "$rootPath\$project"
+Remove-Item -Path "$env:TEMP\$project-$latestVersion.zip"
 
 # Get config
 $config = Get-Content "$rootPath\$project\config\conf.json" -Raw | ConvertFrom-Json
