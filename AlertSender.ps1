@@ -45,7 +45,7 @@ $updateStatus = Get-UpdateStatus
 # Define static output objects.
 
 ## Footer message.
-Switch ($updateStatus) {
+Switch ($updateStatus.Status) {
 	Current {
 		$footerMessage = "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion) - Up to date."
 	}
@@ -54,6 +54,9 @@ Switch ($updateStatus) {
 	}
 	Ahead {
 		$footerMessage = "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion) - Pre-release."
+	}
+	Default {
+		$footerMessage = "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion)."
 	}
 }
 
