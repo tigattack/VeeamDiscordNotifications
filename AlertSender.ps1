@@ -46,14 +46,20 @@ $updateStatus = Get-UpdateStatus
 
 ## Footer message.
 Switch ($updateStatus) {
-	Current { $footerAddition = "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion) - Up to date."}
-	Behind { $footerAddition = "- Update to $($updateStatus.LatestVersion) is available!"}
-	Ahead { $footerAddition = "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion) - Pre-release."}
+	Current {
+		$footerMessage = "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion) - Up to date."
+	}
+	Behind {
+		$footerMessage = "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion) - Update to $($updateStatus.LatestVersion) is available!"
+	}
+	Ahead {
+		$footerMessage = "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion) - Pre-release."
+	}
 }
 
 ## Footer object.
 $footerObject = [PSCustomObject]@{
-	text 		= "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion) $footerAddition"
+	text 		= $footerMessage
 	icon_url	= 'https://avatars0.githubusercontent.com/u/10629864'
 }
 
