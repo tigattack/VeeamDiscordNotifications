@@ -43,6 +43,12 @@ function ConvertTo-ByteUnit {
 				$Value += ' KB'
 				break
 			}
+			{$_ -lt 1KB} {
+				$Value = $Data
+				[String]$Value = [math]::Round($Value,2)
+				$Value += ' B'
+				break
+			}
 			default {
 				$Value = $Data
 				break
