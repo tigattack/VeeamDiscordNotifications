@@ -17,6 +17,9 @@ function DeploymentError {
 # Import Veeam module
 Import-Module Veeam.Backup.PowerShell -DisableNameChecking
 
+# Write notice
+Write-Output "`nPlease note: This script can currently only be used to configure VM backup jobs and VM replica jobs.`n"
+
 # Get all supported jobs
 $backupJobs = Get-VBRJob -WarningAction SilentlyContinue | Where-Object {$_.IsBackupJob -or $_.IsReplica}
 

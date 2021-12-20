@@ -49,7 +49,7 @@ until ($webhookUrl -match $webhookRegex)
 Write-Output "`nDo you wish to be mentioned in Discord when a job fails or finishes with warnings?"
 
 do {
-	$mentionPreference = Read-Host -Prompt "1 = No`n2 = On warn`n3 = On fail`n4 = 2 and 3`nYour choice"
+	$mentionPreference = Read-Host -Prompt "1 = No`n2 = On warn`n3 = On fail`n4 = On fail and on warn`nYour choice"
 	If (1..4 -notcontains $mentionPreference) {
 		Write-Output "`nInvalid choice. Please try again."
 	}
