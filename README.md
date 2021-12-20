@@ -1,6 +1,8 @@
 # Veeam Backup & Replication Notifications for Discord
 
-Sends notifications from Veeam Backup & Replication to Discord.
+Sends notifications from Veeam Backup & Replication to Discord, detailing session results and statistics and optionally alerting you via mention when a job finishes in a warning or failed state.
+
+![Chat Example](https://github.com/tigattack/VeeamDiscordNotifications/blob/master/asset/example.png)
 
 ## Installing
 
@@ -9,8 +11,6 @@ Sends notifications from Veeam Backup & Replication to Discord.
   * Open PowerShell (as Administrator) and run `C:\path\to\Installer.ps1`.
 * Option 2 - Manual install
   * Follow the [setup instructions](https://blog.tiga.tech/veeam-b-r-notifications-in-discord/).
-
-![Chat Example](https://github.com/tigattack/VeeamDiscordNotifications/blob/master/asset/example.png)
 
 ### Looking for volunteers
 
