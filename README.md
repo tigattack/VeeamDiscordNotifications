@@ -6,9 +6,15 @@ Send Veeam Backup & Replication session summary notifications to Discord, detail
 
 ## Installing
 
-* Option 1 - Install script
-  * Download [Installer.ps1](Installer.ps1).
-  * Open PowerShell (as Administrator) on your Veeam server and run `C:\path\to\Installer.ps1`.
+* Option 1 - Install script. This option will also optionally configure your any supported jobs to send Discord notifications.
+  1. Download [Installer.ps1](Installer.ps1).
+  2. Open PowerShell (as Administrator) on your Veeam server.
+  3. Run the following commands:
+      ```powershell
+      PS> Set-ExecutionPolicy -Scope Process -ExecutionPolicy Unrestricted -Force
+      PS> Unblock-File C:\path\to\Installer.ps1
+      PS> C:\path\to\Installer.ps1
+      ```
 * Option 2 - Manual install
   * Follow the [setup instructions](https://blog.tiga.tech/veeam-b-r-notifications-in-discord/).
 
@@ -22,7 +28,7 @@ As much as I love this project, free time is hard to find and some work is neede
 
 * VM Backup
 * VM Replication
-* Agents managed by backup server
+* Agent jobs managed by backup server
 
 ### Agent job caveats
 
