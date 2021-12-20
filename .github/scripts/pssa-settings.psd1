@@ -35,17 +35,17 @@
 			)
 		}
 		PSPlaceCloseBrace = @{
-            Enable = $true
-            NoEmptyLineBefore = $false
-            IgnoreOneLineBlock = $true
-            NewLineAfter = $true
-        }
+			Enable = $true
+			NoEmptyLineBefore = $false
+			IgnoreOneLineBlock = $true
+			NewLineAfter = $true
+		}
 		PSPlaceOpenBrace = @{
-            Enable = $true
-            OnSameLine = $true
-            NewLineAfter = $true
-            IgnoreOneLineBlock = $true
-        }
+			Enable = $true
+			OnSameLine = $true
+			NewLineAfter = $true
+			IgnoreOneLineBlock = $true
+		}
 		PSUseConsistentIndentation = @{
 			Enable = $true
 			IndentationSize = 4
@@ -53,8 +53,8 @@
 			Kind = 'tab'
 		}
 		PSAvoidLongLines = @{
-            Enable = $true
-            MaximumLineLength = 155
-        }
+			Enable = $true
+			MaximumLineLength = 155
+		}
 	}
 }
