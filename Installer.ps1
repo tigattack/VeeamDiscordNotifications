@@ -23,19 +23,26 @@ catch {
 
 # Check if this project is already installed and, if so, whether it's the latest version.
 if (Test-Path $rootPath\$project) {
-	Write-Output 'VeeamDiscordNotifications is already installed; Checking version.'
 	$installedVersion = Get-Content -Raw "$rootPath\$project\resources\version.txt"
 	If ($installedVersion -ge $latestVersion) {
-		Write-Output "VeeamDiscordNotifications is already up to date.`nExiting."
+		Write-Output "VeeamDiscordNotifications is already installed and up to date.`nExiting."
+		Start-Sleep -Seconds 5
 		exit
+	}
+	else {
+		Write-Output "VeeamDiscordNotifications is already installed but it's out of date!"
+		Write-Output "Please try the updater script in `"$rootPath\$project`" or download from https://github.com/tigattack/$project/releases."
 	}
 }
 
 # Check user has webhook URL ready
-$userPrompt = Read-Host -Prompt 'Do you have your Discord webhook URL ready? Y/N'
+do {
+	$webhookPrompt = Read-Host -Prompt 'Do you have your Discord webhook URL ready? Y/N'
+}
+until ($webhookPrompt -in 'Y', 'N')
 
 # Prompt user to create webhook first if not ready
-If ($userPrompt -ne 'Y') {
+If ($webhookPrompt -eq 'N') {
 	Write-Output 'Please create a Discord webhook before continuing.'
 	Write-Output 'Full instructions available at https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks'
 
@@ -143,6 +150,8 @@ Try {
 catch {
 	Write-Warning "Failed to write configuration file at `"$rootPath\$project\config\conf.json`". Please open the file and complete configuration manually."
 }
+
+Write-Output "Installation complete!`n"
 
 # Run Post Script action.
 & "$rootPath\$project\resources\DeployVeeamConfiguration.ps1"
