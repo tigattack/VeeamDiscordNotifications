@@ -153,5 +153,18 @@ catch {
 
 Write-Output "Installation complete!`n"
 
-# Run Post Script action.
-& "$rootPath\$project\resources\DeployVeeamConfiguration.ps1"
+# Run configuration deployment script.
+do {
+	$configPrompt = Read-Host -Prompt 'Would you like to automatically configure any of your jobs for Discord notifications? Y/N'
+}
+until ($configPrompt -in 'Y', 'N')
+
+If ($configPrompt -eq 'Y') {
+	Write-Output "`nRunning configuration deployment script...`n"
+	& "$rootPath\$project\resources\DeployVeeamConfiguration.ps1"
+}
+else {
+	Write-Output 'Exiting.'
+	Start-Sleep -Seconds 5
+	exit
+}
