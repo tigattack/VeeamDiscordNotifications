@@ -109,6 +109,7 @@ $DownloadParams = @{
 	OutFile = "$env:TEMP\$project-$release.zip"
 }
 Try {
+	Write-Output "`nDownloading $project $release from GitHub..."
 	Invoke-WebRequest @DownloadParams
 }
 catch {
@@ -119,6 +120,7 @@ catch {
 
 # Unblock downloaded ZIP
 try {
+	Write-Output 'Unblocking ZIP...'
 	Unblock-File -Path "$env:TEMP\$project-$release.zip"
 }
 catch {
@@ -128,9 +130,11 @@ catch {
 }
 
 # Extract release to destination path
+Write-Output "Extracting files to '$rootPath'..."
 Expand-Archive -Path "$env:TEMP\$project-$release.zip" -DestinationPath "$rootPath"
 
 # Rename destination and tidy up
+Write-Output "Renaming directory and tidying up..."
 Rename-Item -Path "$rootPath\$project-$release" -NewName "$project"
 Remove-Item -Path "$env:TEMP\$project-$release.zip"
 
@@ -162,13 +166,14 @@ Switch ($mentionPreference) {
 
 # Write config
 Try {
+	Write-Output 'Setting configuration...'
 	ConvertTo-Json $config | Set-Content "$rootPath\$project\config\conf.json"
 }
 catch {
 	Write-Warning "Failed to write configuration file at `"$rootPath\$project\config\conf.json`". Please open the file and complete configuration manually."
 }
 
-Write-Output "Installation complete!`n"
+Write-Output "`nInstallation complete!`n"
 
 # Run configuration deployment script.
 do {
