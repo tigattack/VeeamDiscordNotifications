@@ -51,7 +51,7 @@ $parentCmd = (Get-CimInstance Win32_Process -Filter "processid='$parentPID'").Co
 $jobId = ([regex]::Matches($parentCmd, $idRegex)).Value[0]
 $sessionId = ([regex]::Matches($parentCmd, $idRegex)).Value[1]
 
-# Get the Veeam job details and hide warnings to mute the warning regarding deprecation of the use of this cmdlet to get Agent job details.
+# Get the Veeam job details and hide warnings to mute the warning regarding deprecation of the use of some cmdlets to get certain job type details.
 # At time of writing, there is no alternative way to discover the job time.
 $job = Get-VBRJob -WarningAction SilentlyContinue | Where-Object {$_.Id.Guid -eq $jobId}
 
@@ -91,7 +91,7 @@ If ($config.debug_log) {
 
 	# Rename log file to include the job name.
 	Try {
-		Rename-Item -Path $logFile -NewName "$newLogfile"
+		Rename-Item -Path $logFile -NewName "$(Split-Path $newLogfile -Leaf)"
 	}
 	Catch {
 		Write-LogMessage -Tag 'ERROR' -Message "Failed to rename log file: $_"
