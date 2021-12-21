@@ -1,7 +1,8 @@
 # Settings for PSScriptAnalyzer invocation.
 @{
 	ExcludeRules = @(
-		'PSReviewUnusedParameter' # Required due to PowerShell/PSScriptAnalyzer#1472.
+		'PSReviewUnusedParameter', # Required due to PowerShell/PSScriptAnalyzer#1472.
+		'PSAvoidLongLines'
 	)
 	Rules = @{
 		PSAvoidUsingDoubleQuotesForConstantString = @{
