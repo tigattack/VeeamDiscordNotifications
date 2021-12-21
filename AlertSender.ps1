@@ -12,11 +12,12 @@ $Config = $Config | ConvertFrom-Json
 
 # Import modules.
 Import-Module Veeam.Backup.PowerShell -DisableNameChecking
-Import-Module "$PSScriptRoot\resources\Logger.psm1"
 Import-Module "$PSScriptRoot\resources\ConvertTo-ByteUnit.psm1"
-Import-Module "$PSScriptRoot\resources\VBRSessionInfo.psm1"
-Import-Module "$PSScriptRoot\resources\UpdateInfo.psm1"
+Import-Module "$PSScriptRoot\resources\Logger.psm1"
+Import-Module "$PSScriptRoot\resources\NotificationBuilder.psm1"
 Import-Module "$PSScriptRoot\resources\Test-FileIsLocked.psm1"
+Import-Module "$PSScriptRoot\resources\UpdateInfo.psm1"
+Import-Module "$PSScriptRoot\resources\VBRSessionInfo.psm1"
 
 
 # Start logging if logging is enabled in config
@@ -39,7 +40,6 @@ If ($Config.debug_log) {
 
 
 # Initialise some variables.
-$fieldArray = @()
 $mention = $false
 
 
@@ -64,25 +64,6 @@ Switch ($updateStatus.Status) {
 		$footerMessage = "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion)."
 	}
 }
-
-## Footer object.
-$footerObject = [PSCustomObject]@{
-	text 		= $footerMessage
-	icon_url	= 'https://avatars0.githubusercontent.com/u/10629864'
-}
-
-## Define thumbnail object.
-If ($Config.thumbnail) {
-	$thumbObject = [PSCustomObject]@{
-		url = $Config.thumbnail
-	}
-}
-Else {
-	$thumbObject = [PSCustomObject]@{
-		url = 'https://raw.githubusercontent.com/tigattack/VeeamDiscordNotifications/master/asset/thumb01.png'
-	}
-}
-
 
 # Job info preparation
 
@@ -286,37 +267,6 @@ Switch ($duration) {
 	}
 }
 
-## Add job times to fieldArray.
-$fieldArray += @(
-	[PSCustomObject]@{
-		name	= 'Job Duration'
-		value	= $durationFormatted
-		inline	= 'true'
-	}
-	[PSCustomObject]@{
-		name	= 'Time Started'
-		value	= "<t:$(([System.DateTimeOffset]$(Get-Date $jobStartTime)).ToUnixTimeSeconds())>"
-		inline	= 'true'
-	}
-	[PSCustomObject]@{
-		name	= 'Time Ended'
-		value	= "<t:$(([System.DateTimeOffset]$(Get-Date $jobEndTime)).ToUnixTimeSeconds())>"
-		inline	= 'true'
-	}
-)
-
-
-# If agent backup, add notice to fieldArray.
-If ($jobType -eq 'EpAgentBackup') {
-	$fieldArray += @(
-		[PSCustomObject]@{
-			name	= 'Notice'
-			value	= "Further details are missing due to limitations in Veeam's PowerShell module."
-			inline	= 'false'
-		}
-	)
-}
-
 # Define nice job type name
 Switch ($jobType) {
 	Backup 			{$jobTypeNice = 'VM Backup'}
@@ -352,35 +302,6 @@ Try {
 }
 Catch {
 	Write-LogMessage -Tag 'WARN' -Message "Unable to determine 'mention on warning' configuration. User will not be mentioned."
-}
-
-
-# Build embed object.
-$embedArray = @(
-	[PSCustomObject]@{
-		title		= $jobName
-		description	= "Session result: $status`nJob type: $jobTypeNice"
-		color		= $colour
-		thumbnail	= $thumbObject
-		fields		= $fieldArray
-		footer		= $footerObject
-		timestamp	= $((Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ss.fffK'))
-	}
-)
-
-# Create payload object.
-Switch ($mention) {
-	## Mention user on job failure if configured to do so.
-	$true {
-		$payload = [PSCustomObject]@{
-			content = "<@!$($Config.userid)> Job $status!"
-			embeds	= $embedArray
-		}
-	}
-	## Otherwise do not mention user.
-	$False {
-		$payload = [PSCustomObject]@{ embeds = $embedArray }
-	}
 }
 
 
