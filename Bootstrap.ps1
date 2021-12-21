@@ -1,34 +1,24 @@
-# Import modules
-Import-Module Veeam.Backup.PowerShell -DisableNameChecking
-Import-Module "$PSScriptRoot\resources\Logger.psm1"
-Import-Module "$PSScriptRoot\resources\VBRSessionInfo.psm1"
-
 # Set vars
 $configFile = "$PSScriptRoot\config\conf.json"
 $date = (Get-Date -UFormat %Y-%m-%d_%T).Replace(':','.')
-$logFile = "$PSScriptRoot\log\$($date)_Bootstrap.log"
 $idRegex = '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}'
 $supportedTypes = 'Backup', 'EpAgentBackup','Replica'
 
-# Start logging to file
-Start-Logging -Path $logFile
+# Retrieve configuration
+$config = Get-Content -Raw $ConfigPath | ConvertFrom-Json
 
-# Log version
-Write-LogMessage -Tag 'INFO' -Message "Version: $(Get-Content "$PSScriptRoot\resources\version.txt" -Raw)"
-
-# Retrieve configuration.
-## Pull config to PSCustomObject
-$config = Get-Content -Raw $configFile | ConvertFrom-Json # TODO: import config from param instead of later as file. Can then improve logging flow.
-
-# Stop logging and remove log file if logging is disable in config.
-If (-not $config.debug_log) {
-	Stop-Logging
-	Remove-Item $logFile -Force -ErrorAction SilentlyContinue
+# Start logging if enabled in config
+Switch ($config.debug_log) {
+	{$false -eq $_} {break}
+	default {
+		$logFile = "$PSScriptRoot\log\$($date)_Bootstrap.log"
+		Start-Logging -Path $logFile
+	}
 }
 
-## Pull raw config and format for later.
-## This is necessary since $config as a PSCustomObject was not passed through correctly with Start-Process and $powershellArguments.
-$configRaw = (Get-Content -Raw $configFile).Replace('"','\"').Replace("`n",'').Replace("`t",'').Replace('  ',' ')
+# Pull raw config and format for later.
+# This is necessary since $config as a PSCustomObject was not passed correctly with Start-Process and $powershellArguments, further down this script.
+$configRaw = (Get-Content -Raw $ConfigPath).Replace('"','\"').Replace("`n",'').Replace("`t",'').Replace('  ',' ')
 
 ## Test config.
 Try {
@@ -38,10 +28,19 @@ Try {
 			throw "Required configuration property is missing. Property: $i"
 		}
 	}
+	Write-LogMessage -Tag 'INFO' -Message 'Configuration schema validation succeeded.'
 }
 Catch {
 	Write-LogMessage -Tag 'ERROR' -Message "Failed to validate configuration: $_"
 }
+
+# Import modules
+Import-Module Veeam.Backup.PowerShell -DisableNameChecking
+Import-Module "$PSScriptRoot\resources\Logger.psm1"
+Import-Module "$PSScriptRoot\resources\VBRSessionInfo.psm1"
+
+# Log version
+Write-LogMessage -Tag 'INFO' -Message "Version: $(Get-Content "$PSScriptRoot\resources\version.txt" -Raw)"
 
 # Get the command line used to start the Veeam session.
 $parentPid = (Get-CimInstance Win32_Process -Filter "processid='$PID'").parentprocessid.ToString()
