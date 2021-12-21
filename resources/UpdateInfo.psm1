@@ -2,16 +2,28 @@ function Get-UpdateStatus {
 
 	process {
 		# Get currently downloaded version of this project.
-		$currentVersion = (Get-Content "$PSScriptRoot\version.txt" -Raw).Replace("`n",'')
+		$currentVersion = (Get-Content "$PSScriptRoot\version.txt" -Raw).Trim()
 
-		# Get latest release from GitHub.
+		# Get all releases from GitHub.
 		[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-		$latestRelease = Invoke-WebRequest -Uri https://github.com/tigattack/VeeamDiscordNotifications/releases/latest `
-			-Headers @{'Accept'='application/json'} -UseBasicParsing
+		try {
+			$releases = Invoke-RestMethod -Uri "https://api.github.com/repos/tigattack/$project/releases" -Method Get
+		}
+		catch {
+			$versionStatusCode = $_.Exception.Response.StatusCode.value__
+			Write-LogMessage -Tag 'ERROR' -Message "Failed to query GitHub for the latest version. Please check your internet connection and try again. Status code: $versionStatusCode"
+			exit 1
+		}
 
-		# Release IDs are returned in a format of {"id":3622206,"tag_name":"v1.0"}, so we need to extract tag_name.
-		$latestVersion = ConvertFrom-Json $latestRelease.Content | ForEach-Object {$_.tag_name}
+		# Get latest stable
+		foreach ($i in $releases) {
+			if (-not $i.prerelease) {
+				$latestVersion = $i.tag_name
+				break
+			}
+		}
 
+		# Set version status
 		If ($currentVersion -gt $latestVersion) {
 			$status = 'Ahead'
 		}
