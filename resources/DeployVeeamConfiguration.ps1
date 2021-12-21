@@ -1,3 +1,13 @@
+<#
+TODO:
+Test-Path to Bootstrap and DiscordNotificationBootstrap to allow for configuration of older versions.
+If neither found, prompt for path and test for existence.
+
+Refactor; much of both foreach loops is repeated, need more functions.
+
+Sort by name L46
+#>
+
 # Function to be used when an error is encountered
 function DeploymentError {
 	$issues = 'https://github.com/tigattack/VeeamDiscordNotifications/issues'
