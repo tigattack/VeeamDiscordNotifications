@@ -46,6 +46,34 @@ else {
 	Format-Table -InputObject $backupJobs -Property Name,@{Name='Type'; Expression={$_.TypeToString}} -AutoSize
 }
 
+# Query config backup
+do {
+	$backupChoice = Read-Host -Prompt 'This script can make a Veeam configuration backup for you before making any changes. Do you want to create a backup now? Y/N'
+}
+until ($backupChoice -in 'Y','N')
+
+If ($backupChoice -eq 'Y') {
+	# Run backup
+	Write-Output 'Creating backup, please wait...'
+	($backupResult = Start-VBRConfigurationBackupJob) | Out-Null
+	if ($backupResult.Result -ne 'Failed') {
+		Write-Output 'Backup completed successfully.'
+	}
+	else {
+		do {
+			$continueChoice = Read-Host -Prompt 'Backup failed. Do you want to continue anyway? Y/N'
+		} until ($continueChoice -in 'Y','N')
+		if ($continueChoice -eq 'N') {
+			Write-Output 'Exiting.'
+			Start-Sleep 10
+			exit
+		}
+		else {
+			Write-Output 'Continuing anyway.'
+		}
+	}
+}
+
 # Query configure all or selected jobs
 do {
 	$configChoice = Read-Host -Prompt 'Do you wish to configure all supported jobs, make a decision for each job, or configure none? A(ll)/D(ecide)/N(one)'
