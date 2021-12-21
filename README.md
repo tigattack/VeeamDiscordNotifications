@@ -20,11 +20,11 @@ Send Veeam Backup & Replication session summary notifications to Discord, detail
 * Option 2 - Manual install
   * Follow the [setup instructions](https://blog.tiga.tech/veeam-b-r-notifications-in-discord/).
 
-### Looking for volunteers
+### Looking for collaborators
 
-If you enjoy this project and would like to help out, please do so. If you're interested in helping out, contact me on Discord - `tigatack#7987`
-
-As much as I love this project, free time is hard to find and some work is needed to add functionality for more types of jobs, add more optional detail to outputs, and to bring this project in-line with recent changes in Veeam Backup & Replication (VBR) and VBR's PowerShell module.
+If you enjoy this project and would like to help out, please get in contact with me on Discord - `tigatack#7987`.  
+I have so many ideas for this project but free time is hard to find. Having someone to work with me on it would be amazing. Work is needed to add functionality for more types of jobs, add more optional detail to outputs, bring this project in-line with recent changes in Veeam Backup & Replication (VBR) and VBR's PowerShell module.  
+I'd also like to bring the [Slack fork](https://github.com/tigattack/VeeamSlackNotifications) and [Teams fork](https://github.com/tigattack/VeeamTeamsNotifications) up to date, possibly even rebranding this repository or creating a new one and adding functionality for all three into the single set of scripts.
 
 ## Supported Job Types
 
