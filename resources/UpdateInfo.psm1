@@ -18,16 +18,33 @@ function Get-UpdateStatus {
 		# Get latest stable
 		foreach ($i in $releases) {
 			if (-not $i.prerelease) {
-				$latestVersion = $i.tag_name
+				$latestStable = $i.tag_name
+				break
+			}
+		}
+
+		# Get latest prerelease
+		foreach ($i in $releases) {
+			if ($i.prerelease) {
+				$latestPrerelease = $i.tag_name
+				break
+			}
+		}
+
+		# Determine if prerelease
+		$prerelease = $false
+		foreach ($i in $releases) {
+			if ($i.tag_name -eq $currentVersion -and $i.prerelease) {
+				$prerelease = $true
 				break
 			}
 		}
 
 		# Set version status
-		If ($currentVersion -gt $latestVersion) {
+		If ($currentVersion -gt $latestStable) {
 			$status = 'Ahead'
 		}
-		elseif ($currentVersion -lt $latestVersion) {
+		elseif ($currentVersion -lt $latestStable) {
 			$status = 'Behind'
 		}
 		else {
@@ -36,9 +53,11 @@ function Get-UpdateStatus {
 
 		# Create PSObject to return.
 		$out = New-Object PSObject -Property @{
-			CurrentVersion 	= $currentVersion
-			LatestVersion 	= $latestVersion
-			Status 			= $status
+			CurrentVersion   = $currentVersion
+			LatestStable     = $latestStable
+			LatestPrerelease = $latestPrerelease
+			Prerelease       = $prerelease
+			Status           = $status
 		}
 
 		# Return PSObject.

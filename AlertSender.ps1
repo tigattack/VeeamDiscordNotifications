@@ -50,7 +50,7 @@ Switch ($updateStatus.Status) {
 		$footerMessage = "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion) - Up to date."
 	}
 	Behind {
-		$footerMessage = "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion) - Update to $($updateStatus.LatestVersion) is available!"
+		$footerMessage = "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion) - Update to $($updateStatus.LatestStable) is available!"
 	}
 	Ahead {
 		$footerMessage = "tigattack's VeeamDiscordNotifications $($updateStatus.CurrentVersion) - Pre-release."
@@ -389,7 +389,7 @@ Catch [System.Net.WebException] {
 
 
 # If newer version available...
-If ($updateStatus.CurrentVersion -lt $updateStatus.latestVersion) {
+If ($updateStatus.CurrentVersion -lt $updateStatus.latestStable) {
 
 	# Trigger update if configured to do so.
 	If ($Config.self_update) {
@@ -399,12 +399,12 @@ If ($updateStatus.CurrentVersion -lt $updateStatus.latestVersion) {
 		Unblock-File $PSScriptRoot\..\VDNotifs-Updater.ps1
 
 		# Run update script.
-		$updateArgs = "-file $PSScriptRoot\..\VDNotifs-Updater.ps1", "-LatestVersion $latestVersion"
+		$updateArgs = "-file $PSScriptRoot\..\VDNotifs-Updater.ps1", "-LatestVersion $latestStable"
 		Start-Process -FilePath 'powershell' -Verb runAs -ArgumentList $updateArgs -WindowStyle hidden
 	}
 
 	# Send update notice if configured to do so.
-	If ($false -ne $Config.notify_update) {
+	If ($Config.notify_update) {
 
 		# Define
 		$updateNotice = [PSCustomObject]@{
