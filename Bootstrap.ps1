@@ -1,5 +1,9 @@
+# Define parameters
+Param(
+	[string]$ConfigPath = "$PSScriptRoot\config\conf.json"
+)
+
 # Set vars
-$configFile = "$PSScriptRoot\config\conf.json"
 $date = (Get-Date -UFormat %Y-%m-%d_%T).Replace(':','.')
 $idRegex = '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}'
 $supportedTypes = 'Backup', 'EpAgentBackup','Replica'
