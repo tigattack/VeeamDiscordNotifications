@@ -7,8 +7,19 @@ $webhookRegex = 'https:\/\/(.*\.)?discord(app)?\.com\/api\/webhooks\/([^\/]+)\/(
 
 # Get latest release from GitHub
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$latestVersion = ((Invoke-WebRequest -Uri "https://github.com/tigattack/$project/releases/latest" `
-			-Headers @{'Accept'='application/json'} -UseBasicParsing).Content | ConvertFrom-Json).tag_name
+$versionParams = @{
+	Uri = "https://github.com/tigattack/$project/releases/latest"
+	Headers = @{'Accept'='application/json'}
+	UseBasicParsing = $true
+}
+try {
+	$latestVersion = ((Invoke-WebRequest @versionParams).Content | ConvertFrom-Json).tag_name
+}
+catch {
+	$versionStatusCode = $_.Exception.Response.StatusCode.value__
+	Write-Warning "Failed to query GitHub for the latest version. Please check your internet connection and try again.`nStatus code: $versionStatusCode"
+	exit 1
+}
 
 # Check if this project is already installed and, if so, whether it's the latest version.
 if (Test-Path $rootPath\$project) {
@@ -69,12 +80,28 @@ If ($mentionPreference -ne 1) {
 }
 
 # Pull latest version of script from GitHub
-Invoke-WebRequest -Uri `
-	"https://github.com/tigattack/$project/releases/download/$latestVersion/$project-$latestVersion.zip" `
-	-OutFile "$env:TEMP\$project-$latestVersion.zip"
+$DownloadParams = @{
+	Uri = "https://github.com/tigattack/$project/releases/download/$latestVersion/$project-$latestVersion.zip"
+	OutFile = "$env:TEMP\$project-$latestVersion.zip"
+}
+Try {
+	Invoke-WebRequest @DownloadParams
+}
+catch {
+	$downloadStatusCode = $_.Exception.Response.StatusCode.value__
+	Write-Warning "Failed to download $project $latestVersion. Please check your internet connection and try again.`nStatus code: $downloadStatusCode"
+	exit 1
+}
 
 # Unblock downloaded ZIP
-Unblock-File -Path "$env:TEMP\$project-$latestVersion.zip"
+try {
+	Unblock-File -Path "$env:TEMP\$project-$latestVersion.zip"
+}
+catch {
+	Write-Warning 'Failed to unblock downloaded files. You will need to run the following commands manually once installation is complete:'
+	Write-Output "Unblock-File -Path $rootPath\$project\*.ps*"
+	Write-Output "Unblock-File -Path $rootPath\$project\resources\*.ps*"
+}
 
 # Extract release to destination path
 Expand-Archive -Path "$env:TEMP\$project-$latestVersion.zip" -DestinationPath "$rootPath"
@@ -110,7 +137,12 @@ Switch ($mentionPreference) {
 }
 
 # Write config
-ConvertTo-Json $config | Set-Content "$rootPath\$project\config\conf.json"
+Try {
+	ConvertTo-Json $config | Set-Content "$rootPath\$project\config\conf.json"
+}
+catch {
+	Write-Warning "Failed to write configuration file at `"$rootPath\$project\config\conf.json`". Please open the file and complete configuration manually."
+}
 
 # Run Post Script action.
 & "$rootPath\$project\resources\DeployVeeamConfiguration.ps1"
