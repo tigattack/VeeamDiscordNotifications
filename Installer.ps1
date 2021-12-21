@@ -32,17 +32,17 @@ foreach ($i in $releases) {
 
 # Query release stream
 if ($releases[0].prerelease) {
-    do {
+	do {
 		$prereleaseQuery = Read-Host -Prompt "Do you wish to install the latest prelease version $($latestPrerelease)? Y/N"
-    }
-    until ($prereleaseQuery -in 'Y','N')
+	}
+	until ($prereleaseQuery -in 'Y', 'N')
 
-    if ($prereleaseQuery -eq 'Y') {
+	if ($prereleaseQuery -eq 'Y') {
 		$release = $latestPrerelease
-    }
-    else {
+	}
+	else {
 		$release = $latestStable
-    }
+	}
 }
 else {
 	$release = $latestStable
@@ -64,7 +64,7 @@ if (Test-Path $rootPath\$project) {
 
 # Pull latest version of script from GitHub
 $DownloadParams = @{
-	Uri = "https://github.com/tigattack/$project/releases/download/$release/$project-$release.zip"
+	Uri     = "https://github.com/tigattack/$project/releases/download/$release/$project-$release.zip"
 	OutFile = "$env:TEMP\$project-$release.zip"
 }
 Try {
@@ -187,7 +187,7 @@ If ($mentionOnWarnExist) {
 
 elseif ($mentionOnFailExist) {
 	do {
-		$mentionPreference = Read-Host -Prompt "Do you wish to be mentioned in Discord when a job finishes in a failed state? Y/N"
+		$mentionPreference = Read-Host -Prompt 'Do you wish to be mentioned in Discord when a job finishes in a failed state? Y/N'
 	}
 	until ($mentionPreference -in 'Y', 'N')
 
