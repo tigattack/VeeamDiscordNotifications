@@ -19,20 +19,29 @@ catch {
 foreach ($i in $releases) {
 	if ($i.prerelease) {
 		$latestPrerelease = $i.tag_name
+		break
 	}
-	else {
+}
+foreach ($i in $releases) {
+	if (-not $i.prerelease) {
 		$latestStable = $i.tag_name
+		break
 	}
 }
 
 # Query release stream
-do {
-	$prereleaseQuery = Read-Host -Prompt "Do you wish to install prelease version $latestPrerelease? Y/N"
-}
-until ($prereleaseQuery -in 'Y','N')
+if ($releases[0].prerelease) {
+    do {
+		$prereleaseQuery = Read-Host -Prompt "Do you wish to install the latest prelease version $($latestPrerelease)? Y/N"
+    }
+    until ($prereleaseQuery -in 'Y','N')
 
-if ($prereleaseQuery -eq 'Y') {
-	$release = $latestPrerelease
+    if ($prereleaseQuery -eq 'Y') {
+		$release = $latestPrerelease
+    }
+    else {
+		$release = $latestStable
+    }
 }
 else {
 	$release = $latestStable
