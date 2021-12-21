@@ -7,13 +7,8 @@ $webhookRegex = 'https:\/\/(.*\.)?discord(app)?\.com\/api\/webhooks\/([^\/]+)\/(
 
 # Get latest release from GitHub
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$versionParams = @{
-	Uri = "https://github.com/tigattack/$project/releases/latest"
-	Headers = @{'Accept'='application/json'}
-	UseBasicParsing = $true
-}
 try {
-	$latestVersion = ((Invoke-WebRequest @versionParams).Content | ConvertFrom-Json).tag_name
+	$releases = Invoke-RestMethod -Uri "https://api.github.com/repos/tigattack/$project/releases" -Method Get
 }
 catch {
 	$versionStatusCode = $_.Exception.Response.StatusCode.value__
@@ -21,10 +16,32 @@ catch {
 	exit 1
 }
 
+foreach ($i in $releases) {
+	if ($i.prerelease) {
+		$latestPrerelease = $i.tag_name
+	}
+	else {
+		$latestStable = $i.tag_name
+	}
+}
+
+# Query release stream
+do {
+	$prereleaseQuery = Read-Host -Prompt "Do you wish to install prelease version $latestPrerelease? Y/N"
+}
+until ($prereleaseQuery -in 'Y','N')
+
+if ($prereleaseQuery -eq 'Y') {
+	$release = $latestPrerelease
+}
+else {
+	$release = $latestStable
+}
+
 # Check if this project is already installed and, if so, whether it's the latest version.
 if (Test-Path $rootPath\$project) {
 	$installedVersion = Get-Content -Raw "$rootPath\$project\resources\version.txt"
-	If ($installedVersion -ge $latestVersion) {
+	If ($installedVersion -ge $release) {
 		Write-Output "VeeamDiscordNotifications is already installed and up to date.`nExiting."
 		Start-Sleep -Seconds 5
 		exit
@@ -88,21 +105,21 @@ If ($mentionPreference -ne 1) {
 
 # Pull latest version of script from GitHub
 $DownloadParams = @{
-	Uri = "https://github.com/tigattack/$project/releases/download/$latestVersion/$project-$latestVersion.zip"
-	OutFile = "$env:TEMP\$project-$latestVersion.zip"
+	Uri = "https://github.com/tigattack/$project/releases/download/$release/$project-$release.zip"
+	OutFile = "$env:TEMP\$project-$release.zip"
 }
 Try {
 	Invoke-WebRequest @DownloadParams
 }
 catch {
 	$downloadStatusCode = $_.Exception.Response.StatusCode.value__
-	Write-Warning "Failed to download $project $latestVersion. Please check your internet connection and try again.`nStatus code: $downloadStatusCode"
+	Write-Warning "Failed to download $project $release. Please check your internet connection and try again.`nStatus code: $downloadStatusCode"
 	exit 1
 }
 
 # Unblock downloaded ZIP
 try {
-	Unblock-File -Path "$env:TEMP\$project-$latestVersion.zip"
+	Unblock-File -Path "$env:TEMP\$project-$release.zip"
 }
 catch {
 	Write-Warning 'Failed to unblock downloaded files. You will need to run the following commands manually once installation is complete:'
@@ -111,11 +128,11 @@ catch {
 }
 
 # Extract release to destination path
-Expand-Archive -Path "$env:TEMP\$project-$latestVersion.zip" -DestinationPath "$rootPath"
+Expand-Archive -Path "$env:TEMP\$project-$release.zip" -DestinationPath "$rootPath"
 
 # Rename destination and tidy up
-Rename-Item -Path "$rootPath\$project-$latestVersion" -NewName "$project"
-Remove-Item -Path "$env:TEMP\$project-$latestVersion.zip"
+Rename-Item -Path "$rootPath\$project-$release" -NewName "$project"
+Remove-Item -Path "$env:TEMP\$project-$release.zip"
 
 # Get config
 $config = Get-Content "$rootPath\$project\config\conf.json" -Raw | ConvertFrom-Json
