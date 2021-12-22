@@ -22,11 +22,16 @@ Import-Module "$PSScriptRoot\resources\Test-FileIsLocked.psm1"
 # Start logging if logging is enabled in config
 If ($Config.debug_log) {
 	## Wait until log file is closed by Bootstrap.ps1
-	do {
-		$logLocked = $(Test-FileIsLocked -Path "$Logfile").IsLocked
-		Start-Sleep -Seconds 1
+	try {
+		do {
+			$logLocked = $(Test-FileIsLocked -Path "$Logfile" -ErrorAction Stop).IsLocked
+			Start-Sleep -Seconds 1
+		}
+		until (-not $logLocked)
 	}
-	until (-not $logLocked)
+	catch [System.Management.Automation.ItemNotFoundException] {
+		Write-LogMessage -Tag 'INFO' -Message 'Log file not found. Starting logging to new file.'
+	}
 
 	## Start logging to file
 	Start-Logging -Path $Logfile -Append
