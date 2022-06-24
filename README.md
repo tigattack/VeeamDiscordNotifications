@@ -1,5 +1,11 @@
 # Veeam Backup & Replication Notifications for Discord
 
+## VeeamDiscordNotifications has been replaced by [VeeamNotify](https://github.com/tigattack/VeeamNotify).
+
+This repository is now archived.
+
+---
+
 Send Veeam Backup & Replication session summary notifications to Discord, detailing session result and statistics and optionally alerting you via mention when a job finishes in a warning or failed state.
 
 <a href="https://github.com/tigattack/VeeamDiscordNotifications/blob/master/asset/embeds.png"><img src="https://github.com/tigattack/VeeamDiscordNotifications/blob/dev/asset/embeds-small.png?raw=true" alt="Notification Example" width="90%"/></a>
